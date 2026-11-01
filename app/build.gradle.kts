@@ -13,10 +13,12 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.bundles.navigation3)
     implementation(libs.bundles.koin.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
 
     // core
     implementation(projects.core.navigation)
     implementation(projects.core.designsystem)
+    implementation(projects.core.model)
     implementation(projects.core.database)
     implementation(projects.core.datastore)
     implementation(projects.core.network)

@@ -21,17 +21,17 @@ fun CoupleDateSummary(
     daysSinceStart: Int,
     coupleDate: String?,
     showDatePicker: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier
-            .clickable(
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() },
-                onClick = showDatePicker
-            )
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier =
+            modifier
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() },
+                    onClick = showDatePicker,
+                ).padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = stringResource(R.string.day_count, daysSinceStart),

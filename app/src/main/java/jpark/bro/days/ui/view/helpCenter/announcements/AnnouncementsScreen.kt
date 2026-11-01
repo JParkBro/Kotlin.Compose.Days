@@ -11,29 +11,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
-import jpark.bro.days.ui.view.common.DaysDefaultTopBar
 import jpark.bro.days.R
+import jpark.bro.days.ui.view.common.DaysDefaultTopBar
 
 @Composable
-fun AnnouncementsScreen(
-    navController: NavController
-) {
+fun AnnouncementsScreen(navController: NavController) {
     Scaffold(
         topBar = {
             DaysDefaultTopBar(
                 navController = navController,
-                title = stringResource(R.string.announcements)
+                title = stringResource(R.string.announcements),
             )
         },
-        modifier = Modifier
-            .fillMaxSize()
+        modifier =
+            Modifier
+                .fillMaxSize(),
     ) { innerPadding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(text = stringResource(R.string.no_announcements))
         }

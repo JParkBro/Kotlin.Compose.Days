@@ -27,30 +27,33 @@ fun DaysCustomTopBar(
     startContent: @Composable () -> Unit = {},
     centerContent: @Composable () -> Unit = {},
     endContent: @Composable () -> Unit = {},
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(96.dp)
-            .padding(WindowInsets.statusBars.asPaddingValues())
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .height(96.dp)
+                .padding(WindowInsets.statusBars.asPaddingValues()),
     ) {
         Box(
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .padding(start = 16.dp)
+            modifier =
+                Modifier
+                    .align(Alignment.CenterStart)
+                    .padding(start = 16.dp),
         ) {
             startContent()
         }
         Box(
-            modifier = Modifier.align(Alignment.Center)
+            modifier = Modifier.align(Alignment.Center),
         ) {
             centerContent()
         }
         Box(
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .padding(end = 16.dp)
+            modifier =
+                Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 16.dp),
         ) {
             endContent()
         }
@@ -62,20 +65,20 @@ fun DaysCustomTopBar(
 fun DaysDefaultTopBar(
     navController: NavController,
     title: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     TopAppBar(
         title = { Text(text = title) },
         navigationIcon = {
             IconButton(
-                onClick = { navController.navigateUp() }
+                onClick = { navController.navigateUp() },
             ) {
                 Icon(
                     painter = painterResource(R.drawable.arrow_back_24),
-                    contentDescription = stringResource(R.string.arrow_back_icon)
+                    contentDescription = stringResource(R.string.arrow_back_icon),
                 )
             }
         },
-        modifier = modifier
+        modifier = modifier,
     )
 }

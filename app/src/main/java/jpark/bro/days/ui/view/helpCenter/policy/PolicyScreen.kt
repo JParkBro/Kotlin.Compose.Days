@@ -20,65 +20,65 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
-import jpark.bro.days.ui.view.common.DaysDefaultTopBar
 import jpark.bro.days.R
+import jpark.bro.days.ui.view.common.DaysDefaultTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PolicyScreen(
-    navController: NavController
-) {
+fun PolicyScreen(navController: NavController) {
     val context = LocalContext.current
     Scaffold(
         topBar = {
             DaysDefaultTopBar(
                 navController = navController,
-                title = stringResource(R.string.policy)
+                title = stringResource(R.string.policy),
             )
         },
-        modifier = Modifier
-            .fillMaxSize()
+        modifier =
+            Modifier
+                .fillMaxSize(),
     ) { innerPadding ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
         ) {
             Column {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable(
-                            onClick = {
-                                val uri = "https://sites.google.com/view/jparkbro-days"
-                                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(uri)))
-                            },
-                        )
-                        .padding(horizontal = 16.dp, vertical = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable(
+                                onClick = {
+                                    val uri = "https://sites.google.com/view/jparkbro-days"
+                                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(uri)))
+                                },
+                            ).padding(horizontal = 16.dp, vertical = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
                         text = stringResource(R.string.privacy_policy),
                         modifier = Modifier,
-                        fontSize = 18.sp
+                        fontSize = 18.sp,
                     )
                 }
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable(
-                            onClick = {
-                                OssLicensesMenuActivity.setActivityTitle(context.getString(R.string.oss_licenses))
-                                context.startActivity(Intent(context, OssLicensesMenuActivity::class.java))
-                            },
-                        )
-                        .padding(horizontal = 16.dp, vertical = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable(
+                                onClick = {
+                                    OssLicensesMenuActivity.setActivityTitle(context.getString(R.string.oss_licenses))
+                                    context.startActivity(Intent(context, OssLicensesMenuActivity::class.java))
+                                },
+                            ).padding(horizontal = 16.dp, vertical = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
                         text = stringResource(R.string.oss_licenses),
                         modifier = Modifier,
-                        fontSize = 18.sp
+                        fontSize = 18.sp,
                     )
                 }
             }

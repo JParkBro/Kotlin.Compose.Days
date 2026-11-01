@@ -52,14 +52,15 @@ fun <T> DaysPicker(
     textStyle: TextStyle = LocalTextStyle.current,
     selectedTextStyle: TextStyle = LocalTextStyle.current,
     itemPadding: PaddingValues = PaddingValues(8.dp),
-    fadingEdgeGradient: Brush = Brush.verticalGradient(
-        0f to Color.Transparent,
-        0.5f to Color.Black,
-        1f to Color.Transparent
-    ),
+    fadingEdgeGradient: Brush =
+        Brush.verticalGradient(
+            0f to Color.Transparent,
+            0.5f to Color.Black,
+            1f to Color.Transparent,
+        ),
     horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
     itemTextAlignment: Alignment.Vertical = Alignment.CenterVertically,
-    onSelectedChange: (T?) -> Unit = {}
+    onSelectedChange: (T?) -> Unit = {},
 ) {
     val density = LocalDensity.current
     val visibleItemsMiddle = remember { visibleItemsCount / 2 }
@@ -74,9 +75,10 @@ fun <T> DaysPicker(
     val listState = rememberLazyListState(initialFirstVisibleItemIndex = listStartIndex)
     val flingBehavior = rememberSnapFlingBehavior(lazyListState = listState)
 
-    val itemHeight = with(density) {
-        selectedTextStyle.fontSize.toDp() + itemPadding.calculateTopPadding() + itemPadding.calculateBottomPadding()
-    }
+    val itemHeight =
+        with(density) {
+            selectedTextStyle.fontSize.toDp() + itemPadding.calculateTopPadding() + itemPadding.calculateBottomPadding()
+        }
 
     LaunchedEffect(listState) {
         snapshotFlow { listState.firstVisibleItemIndex }
@@ -88,17 +90,18 @@ fun <T> DaysPicker(
             }
     }
     Box(
-        modifier = modifier
+        modifier = modifier,
     ) {
         LazyColumn(
             state = listState,
             flingBehavior = flingBehavior,
             horizontalAlignment = horizontalAlignment,
-            modifier = Modifier
-                .align(Alignment.Center)
-                .wrapContentSize()
-                .height(itemHeight * visibleItemsCount)
-                .fadingEdge(fadingEdgeGradient)
+            modifier =
+                Modifier
+                    .align(Alignment.Center)
+                    .wrapContentSize()
+                    .height(itemHeight * visibleItemsCount)
+                    .fadingEdge(fadingEdgeGradient),
         ) {
             items(
                 listScrollCount,
@@ -125,44 +128,50 @@ fun <T> DaysPicker(
                     text = currentItemText,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    style = textStyle.copy(
-                        fontSize = lerp(
-                            selectedTextStyle.fontSize,
-                            textStyle.fontSize,
-                            fraction
+                    style =
+                        textStyle.copy(
+                            fontSize =
+                                lerp(
+                                    selectedTextStyle.fontSize,
+                                    textStyle.fontSize,
+                                    fraction,
+                                ),
+                            color =
+                                lerp(
+                                    selectedTextStyle.color,
+                                    textStyle.color,
+                                    fraction,
+                                ),
                         ),
-                        color = lerp(
-                            selectedTextStyle.color,
-                            textStyle.color,
-                            fraction
-                        )
-                    ),
                     textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .height(itemHeight)
-                        .wrapContentHeight(align = itemTextAlignment)
-                        .fillParentMaxWidth()
-                        .then(textModifier)
-                        .semantics { contentDescription = currentItemText }
+                    modifier =
+                        Modifier
+                            .height(itemHeight)
+                            .wrapContentHeight(align = itemTextAlignment)
+                            .fillParentMaxWidth()
+                            .then(textModifier)
+                            .semantics { contentDescription = currentItemText },
                 )
             }
         }
         Box(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .fillMaxWidth()
-                .height(itemHeight)
-                .background(
-                    color = Color.LightGray.copy(alpha = 0.2f),
-                    shape = RoundedCornerShape(8.dp)
-                )
+            modifier =
+                Modifier
+                    .align(Alignment.Center)
+                    .fillMaxWidth()
+                    .height(itemHeight)
+                    .background(
+                        color = Color.LightGray.copy(alpha = 0.2f),
+                        shape = RoundedCornerShape(8.dp),
+                    ),
         )
     }
 }
 
-private fun Modifier.fadingEdge(brush: Brush) = this
-    .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
-    .drawWithContent {
-        drawContent()
-        drawRect(brush = brush, blendMode = BlendMode.DstIn)
-    }
+private fun Modifier.fadingEdge(brush: Brush) =
+    this
+        .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
+        .drawWithContent {
+            drawContent()
+            drawRect(brush = brush, blendMode = BlendMode.DstIn)
+        }

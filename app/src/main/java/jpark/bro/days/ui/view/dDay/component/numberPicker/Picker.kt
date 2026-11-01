@@ -18,10 +18,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -32,13 +32,13 @@ import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
-import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.mapNotNull
 import kotlin.math.abs
@@ -55,49 +55,54 @@ fun <T> Picker(
     selectedTextStyle: TextStyle = LocalTextStyle.current,
     dividerColor: Color = LocalContentColor.current,
     itemPadding: PaddingValues = PaddingValues(8.dp),
-    fadingEdgeGradient: Brush = Brush.verticalGradient(
-        0f to Color.Transparent,
-        0.5f to Color.Black,
-        1f to Color.Transparent
-    ),
+    fadingEdgeGradient: Brush =
+        Brush.verticalGradient(
+            0f to Color.Transparent,
+            0.5f to Color.Black,
+            1f to Color.Transparent,
+        ),
     horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
     itemTextAlignment: Alignment.Vertical = Alignment.CenterVertically,
     dividerThickness: Dp = 1.dp,
     dividerShape: Shape = RoundedCornerShape(10.dp),
-    isInfinity: Boolean = true
+    isInfinity: Boolean = true,
 ) {
     val density = LocalDensity.current
     val visibleItemsMiddle = remember { visibleItemsCount / 2 }
 
-    val adjustedItems = if (!isInfinity) {
-        listOf(null) + items + listOf(null)
-    } else {
-        items
-    }
+    val adjustedItems =
+        if (!isInfinity) {
+            listOf(null) + items + listOf(null)
+        } else {
+            items
+        }
 
-    val listScrollCount = if (isInfinity) {
-        Int.MAX_VALUE
-    } else {
-        adjustedItems.size
-    }
+    val listScrollCount =
+        if (isInfinity) {
+            Int.MAX_VALUE
+        } else {
+            adjustedItems.size
+        }
 
     val listScrollMiddle = remember { listScrollCount / 2 }
-    val listStartIndex = remember {
-        if (isInfinity) {
-            listScrollMiddle - listScrollMiddle % adjustedItems.size - visibleItemsMiddle + startIndex
-        } else {
-            startIndex + 1
+    val listStartIndex =
+        remember {
+            if (isInfinity) {
+                listScrollMiddle - listScrollMiddle % adjustedItems.size - visibleItemsMiddle + startIndex
+            } else {
+                startIndex + 1
+            }
         }
-    }
 
     fun getItem(index: Int) = adjustedItems[index % adjustedItems.size]
 
     val listState = rememberLazyListState(initialFirstVisibleItemIndex = listStartIndex)
     val flingBehavior = rememberSnapFlingBehavior(lazyListState = listState)
 
-    val itemHeight = with(density) {
-        selectedTextStyle.fontSize.toDp() + itemPadding.calculateTopPadding() + itemPadding.calculateBottomPadding()
-    }
+    val itemHeight =
+        with(density) {
+            selectedTextStyle.fontSize.toDp() + itemPadding.calculateTopPadding() + itemPadding.calculateBottomPadding()
+        }
 
     LaunchedEffect(listState) {
         snapshotFlow { listState.firstVisibleItemIndex }
@@ -111,11 +116,12 @@ fun <T> Picker(
             state = listState,
             flingBehavior = flingBehavior,
             horizontalAlignment = horizontalAlignment,
-            modifier = Modifier
-                .align(Alignment.Center)
-                .wrapContentSize()
-                .height(itemHeight * visibleItemsCount)
-                .fadingEdge(fadingEdgeGradient)
+            modifier =
+                Modifier
+                    .align(Alignment.Center)
+                    .wrapContentSize()
+                    .height(itemHeight * visibleItemsCount)
+                    .fadingEdge(fadingEdgeGradient),
         ) {
             items(
                 listScrollCount,
@@ -142,64 +148,70 @@ fun <T> Picker(
                     text = currentItemText,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    style = textStyle.copy(
-                        fontSize = lerp(
-                            selectedTextStyle.fontSize,
-                            textStyle.fontSize,
-                            fraction
+                    style =
+                        textStyle.copy(
+                            fontSize =
+                                lerp(
+                                    selectedTextStyle.fontSize,
+                                    textStyle.fontSize,
+                                    fraction,
+                                ),
+                            color =
+                                lerp(
+                                    selectedTextStyle.color,
+                                    textStyle.color,
+                                    fraction,
+                                ),
                         ),
-                        color = lerp(
-                            selectedTextStyle.color,
-                            textStyle.color,
-                            fraction
-                        )
-                    ),
                     textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .height(itemHeight)
-                        .wrapContentHeight(align = itemTextAlignment)
-                        .fillParentMaxWidth()
-                        .then(textModifier)
+                    modifier =
+                        Modifier
+                            .height(itemHeight)
+                            .wrapContentHeight(align = itemTextAlignment)
+                            .fillParentMaxWidth()
+                            .then(textModifier),
                 )
             }
         }
 
         Box(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .fillMaxWidth()
-                .height(itemHeight)
+            modifier =
+                Modifier
+                    .align(Alignment.Center)
+                    .fillMaxWidth()
+                    .height(itemHeight),
         ) {
             HorizontalDivider(
                 color = dividerColor,
                 thickness = dividerThickness,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = dividerColor,
-                        shape = dividerShape
-                    )
-                    .align(Alignment.TopCenter)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .background(
+                            color = dividerColor,
+                            shape = dividerShape,
+                        ).align(Alignment.TopCenter),
             )
 
             HorizontalDivider(
                 color = dividerColor,
                 thickness = dividerThickness,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = dividerColor,
-                        shape = dividerShape
-                    )
-                    .align(Alignment.BottomCenter)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .background(
+                            color = dividerColor,
+                            shape = dividerShape,
+                        ).align(Alignment.BottomCenter),
             )
         }
     }
 }
 
-private fun Modifier.fadingEdge(brush: Brush) = this
-    .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
-    .drawWithContent {
-        drawContent()
-        drawRect(brush = brush, blendMode = BlendMode.DstIn)
-    }
+private fun Modifier.fadingEdge(brush: Brush) =
+    this
+        .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
+        .drawWithContent {
+            drawContent()
+            drawRect(brush = brush, blendMode = BlendMode.DstIn)
+        }

@@ -14,39 +14,43 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import jpark.bro.days.ui.view.DaysApp
-import jpark.bro.days.ui.view.helpCenter.announcements.AnnouncementsScreen
 import jpark.bro.days.ui.view.helpCenter.HelpCenterScreen
+import jpark.bro.days.ui.view.helpCenter.announcements.AnnouncementsScreen
 import jpark.bro.days.ui.view.helpCenter.policy.PolicyScreen
 
 @Composable
-fun NavGraph(
-    navController: NavHostController
-) {
+fun NavGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
         startDestination = "daysApp",
         enterTransition = {
             fadeIn(
-                animationSpec = tween(
-                    300, easing = LinearEasing
+                animationSpec =
+                    tween(
+                        300,
+                        easing = LinearEasing,
+                    ),
+            ) +
+                slideIntoContainer(
+                    animationSpec = tween(300, easing = EaseIn),
+                    towards = AnimatedContentTransitionScope.SlideDirection.Up,
                 )
-            ) + slideIntoContainer(
-                animationSpec = tween(300, easing = EaseIn),
-                towards = AnimatedContentTransitionScope.SlideDirection.Up
-            )
         },
         exitTransition = { ExitTransition.None },
         popEnterTransition = { EnterTransition.None },
         popExitTransition = {
             fadeOut(
-                animationSpec = tween(
-                    300, easing = LinearEasing
+                animationSpec =
+                    tween(
+                        300,
+                        easing = LinearEasing,
+                    ),
+            ) +
+                slideOutOfContainer(
+                    animationSpec = tween(300, easing = EaseOut),
+                    towards = AnimatedContentTransitionScope.SlideDirection.Down,
                 )
-            ) + slideOutOfContainer(
-                animationSpec = tween(300, easing = EaseOut),
-                towards = AnimatedContentTransitionScope.SlideDirection.Down
-            )
-        }
+        },
     ) {
         composable("daysApp") { DaysApp(navController) }
         composable("helpCenter") { HelpCenterScreen(navController) }

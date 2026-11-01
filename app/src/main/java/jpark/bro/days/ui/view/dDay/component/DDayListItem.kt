@@ -16,34 +16,33 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun DDayListItem(
-    item: Triple<String, String, String>
-) {
+fun DDayListItem(item: Triple<String, String, String>) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(87.dp)
-            .padding(top = 3.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(87.dp)
+                .padding(top = 3.dp),
     ) {
         HorizontalDivider(
             modifier = Modifier,
-            color = Color(0xFFCECECE)
+            color = Color(0xFFCECECE),
         )
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Column {
                 Text(text = item.first)
                 Text(text = item.second)
             }
             Text(
-                text = item.third
+                text = item.third,
             )
         }
     }
-
 }

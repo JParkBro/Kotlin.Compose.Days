@@ -42,24 +42,27 @@ fun YearMonthPicker(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
-
-            val yearStartIndex = remember {
-                yearItems.indexOf(initialYear)
-            }
-            val monthStartIndex = remember {
-                monthItems.indexOf(initialMonth)
-            }
+            val yearStartIndex =
+                remember {
+                    yearItems.indexOf(initialYear)
+                }
+            val monthStartIndex =
+                remember {
+                    monthItems.indexOf(initialMonth)
+                }
 
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White),
-                horizontalArrangement = Arrangement.spacedBy(
-                    spacingBetweenPickers,
-                    Alignment.CenterHorizontally
-                ),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .background(Color.White),
+                horizontalArrangement =
+                    Arrangement.spacedBy(
+                        spacingBetweenPickers,
+                        Alignment.CenterHorizontally,
+                    ),
             ) {
                 DaysPicker(
                     state = yearPickerState,
@@ -71,7 +74,7 @@ fun YearMonthPicker(
                     selectedTextStyle = selectedTextStyle,
                     onSelectedChange = { selectedItem ->
                         selectedItem?.let { onYearSelected(it) }
-                    }
+                    },
                 )
                 DaysPicker(
                     state = monthPickerState,
@@ -83,7 +86,7 @@ fun YearMonthPicker(
                     textModifier = Modifier.padding(PaddingValues(8.dp)),
                     onSelectedChange = { selectedItem ->
                         selectedItem?.let { onMonthSelected(it) }
-                    }
+                    },
                 )
             }
         }

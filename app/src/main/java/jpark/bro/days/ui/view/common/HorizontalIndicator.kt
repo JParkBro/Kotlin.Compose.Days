@@ -25,27 +25,30 @@ import androidx.compose.ui.unit.dp
 import jpark.bro.days.R
 
 @Composable
-fun HorizontalIndicator(
-    pagerState: PagerState
-) {
+fun HorizontalIndicator(pagerState: PagerState) {
     Row(
-        modifier = Modifier
-            .wrapContentHeight()
-            .fillMaxWidth()
-            .padding(WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + dimensionResource(R.dimen.small_padding)),
+        modifier =
+            Modifier
+                .wrapContentHeight()
+                .fillMaxWidth()
+                .padding(
+                    WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() +
+                        dimensionResource(R.dimen.small_padding),
+                ),
         horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         repeat(pagerState.pageCount) { iteration ->
             val isSelected = pagerState.currentPage == iteration
             val color = if (isSelected) Color.DarkGray else Color.DarkGray.copy(alpha = 0.5f)
             val size = if (isSelected) 12.dp else 8.dp
             Box(
-                modifier = Modifier
-                    .padding(dimensionResource(R.dimen.indicator_padding))
-                    .clip(CircleShape)
-                    .background(color)
-                    .size(size)
+                modifier =
+                    Modifier
+                        .padding(dimensionResource(R.dimen.indicator_padding))
+                        .clip(CircleShape)
+                        .background(color)
+                        .size(size),
             )
         }
     }

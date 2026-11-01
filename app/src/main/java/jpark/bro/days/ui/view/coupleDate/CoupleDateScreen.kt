@@ -26,10 +26,11 @@ fun CoupleDateScreen(
     val daysSinceStart by viewModel.daysSinceStart.collectAsState()
 
     Column(
-        modifier = modifier
-            .fillMaxSize(),
+        modifier =
+            modifier
+                .fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(modifier = Modifier)
         CoupleDateSummary(
@@ -40,14 +41,14 @@ fun CoupleDateScreen(
         )
         CoupleProfile()
     }
-    if(showDatePicker) {
+    if (showDatePicker) {
         DaysDatePicker(
             initialDate = coupleDate ?: DateUtil.getCurrentLocalDate(),
             onDismiss = { showDatePicker = false },
             onDateSelected = { selectedDate ->
                 viewModel.saveCoupleDate(selectedDate)
                 showDatePicker = false
-            }
+            },
         )
     }
 }

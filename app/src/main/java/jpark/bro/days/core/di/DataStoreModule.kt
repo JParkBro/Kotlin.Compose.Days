@@ -13,17 +13,15 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object DataStoreModule {
+    @Singleton
+    @Provides
+    fun provideCoupleDateDataStore(
+        @ApplicationContext context: Context,
+    ): CoupleDateDataStore = CoupleDateDataStore(context = context)
 
     @Singleton
     @Provides
-    fun provideCoupleDateDataStore(@ApplicationContext context: Context): CoupleDateDataStore {
-        return CoupleDateDataStore(context = context)
-    }
-
-    @Singleton
-    @Provides
-    fun provideProfileDataStore(@ApplicationContext context: Context): ProfileDataStore {
-        return ProfileDataStore(context = context)
-    }
-
+    fun provideProfileDataStore(
+        @ApplicationContext context: Context,
+    ): ProfileDataStore = ProfileDataStore(context = context)
 }

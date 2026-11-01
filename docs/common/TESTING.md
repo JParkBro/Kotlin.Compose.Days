@@ -312,6 +312,10 @@ class KoinModulesTest {
 }
 ```
 
+- `verify()`는 정의된 클래스의 **생성자 타입**을 검사합니다. `single { X(값) }`처럼 값을 직접 넣거나 `parametersOf`로 받는 타입(화면 키 등)은 `extraTypes`에 넣습니다.
+- 기능 내부(`internal`) 키는 app에서 참조할 수 없으므로 `Class.forName("…Key").kotlin`으로 넣습니다. 키 이름을 바꾸면 이 테스트도 함께 고칩니다.
+- `navigation<Key> { … }` 안에서 `get()`으로 꺼내는 의존성은 람다라 검사되지 않습니다. 실행 확인으로 보완합니다.
+
 ### 5-10. 스크린샷 테스트 (private Screen 대응)
 
 `{Feature}Screen`이 `private`이므로 테스트에서 직접 호출하지 않고, **같은 파일의 Preview를 자동으로 찾아 촬영**합니다.

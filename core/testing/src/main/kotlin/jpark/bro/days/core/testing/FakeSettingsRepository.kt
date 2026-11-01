@@ -4,16 +4,23 @@ import jpark.bro.days.core.data.repository.SettingsRepository
 import jpark.bro.days.core.model.ThemeSetting
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 
 class FakeSettingsRepository(
     initial: ThemeSetting = ThemeSetting(),
 ) : SettingsRepository {
     private val theme = MutableStateFlow(initial)
+    private val preview = MutableStateFlow<ThemeSetting?>(null)
 
-    /** true면 저장이 실패한다 */
+    /** 현재 미리보기 값 (null이면 미리보기 아님) */
+    val themePreview: ThemeSetting? get() = preview.value
+
+    /** true면 다음 저장이 실패한다 */
     var failNextSave: Boolean = false
 
     override fun observeThemeSetting(): Flow<ThemeSetting> = theme
+
+    override fun observeEffectiveThemeSetting(): Flow<ThemeSetting> = combine(theme, preview) { saved, p -> p ?: saved }
 
     override suspend fun setThemeSetting(setting: ThemeSetting): Result<Unit> {
         if (failNextSave) {
@@ -22,5 +29,9 @@ class FakeSettingsRepository(
         }
         theme.value = setting
         return Result.success(Unit)
+    }
+
+    override fun setThemePreview(setting: ThemeSetting?) {
+        preview.value = setting
     }
 }

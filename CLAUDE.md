@@ -190,3 +190,5 @@ di/{Feature}Module.kt  viewModelOf + navigation<{Feature}Key>
 ```
 
 UI를 바꿨다면 `verifyRoborazziDevDebug` 결과를 확인하고, 의도한 변경이면 기준 이미지를 갱신한다.
+
+ktlint · detekt 위반은 코드를 고쳐서 해결한다. `ktlint-baseline.xml` · `detekt-baseline.xml`에 새 위반을 추가하지 않는다.

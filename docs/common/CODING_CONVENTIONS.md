@@ -52,6 +52,12 @@
 
 - **[필수]** CI에서 위 검사가 실패하면 병합하지 않습니다.
 - **[필수]** 포맷은 IDE 설정이 아니라 `.editorconfig`를 기준으로 합니다.
+- **[필수]** ktlint · detekt는 build-logic의 `{app}.android.application` · `{app}.android.library` · `{app}.jvm.library`가 모든 모듈에 적용합니다. 모듈에서 따로 적용하지 않습니다.
+  - ktlint: `org.jlleitschuh.gradle.ktlint` 플러그인, ktlint 버전은 catalog의 `ktlint`로 고정 (플러그인 기본값은 오래된 버전일 수 있음)
+  - detekt: `io.gitlab.arturbosch.detekt`, 기본 규칙(`buildUponDefaultConfig`) 위에 `config/detekt/detekt.yml`의 값만 덮어씀
+  - 명령: `./gradlew ktlintFormat` (자동 수정), `./gradlew ktlintCheck detekt` (검사)
+- **[필수]** 기존 코드의 위반은 모듈별 `ktlint-baseline.xml` · `detekt-baseline.xml`로만 제외합니다. **새 코드의 위반을 baseline에 추가하지 않습니다.** 고친 위반은 baseline에서도 지웁니다 (`ktlintGenerateBaseline` · `detektBaseline`으로 다시 생성).
+- **[필수]** `@Composable` 함수는 이름(PascalCase) · 길이 · 파라미터 수 규칙에서 제외하고, `@Preview`는 `MagicNumber` · `UnusedPrivateMember`에서 제외합니다 (`detekt.yml`).
 
 ```ini
 # .editorconfig
@@ -72,7 +78,7 @@ ktlint_code_style = ktlint_official
 ktlint_function_naming_ignore_when_annotated_with = Composable
 ```
 
-**detekt로 강제할 주요 금지 패턴**
+**detekt로 강제할 주요 금지 패턴** (`config/detekt/detekt.yml`)
 
 | 규칙 | 이유 |
 |---|---|

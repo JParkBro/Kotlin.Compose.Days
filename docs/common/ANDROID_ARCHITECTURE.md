@@ -785,6 +785,8 @@ compose-gradlePlugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-
 kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 ksp-gradlePlugin = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 room-gradlePlugin = { module = "androidx.room:room-gradle-plugin", version.ref = "room" }
+detekt-gradlePlugin = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
+ktlint-gradlePlugin = { module = "org.jlleitschuh.gradle:ktlint-gradle", version.ref = "ktlintGradle" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -818,16 +820,16 @@ test = ["junit", "kotlinx-coroutines-test", "turbine"]
 ```
 
 - SDK · 앱 ID · 버전은 `project*` 항목 한 곳에서 관리하고, 모듈 `build.gradle.kts`에 숫자를 쓰지 않습니다.
-- 루트 `build.gradle.kts`에는 convention plugin이 내부에서 적용하는 플러그인(`android-application`, `android-library`, `kotlin-jvm`, `kotlin-compose`, `kotlin-serialization`, `ksp`, `room`)을 모두 `apply false`로 선언합니다. build-logic은 이 플러그인들을 `compileOnly`로만 참조하므로, 실행 시 클래스는 루트 빌드의 클래스패스에서 옵니다.
+- 루트 `build.gradle.kts`에는 convention plugin이 내부에서 적용하는 플러그인(`android-application`, `android-library`, `kotlin-jvm`, `kotlin-compose`, `kotlin-serialization`, `ksp`, `room`, `detekt`, `ktlint`)을 모두 `apply false`로 선언합니다. build-logic은 이 플러그인들을 `compileOnly`로만 참조하므로, 실행 시 클래스는 루트 빌드의 클래스패스에서 옵니다.
 
 ### 9-3. Convention Plugin 구성
 
 | 플러그인 ID | 적용 대상 | 하는 일 |
 |---|---|---|
-| `{app}.android.application` | app | 앱 ID · SDK · 버전(`project*`), Java 17, BuildConfig, flavor, release 빌드 타입 · 서명(`keystore.properties`), 공통 테스트 의존성 |
-| `{app}.android.library` | Android 라이브러리 모듈 전체 | compileSdk · minSdk, Java 17, flavor(app과 같은 차원), testInstrumentationRunner, 공통 테스트 의존성 |
+| `{app}.android.application` | app | 앱 ID · SDK · 버전(`project*`), Java 17, BuildConfig, flavor, release 빌드 타입 · 서명(`keystore.properties`), 공통 테스트 의존성, ktlint · detekt |
+| `{app}.android.library` | Android 라이브러리 모듈 전체 | compileSdk · minSdk, Java 17, flavor(app과 같은 차원), testInstrumentationRunner, 공통 테스트 의존성, ktlint · detekt |
 | `{app}.android.compose` | Compose 쓰는 모듈 (app · 라이브러리 공용) | Compose 컴파일러, Compose BOM, `compose` · `compose-debug` 번들, ui-test-junit4 |
-| `{app}.jvm.library` | core:model, common, domain | `kotlin("jvm")`, Java 17, 공통 테스트 의존성 |
+| `{app}.jvm.library` | core:model, common, domain | `kotlin("jvm")`, Java 17, 공통 테스트 의존성, ktlint · detekt |
 | `{app}.jvm.ktor` | 네트워크 쓰는 모듈 (core:network) | kotlinx.serialization 플러그인, `ktor` 번들(OkHttp 엔진), serialization-json, ktor-client-mock(테스트) |
 | `{app}.koin` | Koin 쓰는 모듈 | Koin BOM, koin-android, koin-test-junit4 |
 | `{app}.room` | core:database | Room 플러그인, KSP(`room.generateKotlin`), 스키마 경로 `schemas/`, `room` 번들, room-compiler(`ksp`만), room-testing |
@@ -900,7 +902,8 @@ build-logic/
 ```kotlin
 // build-logic/settings.gradle.kts
 dependencyResolutionManagement {
-    repositories { google(); mavenCentral() }
+    repositories { google(); mavenCentral(); gradlePluginPortal() }
+    // ktlint-gradle은 Gradle Plugin Portal에만 있으므로 gradlePluginPortal()도 추가
     versionCatalogs {
         create("libs") { from(files("../gradle/libs.versions.toml")) }
     }

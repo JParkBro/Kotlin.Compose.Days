@@ -487,3 +487,4 @@ object AppThemeTokens {
 - Material 컴포넌트도 토큰 색을 쓰도록 `AppTheme`이 `colorScheme`을 매핑합니다: `primary`·`onPrimary`, `primaryContainer`=`primary-soft`, `secondary`=`accent`, `background`=`bg`, `surface`·`surfaceContainer`=`surface`, `surfaceContainerHigh(est)`=`surface-raised`, `surfaceVariant`=`fill`, `onSurface`=`text-primary`, `onSurfaceVariant`=`text-secondary`, `outline`=`border-strong`, `outlineVariant`=`border`, `error`=`danger`, `scrim`=`overlay`.
 - 선택한 테마 · 모드는 `core:datastore`(`SettingsDataStore`)에 저장하고 `SettingsRepository.observeThemeSetting()`으로 읽습니다. `MainActivity`가 이 값으로 `AppTheme`을 그리고, 화면 모드에 맞춰 시스템 바 아이콘 색도 바꿉니다. 위젯도 같은 팔레트를 사용합니다.
 - 다크 여부는 `isDarkTheme(mode)`로 계산합니다 (SYSTEM은 기기 설정).
+- 테마 시트에서 고르는 동안은 `SettingsRepository.setThemePreview()`로 메모리에만 미리보기 값을 두고, 앱은 `observeEffectiveThemeSetting()`(미리보기 값 ?: 저장된 값)으로 그립니다. 적용하기는 저장 후 미리보기를 끝내고, 닫기(X · 바깥 · 내리기)와 화면 이탈은 미리보기만 끝냅니다.

@@ -439,5 +439,7 @@ object AppThemeTokens {
 
 - 토큰 이름은 JSON의 kebab-case를 camelCase로 바꿉니다 (`primary-soft` → `primarySoft`).
 - 컴포넌트에서는 `AppThemeTokens.colors.primary`처럼 토큰만 참조합니다. `Color(0xFF…)` 하드코딩은 금지입니다 (CODING_CONVENTIONS 6-5).
-- 8개 팔레트 정의 코드는 `theme-tokens.json`에서 생성 스크립트로 만들면 값 불일치를 막을 수 있습니다.
+- 8개 팔레트(`ThemeTokens.kt`)는 **생성 파일**입니다. 값은 `theme-tokens.json`만 고치고 `python3 scripts/generate-theme-colors.py`로 다시 만듭니다. `ThemeTokensSyncTest`가 JSON과 생성 코드가 다르면 실패합니다.
+- 고정 색(4장)은 `AppFixedColors`(`kakao`, `onKakao`, `onImage`, `imageScrim`)로 씁니다.
+- Material 컴포넌트도 토큰 색을 쓰도록 `AppTheme`이 `colorScheme`을 매핑합니다: `primary`·`onPrimary`, `primaryContainer`=`primary-soft`, `secondary`=`accent`, `background`=`bg`, `surface`·`surfaceContainer`=`surface`, `surfaceContainerHigh(est)`=`surface-raised`, `surfaceVariant`=`fill`, `onSurface`=`text-primary`, `onSurfaceVariant`=`text-secondary`, `outline`=`border-strong`, `outlineVariant`=`border`, `error`=`danger`, `scrim`=`overlay`.
 - 선택한 테마 · 모드는 DataStore에 저장하고, 위젯도 같은 팔레트를 사용합니다.

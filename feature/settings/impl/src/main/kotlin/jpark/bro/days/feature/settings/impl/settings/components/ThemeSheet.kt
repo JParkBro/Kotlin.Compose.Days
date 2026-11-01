@@ -181,6 +181,9 @@ internal fun ThemeSheetContent(
     }
 }
 
+/** 카드 윗줄 높이 = 선택 체크 크기 (선택해도 카드 높이가 변하지 않게) */
+private val CheckSize = 24.dp
+
 /** 테마 카드: 태그 · 대표 색 3개(primary · accent · primary-soft) · 이름 · 설명 */
 @Composable
 private fun ThemeCard(
@@ -193,23 +196,28 @@ private fun ThemeCard(
     val typography = AppThemeTokens.typography
     val swatch = themePalette(type, dark = false)
     val label = type.label
-    val borderWidth = if (selected) 2.dp else 1.dp
     Column(
         modifier =
             modifier
                 .clip(AppShapes.lg)
                 .background(if (selected) colors.primarySoft else colors.surface)
                 .border(
-                    width = borderWidth,
+                    width = if (selected) 2.dp else 1.dp,
                     color = if (selected) colors.primary else colors.border,
                     shape = AppShapes.lg,
                 ).semantics { this.selected = selected }
                 .clickable(role = Role.RadioButton, onClick = onClick)
-                // 테두리가 두꺼워져도 안쪽 내용 위치가 그대로이도록 테두리 두께만큼 줄인다
-                .padding(AppSpacing.md - (borderWidth - 1.dp)),
+                // border는 그리기만 하고 크기에 영향을 주지 않으므로 선택해도 내용 위치가 그대로다
+                .padding(AppSpacing.md),
         verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(CheckSize),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             Text(
                 text = stringResource(label.tag),
                 style = typography.labelSm,
@@ -225,7 +233,7 @@ private fun ThemeCard(
                 Box(
                     modifier =
                         Modifier
-                            .size(24.dp)
+                            .size(CheckSize)
                             .clip(AppShapes.full)
                             .background(colors.primary),
                     contentAlignment = Alignment.Center,

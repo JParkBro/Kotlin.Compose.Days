@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -34,7 +36,7 @@ android {
     signingConfigs {
         create("release") {
             // 서명 정보는 local.properties에서 읽는다 (커밋 금지)
-            val props = java.util.Properties().apply {
+            val props = Properties().apply {
                 rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
             }
             storeFile = props.getProperty("release.storeFile")?.let { file(it) }

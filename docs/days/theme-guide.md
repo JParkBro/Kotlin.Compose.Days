@@ -17,6 +17,7 @@
 7. 명도 대비 검증
 8. 기존 값에서 변경된 부분
 9. 타이포그래피
+10. 모서리 · 간격
 
 ## 1. 테마 전환 방식
 
@@ -396,7 +397,24 @@ WCAG 기준: 일반 텍스트 4.5:1 이상, 큰 텍스트(24px 이상 또는 18.
 
 - 포함한 굵기: Regular(400) · Medium(500) · SemiBold(600) · Bold(700) · ExtraBold(800). 시안에서 쓰지 않는 Thin · Light · Black은 넣지 않습니다.
 - 디데이 숫자는 `tnum`(tabular-nums) 스타일을 씁니다 (5.5).
-- 라이선스 원문은 `core/designsystem/licenses/Pretendard-OFL.txt`. 오픈소스 라이선스 화면에 포함합니다.
+- 라이선스 원문은 `core/designsystem/licenses/Pretendard-OFL.txt`. oss-licenses 플러그인 목록에는 자동으로 들어가지 않으므로 따로 고지합니다 (product-spec 6장).
+
+## 10. 모서리 · 간격
+
+값은 Stitch `DESIGN.md`의 rounded · spacing을 그대로 씁니다. 코드에서는 `AppShapes` · `AppSpacing`으로만 참조하고 모서리 값을 직접 쓰지 않습니다 (CODING_CONVENTIONS 6-5).
+
+| 모서리 | 값 | | 간격 | 값 |
+|---|---|---|---|---|
+| `sm` | 4dp | | `xs` | 4dp |
+| `default` | 8dp | | `sm` | 8dp |
+| `md` | 12dp | | `md` | 14dp |
+| `lg` | 16dp (카드) | | `lg` | 20dp |
+| `xl` | 24dp | | `xl` | 28dp |
+| `full` | 원 · 알약 | | `xxl` | 40dp |
+| | | | `marginMobile` · `margin` | 16dp · 20dp (화면 좌우) |
+| | | | `gutter` · `gutterCompact` | 16dp · 12dp (카드 사이) |
+
+아이콘은 Material Symbols Outlined(Apache 2.0)를 VectorDrawable로 `core:designsystem`의 `res/drawable/ic_*`에 둡니다.
 
 ## Android(Compose) 적용
 
@@ -467,4 +485,5 @@ object AppThemeTokens {
 - 글자 스타일(9장)은 `AppThemeTokens.typography.bodyMd`처럼 참조합니다. Material 컴포넌트용 `Typography`도 같은 값으로 매핑합니다 (`displayLarge`=`displayHero`, `headline*`, `titleLarge`=`headlineSm`, `titleMedium`=`labelLg`, `body*`, `label*`).
 - 고정 색(4장)은 `AppFixedColors`(`kakao`, `onKakao`, `onImage`, `imageScrim`)로 씁니다.
 - Material 컴포넌트도 토큰 색을 쓰도록 `AppTheme`이 `colorScheme`을 매핑합니다: `primary`·`onPrimary`, `primaryContainer`=`primary-soft`, `secondary`=`accent`, `background`=`bg`, `surface`·`surfaceContainer`=`surface`, `surfaceContainerHigh(est)`=`surface-raised`, `surfaceVariant`=`fill`, `onSurface`=`text-primary`, `onSurfaceVariant`=`text-secondary`, `outline`=`border-strong`, `outlineVariant`=`border`, `error`=`danger`, `scrim`=`overlay`.
-- 선택한 테마 · 모드는 DataStore에 저장하고, 위젯도 같은 팔레트를 사용합니다.
+- 선택한 테마 · 모드는 `core:datastore`(`SettingsDataStore`)에 저장하고 `SettingsRepository.observeThemeSetting()`으로 읽습니다. `MainActivity`가 이 값으로 `AppTheme`을 그리고, 화면 모드에 맞춰 시스템 바 아이콘 색도 바꿉니다. 위젯도 같은 팔레트를 사용합니다.
+- 다크 여부는 `isDarkTheme(mode)`로 계산합니다 (SYSTEM은 기기 설정).

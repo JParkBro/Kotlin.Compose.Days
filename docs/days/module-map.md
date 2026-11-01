@@ -82,7 +82,7 @@ days/
 |---|---|
 | `onboarding:impl` | `LoginKey`, `TermsKey`, `StartModeKey` |
 | `couple:impl` | `PairCodeConfirmKey` |
-| `settings:impl` | `ProfileEditKey`, `NotificationSettingsKey`, `WidgetSettingsKey`, `AccountKey`, `WithdrawKey`, `PolicyListKey`, `PolicyDocKey(type)`, `LicensesKey`, `LicenseDetailKey(id)` |
+| `settings:impl` | `ProfileEditKey`, `NotificationSettingsKey`, `WidgetSettingsKey`, `AccountKey`, `WithdrawKey`, `PolicyListKey`, `PolicyDocKey(type)` |
 
 ### 4-3. app에서 결정하는 목적지
 
@@ -125,7 +125,6 @@ days/
 | 커플 관리 | 있음 | 연결 해제 완료 |
 | 계정 관리 · 탈퇴 | 있음 | 결과 전달 (세션 종료) |
 | 정책 문서 보기 | 없음 (`Nothing`) | – |
-| 오픈소스 라이선스 상세 | 없음 (`Nothing`) | – |
 
 ## 7. Koin 모듈
 

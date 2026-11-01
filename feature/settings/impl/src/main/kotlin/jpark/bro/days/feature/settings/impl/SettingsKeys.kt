@@ -26,11 +26,3 @@ internal data object PolicyListKey : NavKey
 internal data class PolicyDocKey(
     val type: PolicyType,
 ) : NavKey
-
-@Serializable
-internal data object LicensesKey : NavKey
-
-@Serializable
-internal data class LicenseDetailKey(
-    val id: String,
-) : NavKey

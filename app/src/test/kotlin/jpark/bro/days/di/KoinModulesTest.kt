@@ -17,7 +17,6 @@ class KoinModulesTest {
             listOf(
                 "jpark.bro.days.feature.couple.impl.PairCodeConfirmKey",
                 "jpark.bro.days.feature.settings.impl.PolicyDocKey",
-                "jpark.bro.days.feature.settings.impl.LicenseDetailKey",
             ).map { Class.forName(it).kotlin }
 
     @OptIn(KoinExperimentalAPI::class)

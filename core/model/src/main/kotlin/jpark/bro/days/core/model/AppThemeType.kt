@@ -1,4 +1,4 @@
-package jpark.bro.days.core.designsystem
+package jpark.bro.days.core.model
 
 /** 컬러 테마 4종 (theme-guide.md 3장) */
 enum class AppThemeType {

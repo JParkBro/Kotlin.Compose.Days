@@ -1,0 +1,54 @@
+<resources>
+    <!-- 설정 탭 -->
+    <string name="settings_main_title">설정</string>
+    <string name="settings_main_profile_empty">프로필을 설정해 주세요</string>
+    <string name="settings_main_profile_edit">프로필 수정</string>
+    <string name="settings_main_profile_days">D+%1$d</string>
+    <string name="settings_main_section_couple">커플</string>
+    <string name="settings_main_couple_manage">커플 관리</string>
+    <string name="settings_main_couple_connected">%1$s 님과 연결됨</string>
+    <string name="settings_main_couple_connect">커플 코드로 연결하기</string>
+    <string name="settings_main_section_app">앱 설정</string>
+    <string name="settings_main_theme">테마</string>
+    <string name="settings_main_notification">알림</string>
+    <string name="settings_main_notification_desc">기념일 및 일정 푸시 알림</string>
+    <string name="settings_main_widget">위젯</string>
+    <string name="settings_main_widget_guide">설정 가이드</string>
+    <string name="settings_main_section_support">지원</string>
+    <string name="settings_main_notice">공지사항</string>
+    <string name="settings_main_inquiry">문의하기</string>
+    <string name="settings_main_rate">앱 평가하기</string>
+    <string name="settings_main_rate_action">별점 남기기</string>
+    <string name="settings_main_section_info">정보</string>
+    <string name="settings_main_policy">약관 및 정책</string>
+    <string name="settings_main_section_account">계정</string>
+    <string name="settings_main_account">계정 관리</string>
+    <string name="settings_main_version">버전 %1$s</string>
+    <string name="settings_main_theme_save_failed">테마를 저장하지 못했어요. 다시 시도해 주세요.</string>
+
+    <!-- 테마 시트 -->
+    <string name="settings_theme_title">테마 설정</string>
+    <string name="settings_theme_subtitle">둘만의 소중한 공간을 원하는 무드로 꾸며보세요</string>
+    <string name="settings_theme_close">닫기</string>
+    <string name="settings_theme_color">컬러 테마</string>
+    <string name="settings_theme_color_count">4가지 감성</string>
+    <string name="settings_theme_selected">선택됨</string>
+    <string name="settings_theme_mode">화면 모드</string>
+    <string name="settings_theme_mode_light">라이트</string>
+    <string name="settings_theme_mode_dark">다크</string>
+    <string name="settings_theme_mode_system">시스템</string>
+    <string name="settings_theme_mode_hint">시스템 선택 시 기기의 다크 모드 설정에 자동으로 맞춰져요.</string>
+    <string name="settings_theme_apply">테마 적용하기</string>
+    <string name="settings_theme_pink">로맨틱 핑크</string>
+    <string name="settings_theme_pink_desc">설레는 첫사랑 무드</string>
+    <string name="settings_theme_pink_tag">기본</string>
+    <string name="settings_theme_navy">미드나잇 네이비</string>
+    <string name="settings_theme_navy_desc">차분하고 모던한 무드</string>
+    <string name="settings_theme_navy_tag">모던</string>
+    <string name="settings_theme_sage">포레스트 세이지</string>
+    <string name="settings_theme_sage_desc">편안하고 싱그러운 일상</string>
+    <string name="settings_theme_sage_tag">내추럴</string>
+    <string name="settings_theme_lavender">라벤더 선셋</string>
+    <string name="settings_theme_lavender_desc">몽환적인 노을빛 감성</string>
+    <string name="settings_theme_lavender_tag">로맨스</string>
+</resources>

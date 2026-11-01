@@ -1,5 +1,6 @@
 package jpark.bro.days.di
 
+import jpark.bro.days.MainViewModel
 import jpark.bro.days.core.ads.di.adsModule
 import jpark.bro.days.core.data.di.dataModule
 import jpark.bro.days.core.database.di.databaseModule
@@ -23,6 +24,7 @@ import jpark.bro.days.navigation.AppOnboardingResultHandler
 import jpark.bro.days.navigation.AppSessionEndedHandler
 import jpark.bro.days.navigation.TopLevelDestination
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
@@ -32,6 +34,7 @@ val appModule =
         single { Navigator(startKey = HomeKey, topLevelKeys = TopLevelDestination.keys) }
         singleOf(::AppOnboardingResultHandler) bind OnboardingResultHandler::class
         singleOf(::AppSessionEndedHandler) bind SessionEndedHandler::class
+        viewModelOf(::MainViewModel)
 
         includes(
             // core

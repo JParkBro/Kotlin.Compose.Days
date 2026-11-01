@@ -8,23 +8,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.NavKey
 import jpark.bro.days.core.designsystem.AppTheme
-import jpark.bro.days.core.model.ItemType
 import jpark.bro.days.core.ui.ObserveEvents
-import jpark.bro.days.feature.settings.impl.AccountKey
-import jpark.bro.days.feature.settings.impl.LicenseDetailKey
-import jpark.bro.days.feature.settings.impl.LicensesKey
-import jpark.bro.days.feature.settings.impl.NotificationSettingsKey
-import jpark.bro.days.feature.settings.impl.PolicyDocKey
-import jpark.bro.days.feature.settings.impl.PolicyListKey
-import jpark.bro.days.feature.settings.impl.PolicyType
-import jpark.bro.days.feature.settings.impl.ProfileEditKey
-import jpark.bro.days.feature.settings.impl.WidgetSettingsKey
-import jpark.bro.days.feature.settings.impl.WithdrawKey
-import jpark.bro.days.feature.settings.impl.settings.SettingsDestination
 import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 
 @Composable
 internal fun ProfileEditRoot(

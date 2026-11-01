@@ -1,8 +1,6 @@
 package jpark.bro.days.feature.notifications.impl.di
 
 import jpark.bro.days.core.navigation.Navigator
-import jpark.bro.days.feature.item.api.ItemDetailKey
-import jpark.bro.days.feature.item.api.ItemEditKey
 import jpark.bro.days.feature.notifications.api.NotificationsKey
 import jpark.bro.days.feature.notifications.impl.NotificationsRoot
 import jpark.bro.days.feature.notifications.impl.NotificationsViewModel

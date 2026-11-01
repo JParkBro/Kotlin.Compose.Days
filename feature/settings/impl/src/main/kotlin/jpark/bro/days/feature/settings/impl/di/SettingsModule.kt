@@ -1,13 +1,10 @@
 package jpark.bro.days.feature.settings.impl.di
 
 import jpark.bro.days.core.navigation.Navigator
-import jpark.bro.days.feature.couple.api.CoupleManageKey
 import jpark.bro.days.feature.settings.api.SessionEnded
 import jpark.bro.days.feature.settings.api.SessionEndedHandler
 import jpark.bro.days.feature.settings.api.SettingsKey
 import jpark.bro.days.feature.settings.impl.AccountKey
-import jpark.bro.days.feature.settings.impl.LicenseDetailKey
-import jpark.bro.days.feature.settings.impl.LicensesKey
 import jpark.bro.days.feature.settings.impl.NotificationSettingsKey
 import jpark.bro.days.feature.settings.impl.PolicyDocKey
 import jpark.bro.days.feature.settings.impl.PolicyListKey
@@ -16,10 +13,6 @@ import jpark.bro.days.feature.settings.impl.WidgetSettingsKey
 import jpark.bro.days.feature.settings.impl.WithdrawKey
 import jpark.bro.days.feature.settings.impl.account.AccountRoot
 import jpark.bro.days.feature.settings.impl.account.AccountViewModel
-import jpark.bro.days.feature.settings.impl.licensedetail.LicenseDetailRoot
-import jpark.bro.days.feature.settings.impl.licensedetail.LicenseDetailViewModel
-import jpark.bro.days.feature.settings.impl.licenses.LicensesRoot
-import jpark.bro.days.feature.settings.impl.licenses.LicensesViewModel
 import jpark.bro.days.feature.settings.impl.notificationsettings.NotificationSettingsRoot
 import jpark.bro.days.feature.settings.impl.notificationsettings.NotificationSettingsViewModel
 import jpark.bro.days.feature.settings.impl.policydoc.PolicyDocRoot
@@ -51,8 +44,6 @@ val settingsModule =
         viewModelOf(::WithdrawViewModel)
         viewModelOf(::PolicyListViewModel)
         viewModel { params -> PolicyDocViewModel(key = params.get()) }
-        viewModelOf(::LicensesViewModel)
-        viewModel { params -> LicenseDetailViewModel(key = params.get()) }
 
         navigation<SettingsKey> {
             val navigator = get<Navigator>()
@@ -89,13 +80,5 @@ val settingsModule =
         navigation<PolicyDocKey> { key ->
             val navigator = get<Navigator>()
             PolicyDocRoot(key = key, onBack = navigator::goBack)
-        }
-        navigation<LicensesKey> {
-            val navigator = get<Navigator>()
-            LicensesRoot(onNavigate = navigator::goTo, onBack = navigator::goBack)
-        }
-        navigation<LicenseDetailKey> { key ->
-            val navigator = get<Navigator>()
-            LicenseDetailRoot(key = key, onBack = navigator::goBack)
         }
     }

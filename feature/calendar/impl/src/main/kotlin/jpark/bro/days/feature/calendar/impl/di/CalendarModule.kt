@@ -4,8 +4,6 @@ import jpark.bro.days.core.navigation.Navigator
 import jpark.bro.days.feature.calendar.api.CalendarKey
 import jpark.bro.days.feature.calendar.impl.CalendarRoot
 import jpark.bro.days.feature.calendar.impl.CalendarViewModel
-import jpark.bro.days.feature.item.api.ItemDetailKey
-import jpark.bro.days.feature.item.api.ItemEditKey
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module

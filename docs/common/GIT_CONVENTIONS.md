@@ -521,7 +521,8 @@ fi
 | 파일 · 값 | 대신 |
 |---|---|
 | 서명 키스토어 (`*.jks`, `*.keystore`) | CI 비밀 변수(Base64) + 로컬 보관 |
-| 키스토어 비밀번호, 서비스 계정 키(JSON), API 비밀 키 | `local.properties`, CI 비밀 변수, Worker Secret |
+| 키스토어 비밀번호 | `keystore.properties`, CI 비밀 변수 |
+| 서비스 계정 키(JSON), API 비밀 키 | `local.properties`, CI 비밀 변수, Worker Secret |
 | `.env`, `local.properties` | 예시 파일 `local.properties.example`만 커밋 |
 | 개인 IDE 설정 (`.idea/workspace.xml` 등) | `.gitignore` |
 
@@ -554,6 +555,7 @@ build/
 
 # Local
 local.properties
+keystore.properties
 .env
 *.jks
 *.keystore

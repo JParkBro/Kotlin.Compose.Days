@@ -1,0 +1,391 @@
+{
+  "tokens": [
+    {
+      "name": "primary",
+      "group": "브랜드",
+      "usage": "주 CTA 버튼, 대표 디데이 숫자, 활성 탭, 토글 ON, 오늘 날짜 원"
+    },
+    {
+      "name": "primary-pressed",
+      "group": "브랜드",
+      "usage": "primary 버튼 눌림·호버 상태"
+    },
+    {
+      "name": "on-primary",
+      "group": "브랜드",
+      "usage": "primary 위 글자·아이콘 (버튼 텍스트, FAB +)"
+    },
+    {
+      "name": "primary-soft",
+      "group": "브랜드",
+      "usage": "히어로 카드 배경, ‘우리 둘이’ 뱃지 배경, 선택된 카드 배경"
+    },
+    {
+      "name": "on-primary-soft",
+      "group": "브랜드",
+      "usage": "primary-soft 위 글자 (뱃지 텍스트, 히어로 라벨)"
+    },
+    {
+      "name": "accent",
+      "group": "보조",
+      "usage": "진행바 그라데이션 끝, 캘린더 일정 마커, 보조 강조 아이콘"
+    },
+    {
+      "name": "accent-soft",
+      "group": "보조",
+      "usage": "‘매년’·카테고리 뱃지 배경, 일정 카드 배경"
+    },
+    {
+      "name": "on-accent-soft",
+      "group": "보조",
+      "usage": "accent-soft 위 글자"
+    },
+    {
+      "name": "bg",
+      "group": "표면",
+      "usage": "앱 전체 배경 (캔버스)"
+    },
+    {
+      "name": "surface",
+      "group": "표면",
+      "usage": "카드, 리스트 아이템, 탭바"
+    },
+    {
+      "name": "surface-raised",
+      "group": "표면",
+      "usage": "바텀시트, 모달, 팝오버, 토스트"
+    },
+    {
+      "name": "fill",
+      "group": "표면",
+      "usage": "세그먼트 트랙, 진행바 트랙, 비활성 칩, 보조 버튼, 아이콘 배경, 입력창 배경"
+    },
+    {
+      "name": "overlay",
+      "group": "표면",
+      "usage": "바텀시트·모달 뒤 딤 배경"
+    },
+    {
+      "name": "border",
+      "group": "선",
+      "usage": "카드 테두리, 리스트 구분선"
+    },
+    {
+      "name": "border-strong",
+      "group": "선",
+      "usage": "입력창 테두리, 토글 OFF, 아웃라인 버튼, 빈 체크박스"
+    },
+    {
+      "name": "text-primary",
+      "group": "텍스트",
+      "usage": "제목, 본문, 리스트 디데이 숫자(기본)"
+    },
+    {
+      "name": "text-secondary",
+      "group": "텍스트",
+      "usage": "날짜, 설명, 보조 정보"
+    },
+    {
+      "name": "text-tertiary",
+      "group": "텍스트",
+      "usage": "플레이스홀더, 비활성 탭, 비활성 텍스트, 지난 기념일"
+    },
+    {
+      "name": "danger",
+      "group": "상태",
+      "usage": "임박 디데이(7일 이내), 연결 해제·삭제, 에러"
+    },
+    {
+      "name": "danger-soft",
+      "group": "상태",
+      "usage": "danger 뱃지·알림 배경"
+    },
+    {
+      "name": "success",
+      "group": "상태",
+      "usage": "연결됨 상태, 달성 완료, 저장 완료"
+    },
+    {
+      "name": "success-soft",
+      "group": "상태",
+      "usage": "success 뱃지 배경"
+    },
+    {
+      "name": "warning",
+      "group": "상태",
+      "usage": "주의 안내 (코드 만료 임박 등)"
+    },
+    {
+      "name": "warning-soft",
+      "group": "상태",
+      "usage": "warning 안내 박스 배경"
+    },
+    {
+      "name": "cal-sunday",
+      "group": "캘린더",
+      "usage": "캘린더 일요일·공휴일 숫자"
+    },
+    {
+      "name": "cal-saturday",
+      "group": "캘린더",
+      "usage": "캘린더 토요일 숫자"
+    },
+    {
+      "name": "shadow",
+      "group": "효과",
+      "usage": "카드·FAB 그림자 색 (box-shadow에 사용)"
+    }
+  ],
+  "themes": {
+    "pink": {
+      "name": "로맨틱 핑크",
+      "light": {
+        "danger": "#C62828",
+        "danger-soft": "#FDECEC",
+        "success": "#127235",
+        "success-soft": "#E7F5EC",
+        "warning": "#B45309",
+        "warning-soft": "#FDF3E1",
+        "cal-sunday": "#C62828",
+        "primary": "#D23C69",
+        "primary-pressed": "#B8305A",
+        "on-primary": "#FFFFFF",
+        "primary-soft": "#FCE8EE",
+        "on-primary-soft": "#A62852",
+        "accent": "#F28C6B",
+        "accent-soft": "#FDEEE7",
+        "on-accent-soft": "#A8492C",
+        "bg": "#FBF8F9",
+        "surface": "#FFFFFF",
+        "surface-raised": "#FFFFFF",
+        "fill": "#F5EFF2",
+        "overlay": "rgba(28,16,22,0.45)",
+        "border": "#F0E6EA",
+        "border-strong": "#DCCBD2",
+        "text-primary": "#221A1E",
+        "text-secondary": "#6E6268",
+        "text-tertiary": "#968A90",
+        "cal-saturday": "#2563EB",
+        "shadow": "rgba(210,60,105,0.14)"
+      },
+      "dark": {
+        "danger": "#F87171",
+        "danger-soft": "#3A1C1F",
+        "success": "#5BD69A",
+        "success-soft": "#163024",
+        "warning": "#FBBF55",
+        "warning-soft": "#3A2C12",
+        "cal-sunday": "#F87171",
+        "primary": "#F0709A",
+        "primary-pressed": "#F48DAE",
+        "on-primary": "#2A0A16",
+        "primary-soft": "#3D1E2A",
+        "on-primary-soft": "#FFB3CA",
+        "accent": "#F7A488",
+        "accent-soft": "#3A2520",
+        "on-accent-soft": "#FFC9B5",
+        "bg": "#161114",
+        "surface": "#1F181C",
+        "surface-raised": "#2B2227",
+        "fill": "#33292E",
+        "overlay": "rgba(0,0,0,0.6)",
+        "border": "#33282E",
+        "border-strong": "#4A3C43",
+        "text-primary": "#F7EEF2",
+        "text-secondary": "#B8A9B0",
+        "text-tertiary": "#85777E",
+        "cal-saturday": "#60A5FA",
+        "shadow": "rgba(0,0,0,0.4)"
+      }
+    },
+    "navy": {
+      "name": "미드나잇 네이비",
+      "light": {
+        "danger": "#C62828",
+        "danger-soft": "#FDECEC",
+        "success": "#127235",
+        "success-soft": "#E7F5EC",
+        "warning": "#B45309",
+        "warning-soft": "#FDF3E1",
+        "cal-sunday": "#C62828",
+        "primary": "#2563EB",
+        "primary-pressed": "#1D4ED8",
+        "on-primary": "#FFFFFF",
+        "primary-soft": "#EAF2FF",
+        "on-primary-soft": "#1D4ED8",
+        "accent": "#0EA5E9",
+        "accent-soft": "#E3F4FD",
+        "on-accent-soft": "#0369A1",
+        "bg": "#F8FAFC",
+        "surface": "#FFFFFF",
+        "surface-raised": "#FFFFFF",
+        "fill": "#F1F5F9",
+        "overlay": "rgba(10,15,30,0.45)",
+        "border": "#E2E8F0",
+        "border-strong": "#CBD5E1",
+        "text-primary": "#0F172A",
+        "text-secondary": "#64748B",
+        "text-tertiary": "#8A94A6",
+        "cal-saturday": "#2563EB",
+        "shadow": "rgba(37,99,235,0.14)"
+      },
+      "dark": {
+        "danger": "#F87171",
+        "danger-soft": "#3A1C1F",
+        "success": "#5BD69A",
+        "success-soft": "#163024",
+        "warning": "#FBBF55",
+        "warning-soft": "#3A2C12",
+        "cal-sunday": "#F87171",
+        "primary": "#60A5FA",
+        "primary-pressed": "#93C5FD",
+        "on-primary": "#0B1120",
+        "primary-soft": "#1A2C4E",
+        "on-primary-soft": "#BFDBFE",
+        "accent": "#38BDF8",
+        "accent-soft": "#0C2A3D",
+        "on-accent-soft": "#A5E3FC",
+        "bg": "#0B1120",
+        "surface": "#111A2E",
+        "surface-raised": "#1A2540",
+        "fill": "#1E2A44",
+        "overlay": "rgba(0,0,0,0.6)",
+        "border": "#223150",
+        "border-strong": "#334766",
+        "text-primary": "#F1F5F9",
+        "text-secondary": "#94A3B8",
+        "text-tertiary": "#6B7A91",
+        "cal-saturday": "#60A5FA",
+        "shadow": "rgba(0,0,0,0.45)"
+      }
+    },
+    "sage": {
+      "name": "포레스트 세이지",
+      "light": {
+        "danger": "#C62828",
+        "danger-soft": "#FDECEC",
+        "success": "#127235",
+        "success-soft": "#E7F5EC",
+        "warning": "#B45309",
+        "warning-soft": "#FDF3E1",
+        "cal-sunday": "#C62828",
+        "primary": "#2F7A57",
+        "primary-pressed": "#256447",
+        "on-primary": "#FFFFFF",
+        "primary-soft": "#E6F1EA",
+        "on-primary-soft": "#24603F",
+        "accent": "#9AAE6E",
+        "accent-soft": "#EFF3E4",
+        "on-accent-soft": "#56652F",
+        "bg": "#F6F8F6",
+        "surface": "#FFFFFF",
+        "surface-raised": "#FFFFFF",
+        "fill": "#EDF2EE",
+        "overlay": "rgba(12,20,16,0.45)",
+        "border": "#E1E8E2",
+        "border-strong": "#C8D3CA",
+        "text-primary": "#17231C",
+        "text-secondary": "#5A6A60",
+        "text-tertiary": "#8A968D",
+        "cal-saturday": "#2563EB",
+        "shadow": "rgba(47,122,87,0.14)"
+      },
+      "dark": {
+        "danger": "#F87171",
+        "danger-soft": "#3A1C1F",
+        "success": "#5BD69A",
+        "success-soft": "#163024",
+        "warning": "#FBBF55",
+        "warning-soft": "#3A2C12",
+        "cal-sunday": "#F87171",
+        "primary": "#6CC497",
+        "primary-pressed": "#8AD3AD",
+        "on-primary": "#0A1A12",
+        "primary-soft": "#1A3527",
+        "on-primary-soft": "#A7E3C3",
+        "accent": "#C2CF9F",
+        "accent-soft": "#283120",
+        "on-accent-soft": "#DCE6C0",
+        "bg": "#0C1410",
+        "surface": "#142019",
+        "surface-raised": "#1C2B23",
+        "fill": "#1F3027",
+        "overlay": "rgba(0,0,0,0.6)",
+        "border": "#233529",
+        "border-strong": "#2F4637",
+        "text-primary": "#EAF3EC",
+        "text-secondary": "#9AAB9F",
+        "text-tertiary": "#6E8073",
+        "cal-saturday": "#60A5FA",
+        "shadow": "rgba(0,0,0,0.45)"
+      }
+    },
+    "lavender": {
+      "name": "라벤더 선셋",
+      "light": {
+        "danger": "#C62828",
+        "danger-soft": "#FDECEC",
+        "success": "#127235",
+        "success-soft": "#E7F5EC",
+        "warning": "#B45309",
+        "warning-soft": "#FDF3E1",
+        "cal-sunday": "#C62828",
+        "primary": "#7C3AED",
+        "primary-pressed": "#6D28D9",
+        "on-primary": "#FFFFFF",
+        "primary-soft": "#F1EBFF",
+        "on-primary-soft": "#5B21B6",
+        "accent": "#F3897A",
+        "accent-soft": "#FDECE8",
+        "on-accent-soft": "#A8402F",
+        "bg": "#FAF8FF",
+        "surface": "#FFFFFF",
+        "surface-raised": "#FFFFFF",
+        "fill": "#F2EFFA",
+        "overlay": "rgba(20,14,40,0.45)",
+        "border": "#EAE5F6",
+        "border-strong": "#D3CAEA",
+        "text-primary": "#1E1838",
+        "text-secondary": "#6B6585",
+        "text-tertiary": "#8C879F",
+        "cal-saturday": "#2563EB",
+        "shadow": "rgba(124,58,237,0.14)"
+      },
+      "dark": {
+        "danger": "#F87171",
+        "danger-soft": "#3A1C1F",
+        "success": "#5BD69A",
+        "success-soft": "#163024",
+        "warning": "#FBBF55",
+        "warning-soft": "#3A2C12",
+        "cal-sunday": "#F87171",
+        "primary": "#A78BFA",
+        "primary-pressed": "#C4B5FD",
+        "on-primary": "#1A0F3D",
+        "primary-soft": "#2E2160",
+        "on-primary-soft": "#DDD3FF",
+        "accent": "#F9A08E",
+        "accent-soft": "#3A2228",
+        "on-accent-soft": "#FFCFC4",
+        "bg": "#0F0C1B",
+        "surface": "#18142B",
+        "surface-raised": "#221C3A",
+        "fill": "#262040",
+        "overlay": "rgba(0,0,0,0.6)",
+        "border": "#2C254A",
+        "border-strong": "#3E3466",
+        "text-primary": "#F5F3FF",
+        "text-secondary": "#B9B0D6",
+        "text-tertiary": "#7F779E",
+        "cal-saturday": "#60A5FA",
+        "shadow": "rgba(0,0,0,0.45)"
+      }
+    }
+  },
+  "fixed": {
+    "kakao": "#FEE500",
+    "on-kakao": "#191919",
+    "on-image": "#FFFFFF",
+    "image-scrim": "rgba(0,0,0,0.35)"
+  }
+}

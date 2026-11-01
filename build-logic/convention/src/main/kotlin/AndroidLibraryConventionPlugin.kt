@@ -2,6 +2,7 @@ import com.android.build.api.dsl.LibraryExtension
 import jpark.bro.days.convention.addUnitTestDependencies
 import jpark.bro.days.convention.configureFlavors
 import jpark.bro.days.convention.configureKotlinAndroid
+import jpark.bro.days.convention.configureStaticAnalysis
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -18,6 +19,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             }
 
             addUnitTestDependencies()
+            configureStaticAnalysis()
         }
     }
 }

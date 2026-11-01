@@ -3,6 +3,7 @@ import jpark.bro.days.convention.addUnitTestDependencies
 import jpark.bro.days.convention.configureApplicationBuildTypes
 import jpark.bro.days.convention.configureFlavors
 import jpark.bro.days.convention.configureKotlinAndroid
+import jpark.bro.days.convention.configureStaticAnalysis
 import jpark.bro.days.convention.libs
 import jpark.bro.days.convention.version
 import org.gradle.api.Plugin
@@ -33,6 +34,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
             }
 
             addUnitTestDependencies()
+            configureStaticAnalysis()
         }
     }
 }

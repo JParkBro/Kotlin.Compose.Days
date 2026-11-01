@@ -1,0 +1,39 @@
+# detekt 기본 설정(buildUponDefaultConfig) 위에 덮어쓰는 값만 둔다.
+# 규칙 근거: docs/common/CODING_CONVENTIONS.md 1장
+
+complexity:
+  LongMethod:
+    active: true
+    ignoreAnnotated: ['Composable']
+  CyclomaticComplexMethod:
+    active: true
+    ignoreAnnotated: ['Composable']
+  LongParameterList:
+    ignoreAnnotated: ['Composable']
+
+coroutines:
+  GlobalCoroutineUsage:
+    active: true
+
+potential-bugs:
+  UnsafeCallOnNullableType:
+    active: true
+  ElseCaseInsteadOfExhaustiveWhen:
+    active: true
+
+style:
+  ForbiddenImport:
+    active: true
+    imports:
+      - value: 'android.util.Log'
+        reason: '로그 래퍼를 사용한다.'
+  MagicNumber:
+    ignoreAnnotated: ['Preview']
+  UnusedPrivateMember:
+    ignoreAnnotated: ['Preview']
+
+naming:
+  FunctionNaming:
+    ignoreAnnotated: ['Composable']
+  TopLevelPropertyNaming:
+    constantPattern: '[A-Z][A-Za-z0-9]*'

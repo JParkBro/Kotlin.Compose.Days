@@ -1,5 +1,6 @@
 import jpark.bro.days.convention.addUnitTestDependencies
 import jpark.bro.days.convention.configureKotlinJvm
+import jpark.bro.days.convention.configureStaticAnalysis
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -11,6 +12,7 @@ class JvmLibraryConventionPlugin : Plugin<Project> {
 
             configureKotlinJvm()
             addUnitTestDependencies()
+            configureStaticAnalysis()
         }
     }
 }

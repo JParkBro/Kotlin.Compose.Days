@@ -17,6 +17,7 @@ local.properties
 # 비밀 정보 (CLAUDE.md "비밀 정보")
 *.jks
 *.keystore
+keystore.properties
 .env
 .env.*
 .dev.vars

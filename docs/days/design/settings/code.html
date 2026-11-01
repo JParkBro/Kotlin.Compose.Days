@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "primary": "#b02051", "inverse-primary": "#ffb1c0", "on-tertiary": "#ffffff", "tertiary-container": "#cb456d", "on-secondary-container": "#752c13", "surface-container": "#faeaef", "on-background": "#21191d", "secondary-container": "#fd9573", "on-primary-fixed": "#3f0016", "surface-container-low": "#fff0f5", "on-error": "#ffffff", "on-tertiary-fixed-variant": "#8b103f", "outline-variant": "dfbec3", "on-primary": "#ffffff", "outline": "#8c7074", "inverse-on-surface": "#fdedf2", "on-error-container": "#93000a", "on-secondary-fixed-variant": "#7a2f16", "on-tertiary-fixed": "#3f0017", "tertiary-fixed": "#ffd9df", "on-secondary": "#ffffff", "surface-variant": "#eedfe4", "on-primary-container": "#fffeff", "on-surface": "#21191d", "on-tertiary-container": "#ffffff", "surface-container-high": "#f4e4ea", "background": "#fff8f8", "surface-container-highest": "#eedfe4", "error-container": "#ffdad6", "inverse-surface": "#372e32", "on-secondary-fixed": "#3a0b00", "primary-fixed": "#ffd9df", "secondary-fixed": "#ffdbd0", "error": "#ba1a1a", "surface-tint": "#b22252", "on-primary-fixed-variant": "#90003c", "surface-dim": "#e5d6dc", "surface-bright": "#fff8f8", "surface": "#fff8f8", "primary-fixed-dim": "#ffb1c0", "tertiary-fixed-dim": "#ffb1c1", "primary-container": "#d23c69", "secondary": "#98462a", "tertiary": "#aa2b55", "secondary-fixed-dim": "#ffb59e", "on-surface-variant": "#584145", "surface-container-lowest": "#ffffff" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "gutter": "1rem", "space-xs": "0.25rem", "space-sm": "0.5rem", "margin-mobile": "1rem", "margin": "1.25rem", "space-2xl": "2.5rem", "space-lg": "1.25rem", "space-xl": "1.75rem", "gutter-compact": "0.75rem", "space-md": "0.875rem" }, fontFamily: { "label-md": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "display-hero-mobile": ["Plus Jakarta Sans"], "headline-lg": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"], "display-hero": ["Plus Jakarta Sans"], "metric-tabular": ["Plus Jakarta Sans"], "body-sm": ["Plus Jakarta Sans"], "body-lg": ["Plus Jakarta Sans"], "label-lg": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"] }, fontSize: { "label-md": ["13px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "600" }], "headline-md": ["22px", { "lineHeight": "30px", "letterSpacing": "-0.015em", "fontWeight": "700" }], "display-hero-mobile": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "800" }], "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "600" }], "display-hero": ["44px", { "lineHeight": "52px", "letterSpacing": "-0.03em", "fontWeight": "800" }], "metric-tabular": ["24px", { "lineHeight": "28px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }], "body-lg": ["17px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400" }], "label-lg": ["15px", { "lineHeight": "20px", "letterSpacing": "-0.005em", "fontWeight": "600" }], "body-md": ["15px", { "lineHeight": "22px", "letterSpacing": "-0.005em", "fontWeight": "400" }], "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }] } } } }</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-on-surface flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(210,60,105,0.04)]"><div class="h-14 px-margin-mobile flex items-center justify-between"><h1 class="font-headline-sm text-headline-sm text-on-surface tracking-tight font-bold">설정</h1><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></header><main class="flex flex-col relative w-full pt-14 pb-24 px-margin-mobile bg-surface"><div class="flex flex-col w-full pb-6 space-y-5">
+<!-- Profile Header Card -->
+<section class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex items-center justify-between">
+<div class="flex items-center gap-space-md min-w-0">
+<div class="relative w-14 h-14 rounded-full overflow-hidden shrink-0 shadow-sm bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A warm, soft-lit portrait photograph of a young Korean man with tidy haircut, smiling gently, wearing a cream knit sweater against a cozy cafe background with subtle blush pink tones and golden hour sunlight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCq0Aij4D6wi4LU2k6KwYDsCwk4SlfLfL6LzSkorSEjTV503_VoOjMelk_-iv5J1eyFvKT37CWIv5A8DTYm9csBYDW2tFln3QD1U10Jczd1ENomTLEqc1bXftV2pibyYH9dZ2_NWdeWGQVDHpMXC0y1eRqwLb0swZ80_vV2aOQG9LtSiDhi20VpbaPzHysQRZZ7IUfiwk_LeGZ7SAzMGP3S0dsOubEJzwiA3-m3Mjc"/>
+<div class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[10px] text-on-primary">favorite</span>
+</div>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1.5">
+<span class="font-headline-sm text-headline-sm text-on-surface truncate">현우</span>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant shrink-0">D+524</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant font-label-md text-label-md mt-0.5">
+<span class="material-symbols-outlined text-[15px] text-tertiary">cake</span>
+<span class="font-metric-tabular text-body-sm text-on-surface-variant">1998.04.12</span>
+</div>
+</div>
+</div>
+<button class="shrink-0 h-9 px-3.5 rounded-full bg-surface-container-low text-primary hover:bg-surface-container active:scale-95 transition-all flex items-center gap-1" type="button">
+<span class="font-label-md text-label-md">프로필 수정</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</section>
+<!-- Couple Highlights Mini Ribbon -->
+<section class="bg-surface-container-low rounded-xl p-space-md flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-tertiary-fixed flex items-center justify-center text-on-tertiary-fixed">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-tertiary uppercase tracking-wider">우리들의 공간</span>
+<span class="font-label-lg text-label-lg text-on-surface">현우 ♥ 지민의 기록 보관함</span>
+</div>
+</div>
+<div class="flex -space-x-2">
+<div class="w-7 h-7 rounded-full overflow-hidden shadow-sm bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Close up warm lifestyle portrait of a happy smiling Asian young man wearing stylish casual warm tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBq6RGOqg5mEOj-6a2vXBVWhY4c3Q_AFkj5FYyOKFjUUbnhArBALIvIaQZ34I729bZRHHCgDBio6J0wlDcI_9lGy_X_8O9iPoXwXanuuc1jSWj9MBLS4X0l_mXkZ2Xzys-SF6DYbnDRVAqqCcGLBXCRAIiAvoU4th1i6vNx6jYHl5dcjBfspPuERLa0yRiilQ0YK8Nrw1sJcj5SSUbRw7pLc3rU-xo3OLI69iLHj5g"/>
+</div>
+<div class="w-7 h-7 rounded-full overflow-hidden shadow-sm bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Close up aesthetic lifestyle portrait of a charming smiling young Korean woman with natural soft makeup and pastel clothing in soft ambient light." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDM9nbAzksOkSDw7ZqNyWJTqJ0ogd-pw7w9dhJ7eTI6dq58Gjgb8laQvxa8u0lfl3BS3eOO8mWrf3D3k-UUoZ5W0eK3lDE82-5Ek0hUQ7Vc0s1WC4iYn6DG-2bnQUxMTiCfiOhNmP8G8Jho8Kikb8p6LHtihCJ_8Ja0FaU1HXmZwRSORJHbSnqivGlIbvzCtzQqYGu3m3tqvmUn85y1NRim8lQ_cs920Gc5IlRm_k"/>
+</div>
+</div>
+</section>
+<!-- 1. Couple Management Section -->
+<div class="space-y-1.5">
+<div class="px-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">커플</span>
+</div>
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden flex flex-col">
+<button class="w-full px-space-md py-3.5 flex items-center justify-between text-left hover:bg-surface-container-low active:bg-surface-container transition-colors" type="button">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[18px]">supervised_user_circle</span>
+</div>
+<span class="font-body-md text-body-md text-on-surface font-semibold truncate">커플 관리</span>
+</div>
+<div class="flex items-center gap-1.5 shrink-0 ml-2">
+<span class="font-label-md text-label-md px-2.5 py-1 rounded-full bg-surface-container-low text-secondary font-semibold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+            지민과 연결됨
+          </span>
+<span class="material-symbols-outlined text-[18px] text-outline">chevron_right</span>
+</div>
+</button>
+</div>
+</div>
+<!-- 2. App Settings Section -->
+<div class="space-y-1.5">
+<div class="px-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">앱 설정</span>
+</div>
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden flex flex-col">
+<!-- Theme -->
+<button class="w-full px-space-md py-3.5 flex items-center justify-between text-left hover:bg-surface-container-low active:bg-surface-container transition-colors" type="button">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[18px]">palette</span>
+</div>
+<span class="font-body-md text-body-md text-on-surface font-semibold truncate">테마</span>
+</div>
+<div class="flex items-center gap-2 shrink-0 ml-2">
+<div class="flex items-center gap-1.5 bg-surface-container-low px-2 py-0.5 rounded-full">
+<span class="w-2.5 h-2.5 rounded-full bg-primary shrink-0"></span>
+<span class="font-label-md text-label-md text-primary font-medium">로맨틱 핑크</span>
+</div>
+<span class="material-symbols-outlined text-[18px] text-outline">chevron_right</span>
+</div>
+</button>
+<!-- Divider line via layout shift -->
+<div class="h-[1px] bg-surface-container mx-space-md"></div>
+<!-- Notifications -->
+<div class="w-full px-space-md py-3 flex items-center justify-between">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[18px]">notifications_active</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-on-surface font-semibold">알림</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">기념일 및 일정 푸시 알림</span>
+</div>
+</div>
+<!-- iOS Toggle simulation with micro-interaction -->
+<button aria-checked="true" class="w-12 h-7 rounded-full bg-primary p-0.5 transition-colors duration-200 ease-in-out focus:outline-none flex items-center shrink-0 cursor-pointer" id="toggleNotifications" type="button">
+<span class="w-6 h-6 rounded-full bg-surface-container-lowest shadow-sm transform translate-x-5 transition-transform duration-200 ease-in-out" id="toggleThumb"></span>
+</button>
+</div>
+<!-- Divider line -->
+<div class="h-[1px] bg-surface-container mx-space-md"></div>
+<!-- Widget Guide -->
+<button class="w-full px-space-md py-3.5 flex items-center justify-between text-left hover:bg-surface-container-low active:bg-surface-container transition-colors" type="button">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[18px]">widgets</span>
+</div>
+<span class="font-body-md text-body-md text-on-surface font-semibold truncate">위젯</span>
+</div>
+<div class="flex items-center gap-1.5 shrink-0 ml-2">
+<span class="font-body-sm text-body-sm text-on-surface-variant">설정 가이드</span>
+<span class="material-symbols-outlined text-[18px] text-outline">chevron_right</span>
+</div>
+</button>
+</div>
+</div>
+<!-- 3. Support Section -->
+<div class="space-y-1.5">
+<div class="px-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">지원</span>
+</div>
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden flex flex-col">
+<!-- Notices -->
+<button class="w-full px-space-md py-3.5 flex items-center justify-between text-left hover:bg-surface-container-low active:bg-surface-container transition-colors" type="button">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[18px]">campaign</span>
+</div>
+<span class="font-body-md text-body-md text-on-surface font-semibold truncate">공지사항</span>
+</div>
+<div class="flex items-center gap-1.5 shrink-0 ml-2">
+<span class="w-2 h-2 rounded-full bg-primary shrink-0"></span>
+<span class="material-symbols-outlined text-[18px] text-outline">chevron_right</span>
+</div>
+</button>
+<!-- Divider line -->
+<div class="h-[1px] bg-surface-container mx-space-md"></div>
+<!-- Contact Us -->
+<button class="w-full px-space-md py-3.5 flex items-center justify-between text-left hover:bg-surface-container-low active:bg-surface-container transition-colors" type="button">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[18px]">contact_support</span>
+</div>
+<span class="font-body-md text-body-md text-on-surface font-semibold truncate">문의하기</span>
+</div>
+<div class="flex items-center gap-1.5 shrink-0 ml-2">
+<span class="material-symbols-outlined text-[18px] text-outline">chevron_right</span>
+</div>
+</button>
+<!-- Divider line -->
+<div class="h-[1px] bg-surface-container mx-space-md"></div>
+<!-- Rate App -->
+<button class="w-full px-space-md py-3.5 flex items-center justify-between text-left hover:bg-surface-container-low active:bg-surface-container transition-colors" type="button">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[18px]">star</span>
+</div>
+<span class="font-body-md text-body-md text-on-surface font-semibold truncate">앱 평가하기</span>
+</div>
+<div class="flex items-center gap-1 shrink-0 ml-2">
+<span class="font-label-md text-label-md text-secondary">별점 남기기</span>
+<span class="material-symbols-outlined text-[18px] text-outline">chevron_right</span>
+</div>
+</button>
+</div>
+</div>
+<!-- 4. Terms & Policy Section -->
+<div class="space-y-1.5">
+<div class="px-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">정보</span>
+</div>
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden flex flex-col">
+<button class="w-full px-space-md py-3.5 flex items-center justify-between text-left hover:bg-surface-container-low active:bg-surface-container transition-colors" type="button">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[18px]">policy</span>
+</div>
+<span class="font-body-md text-body-md text-on-surface font-semibold truncate">약관 및 정책</span>
+</div>
+<div class="flex items-center gap-1.5 shrink-0 ml-2">
+<span class="material-symbols-outlined text-[18px] text-outline">chevron_right</span>
+</div>
+</button>
+</div>
+</div>
+<!-- 5. Account Management Section (Safe & Non-destructive overview) -->
+<div class="space-y-1.5">
+<div class="px-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">계정</span>
+</div>
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden flex flex-col">
+<button class="w-full px-space-md py-3.5 flex items-center justify-between text-left hover:bg-surface-container-low active:bg-surface-container transition-colors" type="button">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[18px]">manage_accounts</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-on-surface font-semibold truncate">계정 관리</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">hyunwoo@lovecalendar.app</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5 shrink-0 ml-2">
+<span class="material-symbols-outlined text-[18px] text-outline">chevron_right</span>
+</div>
+</button>
+</div>
+</div>
+<!-- App Version Footer -->
+<footer class="pt-3 pb-2 flex flex-col items-center justify-center text-center space-y-1">
+<div class="flex items-center gap-1 text-tertiary">
+<span class="material-symbols-outlined text-[14px]">favorite</span>
+<span class="font-label-sm text-label-sm text-tertiary">두 사람의 날들</span>
+</div>
+<p class="font-metric-tabular text-body-sm text-outline">
+      버전 2.4.0 (최신 버전)
+    </p>
+</footer>
+</div>
+<script>
+  (function initSettingsInteractions() {
+    const toggle = document.getElementById('toggleNotifications');
+    const thumb = document.getElementById('toggleThumb');
+    if (!toggle || !thumb) return;
+
+    let isEnabled = true;
+
+    toggle.addEventListener('click', () => {
+      isEnabled = !isEnabled;
+      toggle.setAttribute('aria-checked', isEnabled.toString());
+      if (isEnabled) {
+        toggle.classList.remove('bg-surface-variant');
+        toggle.classList.add('bg-primary');
+        thumb.classList.remove('translate-x-0.5');
+        thumb.classList.add('translate-x-5');
+      } else {
+        toggle.classList.remove('bg-primary');
+        toggle.classList.add('bg-surface-variant');
+        thumb.classList.remove('translate-x-5');
+        thumb.classList.add('translate-x-0.5');
+      }
+    });
+  })();
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/85 backdrop-blur-xl shadow-[0_-4px_16px_rgba(210,60,105,0.06)]" data-active-classes="text-primary font-bold"><div class="flex justify-around items-center h-16 px-space-sm"><a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] gap-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="home" href="#"><span class="material-symbols-outlined text-[24px]">favorite</span><span class="font-label-sm text-label-sm">홈</span></a><a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] gap-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="calendar" href="#"><span class="material-symbols-outlined text-[24px]">calendar_month</span><span class="font-label-sm text-label-sm">캘린더</span></a><a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] gap-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="settings" href="#"><span class="material-symbols-outlined text-[24px]">settings</span><span class="font-label-sm text-label-sm">설정</span></a></div></nav></body></html>

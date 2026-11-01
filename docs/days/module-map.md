@@ -156,8 +156,33 @@ Firebase 프로젝트는 dev · prod를 분리해 개발 중 실수가 실제 �
 2. `core:designsystem` (테마 토큰 8 팔레트)
 3. `core:database`, `core:datastore`, `core:data`
 4. `feature:home`, `feature:item`, `feature:calendar` → **솔로 모드 완성**
-5. `widget`
+5. `widget` (아래 10장 TODO)
 6. `core:firebase`, `core:network`, `core:sync`, `feature:couple`, `workers/`, `firebase/` 규칙 → **커플 모드**
 7. `feature:onboarding`, `feature:settings`, `feature:notifications`, `core:notification`
 8. `core:ads`, 광고 제거 구매
 9. `policy-site/`, 출시 체크리스트 (`infra-and-billing-protection.md`)
+
+## 10. TODO: widget 모듈 (Glance)
+
+> 상태: **미착수.** 솔로 모드(9장 4단계)를 마친 뒤 만든다. 기획은 `product-spec.md` 8장, 시안은 `design/settings-widget/`.
+
+**모듈 · 빌드**
+- [ ] `:widget` 모듈 추가 (`days.android.library` + `days.android.compose` + `days.koin`), `settings.gradle.kts` include
+- [ ] catalog에 `androidx.glance:glance-appwidget`(+ `glance-material3`) 추가
+- [ ] app에 `implementation(projects.widget)`, `appModule`에 `widgetModule` 포함
+
+**위젯**
+- [ ] 크기 3종: 작게(2×2) · 중간(4×2) · 잠금화면 — `GlanceAppWidget` + `GlanceAppWidgetReceiver`, `appwidget-provider` XML(크기별 `minWidth/minHeight`, `previewLayout`)
+- [ ] 표시: 디데이 제목 · D-day 숫자 · 기준일. 계산은 `core:domain`만 사용 (화면 · 위젯 · 알림 공통)
+- [ ] 배경: 사진 · 테마색 · 다크 · 화이트, 프로필 사진 표시 여부. 색은 테마 토큰만 (`theme-guide.md`)
+- [ ] 탭 시 디데이 상세로 이동: `item:api`의 `ItemDetailKey` 딥링크 → app에서 백스택 구성
+
+**설정 · 데이터**
+- [ ] 위젯 설정 Activity (위젯 추가 시 표시할 디데이 · 배경 선택), 설정 화면의 `WidgetSettings`와 같은 값 사용
+- [ ] Room `widget_config` (widget_id, item_id, size, background_type, show_profile) — `data-model-erd.md`
+- [ ] 갱신: 항목 수정 · 날짜 변경(자정) 시 `GlanceAppWidgetManager`로 업데이트, 필요하면 WorkManager 주기 작업
+- [ ] 디데이 상세의 "위젯 추가" Event: `AppWidgetManager.requestPinAppWidget`
+
+**검증**
+- [ ] 위젯 크기별 Preview(Glance), 날짜 경계(자정 · 윤년) 갱신 테스트
+- [ ] 공유 항목이 삭제 · 연결 해제됐을 때 위젯 표시 처리

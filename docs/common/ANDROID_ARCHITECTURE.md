@@ -330,6 +330,9 @@ feature/{feature}/impl/src/main/kotlin/{base.package}/feature/{feature}/impl/
 └─ di/{Feature}Module.kt   # Koin 모듈 + navigation 등록
 ```
 
+- 화면이 여러 개인 기능은 **화면마다 하위 패키지**(소문자, 예: `impl/itemdetail/`, `impl/itemedit/`)를 두고 위 파일 묶음을 그 안에 둡니다. `di/`와 기능 내부 NavKey(`{Feature}Keys.kt`, 하나면 키 이름 파일)는 impl 최상위에 둡니다.
+- 인자가 있는 화면은 Root가 키를 받고 `koinViewModel { parametersOf(key) }`로 ViewModel에 넘깁니다 (`viewModel { params -> {Feature}ViewModel(key = params.get()) }`).
+
 | 타입 | 역할 | 형태 |
 |---|---|---|
 | Action | 사용자가 한 일 (클릭, 입력, 새로고침) | `sealed interface` |

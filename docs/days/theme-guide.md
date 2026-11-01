@@ -16,6 +16,7 @@
 6. 컴포넌트별 토큰 매핑
 7. 명도 대비 검증
 8. 기존 값에서 변경된 부분
+9. 타이포그래피
 
 ## 1. 테마 전환 방식
 
@@ -374,6 +375,29 @@ WCAG 기준: 일반 텍스트 4.5:1 이상, 큰 텍스트(24px 이상 또는 18.
 | 추가 토큰 | 9개 | 27개 | pressed, on-soft, fill, raised, overlay, border-strong, tertiary, 상태, 캘린더, shadow 추가 |
 
 
+## 9. 타이포그래피
+
+글꼴은 **Pretendard**(SIL OFL 1.1) 한 가지입니다. 크기 · 굵기 · 줄 간격 · 자간은 Stitch 시안의 `design/_stitch-design-system/DESIGN.md` typography 값을 그대로 쓰고, 글꼴만 Pretendard로 바꿉니다.
+
+| 스타일 | 크기(sp) | 굵기 | 줄 간격(sp) | 자간 | 숫자 | 용도 (권장) |
+|---|---|---|---|---|---|---|
+| `displayHero` | 44 | 800 | 52 | -0.03em | tnum | 히어로 · 대표 디데이 숫자 (큰 화면) |
+| `displayHeroMobile` | 36 | 800 | 44 | -0.02em | tnum | 히어로 · 대표 디데이 숫자 |
+| `headlineLg` | 28 | 700 | 36 | -0.02em |  | 화면 큰 제목 |
+| `headlineMd` | 22 | 700 | 30 | -0.015em |  | 섹션 제목 |
+| `headlineSm` | 18 | 600 | 24 | -0.01em |  | 카드 제목 |
+| `bodyLg` | 17 | 400 | 24 | -0.01em |  | 강조 본문 |
+| `bodyMd` | 15 | 400 | 22 | -0.005em |  | 기본 본문 |
+| `bodySm` | 13 | 400 | 18 | 0em |  | 보조 설명 · 날짜 |
+| `labelLg` | 15 | 600 | 20 | -0.005em |  | 버튼 |
+| `labelMd` | 13 | 600 | 18 | 0em |  | 칩 · 탭 |
+| `labelSm` | 11 | 600 | 14 | 0.02em |  | 뱃지 · 캡션 |
+| `metricTabular` | 24 | 700 | 28 | -0.02em | tnum | 리스트 디데이 숫자 |
+
+- 포함한 굵기: Regular(400) · Medium(500) · SemiBold(600) · Bold(700) · ExtraBold(800). 시안에서 쓰지 않는 Thin · Light · Black은 넣지 않습니다.
+- 디데이 숫자는 `tnum`(tabular-nums) 스타일을 씁니다 (5.5).
+- 라이선스 원문은 `core/designsystem/licenses/Pretendard-OFL.txt`. 오픈소스 라이선스 화면에 포함합니다.
+
 ## Android(Compose) 적용
 
 `core:designsystem` 모듈에서 아래 구조로 사용합니다.
@@ -440,6 +464,7 @@ object AppThemeTokens {
 - 토큰 이름은 JSON의 kebab-case를 camelCase로 바꿉니다 (`primary-soft` → `primarySoft`).
 - 컴포넌트에서는 `AppThemeTokens.colors.primary`처럼 토큰만 참조합니다. `Color(0xFF…)` 하드코딩은 금지입니다 (CODING_CONVENTIONS 6-5).
 - 8개 팔레트(`ThemeTokens.kt`)는 **생성 파일**입니다. 값은 `theme-tokens.json`만 고치고 `python3 scripts/generate-theme-colors.py`로 다시 만듭니다. `ThemeTokensSyncTest`가 JSON과 생성 코드가 다르면 실패합니다.
+- 글자 스타일(9장)은 `AppThemeTokens.typography.bodyMd`처럼 참조합니다. Material 컴포넌트용 `Typography`도 같은 값으로 매핑합니다 (`displayLarge`=`displayHero`, `headline*`, `titleLarge`=`headlineSm`, `titleMedium`=`labelLg`, `body*`, `label*`).
 - 고정 색(4장)은 `AppFixedColors`(`kakao`, `onKakao`, `onImage`, `imageScrim`)로 씁니다.
 - Material 컴포넌트도 토큰 색을 쓰도록 `AppTheme`이 `colorScheme`을 매핑합니다: `primary`·`onPrimary`, `primaryContainer`=`primary-soft`, `secondary`=`accent`, `background`=`bg`, `surface`·`surfaceContainer`=`surface`, `surfaceContainerHigh(est)`=`surface-raised`, `surfaceVariant`=`fill`, `onSurface`=`text-primary`, `onSurfaceVariant`=`text-secondary`, `outline`=`border-strong`, `outlineVariant`=`border`, `error`=`danger`, `scrim`=`overlay`.
 - 선택한 테마 · 모드는 DataStore에 저장하고, 위젯도 같은 팔레트를 사용합니다.

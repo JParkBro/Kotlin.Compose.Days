@@ -290,7 +290,7 @@
 | 위젯 설정의 iOS 규격 문구 | Android, 중간 크기 4×2 (8장) |
 | 정책 화면의 "AES-256 암호화" 등 보안 문구 | 실제 구현과 맞는 문구만 사용 |
 | 소개 화면 앱 이름 "우리둘이" | 앱 표시 이름 (1장) |
-| `_stitch-design-system/DESIGN.md`의 색 · 글꼴 | 색은 `theme-guide.md` 토큰, 글꼴은 Pretendard |
+| `_stitch-design-system/DESIGN.md`의 색 · 글꼴(Plus Jakarta Sans) | 색은 `theme-guide.md` 토큰, 글꼴은 Pretendard. 글자 크기 · 굵기 값만 사용 (`theme-guide.md` 9장) |
 
 시안이 없는 화면: 프로필 수정, 오픈소스 라이선스 상세.
 

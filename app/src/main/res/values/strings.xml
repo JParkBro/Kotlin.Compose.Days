@@ -1,63 +1,8 @@
 <resources>
     <string name="app_name">데이즈</string>
 
-    <!-- TopBar Title -->
-    <string name="announcements">공지사항</string>
-    <string name="policy">운영정책</string>
-    <string name="oss_licenses">오픈소스 라이선스</string>
-    <string name="help_center">고객지원</string>
-    <string name="our_love_timeline">Our Love Timeline</string>
-    <string name="moments_we_share">Moments We Share</string>
-    <string name="couple_tab">Couple</string>
-    <string name="d_day_tab">D-Day</string>
-
-    <!-- UI -->
-    <string name="nick_name">닉네임</string>
-    <string name="text_length">%d / 8</string>
-    <string name="cancel">취소</string>
-    <string name="update">수정</string>
-    <string name="confirm">확인</string>
-    <string name="en_ok">OK</string>
-    <string name="en_cancel">Cancel</string>
-    <string name="all_picker">전체</string>
-    <string name="year_picker">연도별</string>
-    <string name="month_picker">월별</string>
-    <string name="no_announcements">등록된 공지사항이 없습니다.</string>
-    <string name="privacy_policy">개인정보처리방침</string>
-    <string name="app_version">앱 버전</string>
-
-    <!-- DaysOfWeek -->
-    <string name="monday">월</string>
-    <string name="tuesday">화</string>
-    <string name="wednesday">수</string>
-    <string name="thursday">목</string>
-    <string name="friday">금</string>
-    <string name="saturday">토</string>
-    <string name="sunday">일</string>
-
-    <!-- DDayHelper -->
-    <string name="today">오늘</string>
-    <string name="first_meeting_day">처음 만난 날 %s</string>
-    <string name="day_count">%d일</string>
-    <string name="year_count">%d주년</string>
-    <string name="d_day_format">D-%d</string>
-    <string name="birthday_emoji_nick">%s%s</string>
-    <string name="birthday_info_one">%s (%s)</string>
-    <string name="birthday_info_two">%s (%s) | %s</string>
-
-    <!-- contentDescription -->
-    <string name="arrow_back_icon">Arrow Back Icon</string>
-    <string name="male_profile_icon">Male Profile Icon</string>
-    <string name="account_circle_icon">Account Circle Icon</string>
-    <string name="calendar_icon">Calendar Icon</string>
-    <string name="expand_more_icon">Expand More Icon</string>
-    <string name="notifications_outline_icon">Notifications Outline Icon</string>
-    <string name="help_outline_icon">Help Outline Icon</string>
-    <string name="info_outline_icon">Info Outline Icon</string>
-
-    <!-- Toast Text -->
-    <string name="update_toast">업데이트 예정입니다.</string>
-    <string name="circle_notifications_icon">Circle Notifications Icon</string>
-
-
+    <!-- 하단 탭 -->
+    <string name="app_tab_home">홈</string>
+    <string name="app_tab_calendar">캘린더</string>
+    <string name="app_tab_settings">설정</string>
 </resources>

@@ -5,16 +5,14 @@ import jpark.bro.days.domain.repository.CoupleDateRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class CoupleDateRepositoryImpl @Inject constructor(
-    private val coupleDateDataStore: CoupleDateDataStore
-) : CoupleDateRepository {
+class CoupleDateRepositoryImpl
+    @Inject
+    constructor(
+        private val coupleDateDataStore: CoupleDateDataStore,
+    ) : CoupleDateRepository {
+        override suspend fun saveCoupleDate(date: Long) {
+            coupleDateDataStore.saveCoupleDate(date = date)
+        }
 
-    override suspend fun saveCoupleDate(date: Long) {
-        coupleDateDataStore.saveCoupleDate(date = date)
+        override fun getCoupleDate(): Flow<Long?> = coupleDateDataStore.coupleDate
     }
-
-    override fun getCoupleDate(): Flow<Long?> {
-        return coupleDateDataStore.coupleDate
-    }
-
-}

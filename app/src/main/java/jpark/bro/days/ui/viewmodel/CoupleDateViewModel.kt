@@ -15,44 +15,45 @@ import kotlinx.datetime.atStartOfDayIn
 import javax.inject.Inject
 
 @HiltViewModel
-class CoupleDateViewModel @Inject constructor(
-    private val loadCoupleDateUseCase: LoadCoupleDateUseCase,
-    private val saveCoupleDateUseCase: SaveCoupleDateUseCase,
-) : ViewModel() {
+class CoupleDateViewModel
+    @Inject
+    constructor(
+        private val loadCoupleDateUseCase: LoadCoupleDateUseCase,
+        private val saveCoupleDateUseCase: SaveCoupleDateUseCase,
+    ) : ViewModel() {
+        private val _coupleDate = MutableStateFlow<LocalDate?>(null)
+        val coupleDate: StateFlow<LocalDate?> = _coupleDate
 
-    private val _coupleDate = MutableStateFlow<LocalDate?>(null)
-    val coupleDate: StateFlow<LocalDate?> = _coupleDate
+        private val _formattedCoupleDate = MutableStateFlow<String?>(null)
+        val formattedCoupleDate: StateFlow<String?> = _formattedCoupleDate
 
-    private val _formattedCoupleDate = MutableStateFlow<String?>(null)
-    val formattedCoupleDate: StateFlow<String?> = _formattedCoupleDate
+        private val _daysSinceStart = MutableStateFlow<Int>(0)
+        val daysSinceStart: StateFlow<Int> = _daysSinceStart
 
-    private val _daysSinceStart = MutableStateFlow<Int>(0)
-    val daysSinceStart: StateFlow<Int> = _daysSinceStart
+        init {
+            loadCoupleDate()
+        }
 
-    init {
-        loadCoupleDate()
-    }
-
-    private fun loadCoupleDate() {
-        viewModelScope.launch {
-            loadCoupleDateUseCase().collect { dateMillis ->
-                dateMillis?.let { updateState(it) }
+        private fun loadCoupleDate() {
+            viewModelScope.launch {
+                loadCoupleDateUseCase().collect { dateMillis ->
+                    dateMillis?.let { updateState(it) }
+                }
             }
         }
-    }
 
-    fun saveCoupleDate(selectedDate: LocalDate) {
-        viewModelScope.launch {
-            val dateMillis = selectedDate.atStartOfDayIn(TimeZone.currentSystemDefault()).toEpochMilliseconds()
-            saveCoupleDateUseCase(dateMillis)
-            updateState(dateMillis)
+        fun saveCoupleDate(selectedDate: LocalDate) {
+            viewModelScope.launch {
+                val dateMillis = selectedDate.atStartOfDayIn(TimeZone.currentSystemDefault()).toEpochMilliseconds()
+                saveCoupleDateUseCase(dateMillis)
+                updateState(dateMillis)
+            }
+        }
+
+        private fun updateState(dateMillis: Long) {
+            val date = DateUtil.formatDateToLocalDate(dateMillis)
+            _coupleDate.value = date
+            _formattedCoupleDate.value = DateUtil.formatDateToString(date)
+            _daysSinceStart.value = DateUtil.calculateDaysSinceStart(date)
         }
     }
-
-    private fun updateState(dateMillis: Long) {
-        val date = DateUtil.formatDateToLocalDate(dateMillis)
-        _coupleDate.value = date
-        _formattedCoupleDate.value = DateUtil.formatDateToString(date)
-        _daysSinceStart.value = DateUtil.calculateDaysSinceStart(date)
-    }
-}

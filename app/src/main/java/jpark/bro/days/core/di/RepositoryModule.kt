@@ -13,17 +13,11 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
+    @Binds
+    @Singleton
+    abstract fun bindCoupleDateRepository(coupleDateRepositoryImpl: CoupleDateRepositoryImpl): CoupleDateRepository
 
     @Binds
     @Singleton
-    abstract fun bindCoupleDateRepository(
-        coupleDateRepositoryImpl: CoupleDateRepositoryImpl
-    ) : CoupleDateRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindProfileRepository(
-        profileRepositoryImpl: ProfileRepositoryImpl
-    ) : ProfileRepository
-
+    abstract fun bindProfileRepository(profileRepositoryImpl: ProfileRepositoryImpl): ProfileRepository
 }

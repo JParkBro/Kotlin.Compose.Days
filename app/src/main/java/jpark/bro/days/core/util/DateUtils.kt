@@ -9,17 +9,17 @@ import kotlinx.datetime.daysUntil
 import kotlinx.datetime.toLocalDateTime
 
 object DateUtil {
-    fun getCurrentLocalDate(): LocalDate {
-        return Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
-    }
+    fun getCurrentLocalDate(): LocalDate =
+        Clock.System
+            .now()
+            .toLocalDateTime(TimeZone.currentSystemDefault())
+            .date
 
-    fun formatDateToLocalDate(dateMillis: Long): LocalDate {
-        return Instant.fromEpochMilliseconds(dateMillis).toLocalDateTime(TimeZone.currentSystemDefault()).date
-    }
+    fun formatDateToLocalDate(dateMillis: Long): LocalDate =
+        Instant.fromEpochMilliseconds(dateMillis).toLocalDateTime(TimeZone.currentSystemDefault()).date
 
-    fun formatDateToString(date: LocalDate): String {
-        return "${date.year}.${date.monthNumber.toString().padStart(2, '0')}.${date.dayOfMonth.toString().padStart(2, '0')}"
-    }
+    fun formatDateToString(date: LocalDate): String =
+        "${date.year}.${date.monthNumber.toString().padStart(2, '0')}.${date.dayOfMonth.toString().padStart(2, '0')}"
 
     fun calculateDaysSinceStart(startDate: LocalDate): Int {
         val today = getCurrentLocalDate()
@@ -27,16 +27,20 @@ object DateUtil {
         return if (daysDifference < 1) 0 else daysDifference
     }
 
-    fun calculateDaysSinceStart(startDate: LocalDate, targetDate: LocalDate): Int {
+    fun calculateDaysSinceStart(
+        startDate: LocalDate,
+        targetDate: LocalDate,
+    ): Int {
         val daysDifference = startDate.daysUntil(targetDate).plus(1)
         return if (daysDifference < 1) 0 else daysDifference
     }
 
-    fun LocalDate.toEpochMilli(): Long {
-        return this.atStartOfDayIn(TimeZone.currentSystemDefault()).toEpochMilliseconds()
-    }
+    fun LocalDate.toEpochMilli(): Long = this.atStartOfDayIn(TimeZone.currentSystemDefault()).toEpochMilliseconds()
 
-    fun calculateKoreanAge(birthday: LocalDate, currentDate: LocalDate): Int {
+    fun calculateKoreanAge(
+        birthday: LocalDate,
+        currentDate: LocalDate,
+    ): Int {
         val currentYear = currentDate.year
         val birthYear = birthday.year
         return currentYear - birthYear + 1

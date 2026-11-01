@@ -22,38 +22,41 @@ import androidx.compose.ui.unit.sp
 fun AllPeriodPicker(
     selectedTextStyle: TextStyle = TextStyle(fontSize = 24.sp, color = Color.Black),
     itemPadding: PaddingValues = PaddingValues(8.dp),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val density = LocalDensity.current
 
-    val itemHeight = with(density) {
-        selectedTextStyle.fontSize.toDp() + itemPadding.calculateTopPadding() + itemPadding.calculateBottomPadding()
-    }
+    val itemHeight =
+        with(density) {
+            selectedTextStyle.fontSize.toDp() + itemPadding.calculateTopPadding() + itemPadding.calculateBottomPadding()
+        }
 
     Box(
-        modifier = modifier
-            .height(itemHeight * 3)
-            .fillMaxWidth(),
-        contentAlignment = Alignment.Center
+        modifier =
+            modifier
+                .height(itemHeight * 3)
+                .fillMaxWidth(),
+        contentAlignment = Alignment.Center,
     ) {
         Box(
-            modifier = Modifier
-                .width(100.dp)
-                .height(itemHeight)
-                .background(
-                    color = Color.LightGray.copy(alpha = 0.2f),
-                    shape = RoundedCornerShape(8.dp)
-                )
+            modifier =
+                Modifier
+                    .width(100.dp)
+                    .height(itemHeight)
+                    .background(
+                        color = Color.LightGray.copy(alpha = 0.2f),
+                        shape = RoundedCornerShape(8.dp),
+                    ),
         )
         Text(
             text = "전체",
-            style = selectedTextStyle
+            style = selectedTextStyle,
         )
     }
 }
 
 @Composable
 @Preview(showBackground = true)
-fun AllPeriodPickerPreview(){
+fun AllPeriodPickerPreview() {
     AllPeriodPicker()
 }

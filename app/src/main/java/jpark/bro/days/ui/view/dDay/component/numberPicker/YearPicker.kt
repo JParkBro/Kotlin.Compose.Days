@@ -31,27 +31,29 @@ fun YearPicker(
     spacingBetweenPickers: Dp = 20.dp,
     pickerWidth: Dp = 100.dp,
     initialYear: Int,
-    onYearSelected: (Int) -> Unit
+    onYearSelected: (Int) -> Unit,
 ) {
     Surface(modifier = modifier) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
-
-            val yearStartIndex = remember {
-                yearItems.indexOf(initialYear)
-            }
+            val yearStartIndex =
+                remember {
+                    yearItems.indexOf(initialYear)
+                }
 
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White),
-                horizontalArrangement = Arrangement.spacedBy(
-                    spacingBetweenPickers,
-                    Alignment.CenterHorizontally
-                ),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .background(Color.White),
+                horizontalArrangement =
+                    Arrangement.spacedBy(
+                        spacingBetweenPickers,
+                        Alignment.CenterHorizontally,
+                    ),
             ) {
                 DaysPicker(
                     items = yearItems,
@@ -63,7 +65,7 @@ fun YearPicker(
                     selectedTextStyle = selectedTextStyle,
                     onSelectedChange = { selectedItem ->
                         selectedItem?.let { onYearSelected(it) }
-                    }
+                    },
                 )
             }
         }

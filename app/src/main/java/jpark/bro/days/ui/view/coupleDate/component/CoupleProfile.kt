@@ -56,34 +56,36 @@ import kotlinx.datetime.LocalDate
 @Composable
 fun CoupleProfile(
     modifier: Modifier = Modifier,
-    viewModel: ProfileViewModel = hiltViewModel()
+    viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val profileA by viewModel.profileA.collectAsState()
     val profileB by viewModel.profileB.collectAsState()
 
     Row(
-        modifier = modifier
-            .wrapContentHeight(),
+        modifier =
+            modifier
+                .wrapContentHeight(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceAround
+        horizontalArrangement = Arrangement.SpaceAround,
     ) {
         Profile(
             profileData = profileA,
             onSaveProfile = { name, birthday ->
                 viewModel.saveProfile(ProfileType.A, name, birthday)
-            }
+            },
         )
         Text(
             text = EMOJIS.HEART,
             fontSize = 32.sp,
-            modifier = Modifier
-                .padding(24.dp)
+            modifier =
+                Modifier
+                    .padding(24.dp),
         )
         Profile(
             profileData = profileB,
             onSaveProfile = { name, birthday ->
                 viewModel.saveProfile(ProfileType.B, name, birthday)
-            }
+            },
         )
     }
 }
@@ -91,31 +93,33 @@ fun CoupleProfile(
 @Composable
 private fun Profile(
     profileData: ProfileUiState,
-    onSaveProfile: (String, LocalDate) -> Unit
+    onSaveProfile: (String, LocalDate) -> Unit,
 ) {
     var showDialog by remember { mutableStateOf(false) }
 
     Column(
-        modifier = Modifier
-            .clickable(
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() },
-                onClick = { showDialog = true },
-            )
-            .widthIn(min = 140.dp),
+        modifier =
+            Modifier
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() },
+                    onClick = { showDialog = true },
+                ).widthIn(min = 140.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         Box(
-            modifier = Modifier
-                .border(width = 2.dp, color = Color.White, shape = CircleShape)
-                .clip(shape = CircleShape)
+            modifier =
+                Modifier
+                    .border(width = 2.dp, color = Color.White, shape = CircleShape)
+                    .clip(shape = CircleShape),
         ) {
             Icon(
                 painter = painterResource(R.drawable.male_profile),
                 contentDescription = stringResource(R.string.male_profile_icon),
-                modifier = Modifier
-                    .size(96.dp)
+                modifier =
+                    Modifier
+                        .size(96.dp),
             )
         }
         Text(
@@ -123,16 +127,18 @@ private fun Profile(
             fontSize = 24.sp,
             fontWeight = FontWeight.SemiBold,
             color = Color.White,
-            modifier = Modifier
-                .padding(vertical = 8.dp)
+            modifier =
+                Modifier
+                    .padding(vertical = 8.dp),
         )
         Text(
             text = profileData.ageText,
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold,
             color = Color.White,
-            modifier = Modifier
-                .padding(bottom = 16.dp)
+            modifier =
+                Modifier
+                    .padding(bottom = 16.dp),
         )
     }
     if (showDialog) {
@@ -142,7 +148,7 @@ private fun Profile(
                 onSaveProfile(updatedName, updatedBirthday)
                 showDialog = false
             },
-            onDismiss = { showDialog = false }
+            onDismiss = { showDialog = false },
         )
     }
 }
@@ -152,7 +158,7 @@ private fun ProfileEditDialog(
     profileData: ProfileUiState,
     onConfirm: (String, LocalDate) -> Unit,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     var showDatePicker by remember { mutableStateOf(false) }
@@ -164,34 +170,37 @@ private fun ProfileEditDialog(
     var birthday by remember { mutableStateOf(profileData.birthday) }
 
     Dialog(
-        onDismissRequest = onDismiss
+        onDismissRequest = onDismiss,
     ) {
         Card(
-            modifier = modifier
-                .width(dialogWidth)
-                .wrapContentHeight(),
+            modifier =
+                modifier
+                    .width(dialogWidth)
+                    .wrapContentHeight(),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF)),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         ) {
             Column {
                 Box(
-                    modifier = Modifier
-                        .height(dialogWidth)
-                        .clickable(
-                            onClick = {
-                                ToastUtil.showToast(
-                                    context = context,
-                                    msg = context.getString(R.string.update_toast)
-                                )
-                            }
-                        )
+                    modifier =
+                        Modifier
+                            .height(dialogWidth)
+                            .clickable(
+                                onClick = {
+                                    ToastUtil.showToast(
+                                        context = context,
+                                        msg = context.getString(R.string.update_toast),
+                                    )
+                                },
+                            ),
                 ) {
                     Icon(
                         imageVector = Icons.Default.AccountCircle,
                         contentDescription = stringResource(R.string.account_circle_icon),
-                        modifier = Modifier
-                            .fillMaxSize()
+                        modifier =
+                            Modifier
+                                .fillMaxSize(),
                     )
                 }
                 OutlinedTextField(
@@ -209,46 +218,49 @@ private fun ProfileEditDialog(
                             style = TextStyle(fontSize = 12.sp, color = Color.DarkGray, fontWeight = FontWeight.W600),
                         )
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
                 )
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 0.dp)
-                        .border(
-                            width = 1.dp,
-                            color = Color(0xFF79747E),
-                            shape = RoundedCornerShape(4.dp)
-                        )
-                        .clip(shape = RoundedCornerShape(4.dp))
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 0.dp)
+                            .border(
+                                width = 1.dp,
+                                color = Color(0xFF79747E),
+                                shape = RoundedCornerShape(4.dp),
+                            ).clip(shape = RoundedCornerShape(4.dp)),
                 ) {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                            .clickable(
-                                indication = null,
-                                interactionSource = remember { MutableInteractionSource() },
-                                onClick = { showDatePicker = true }
-                            ),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                                .clickable(
+                                    indication = null,
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    onClick = { showDatePicker = true },
+                                ),
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(text = "$birthday")
                         Icon(
                             painter = painterResource(R.drawable.calendar_month_24),
                             contentDescription = stringResource(R.string.calendar_icon),
-                            modifier = Modifier
+                            modifier = Modifier,
                         )
                     }
                 }
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
                 ) {
                     TextButton(onClick = { onDismiss() }) {
                         Text(stringResource(R.string.cancel))
@@ -266,7 +278,7 @@ private fun ProfileEditDialog(
                 onDateSelected = { selectedDate ->
                     birthday = selectedDate
                     showDatePicker = false
-                }
+                },
             )
         }
     }

@@ -11,8 +11,8 @@ import kotlinx.coroutines.flow.map
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "coupleDate")
 
-class CoupleDateDataStore (
-    private val context: Context
+class CoupleDateDataStore(
+    private val context: Context,
 ) {
     companion object {
         private val COUPLE_DATE_KEY = longPreferencesKey("couple_date")
@@ -24,7 +24,8 @@ class CoupleDateDataStore (
         }
     }
 
-    val coupleDate: Flow<Long?> = context.dataStore.data.map { preferences ->
-        preferences[COUPLE_DATE_KEY]
-    }
+    val coupleDate: Flow<Long?> =
+        context.dataStore.data.map { preferences ->
+            preferences[COUPLE_DATE_KEY]
+        }
 }

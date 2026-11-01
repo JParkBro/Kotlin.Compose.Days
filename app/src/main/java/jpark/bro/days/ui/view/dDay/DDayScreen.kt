@@ -24,7 +24,7 @@ import jpark.bro.days.ui.viewmodel.DDAYViewModel
 @Composable
 fun DDayScreen(
     modifier: Modifier = Modifier,
-    viewModel: DDAYViewModel = hiltViewModel()
+    viewModel: DDAYViewModel = hiltViewModel(),
 ) {
     val currentItems by viewModel.filteredDDays.collectAsState(emptyList())
     val previousItems by viewModel.previousDDays.collectAsState(emptyList())
@@ -40,21 +40,24 @@ fun DDayScreen(
     }
 
     Card(
-        modifier = modifier
-            .fillMaxSize(),
+        modifier =
+            modifier
+                .fillMaxSize(),
         shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor = Color.White,
+            ),
     ) {
-        Column (
-            modifier = Modifier
-                .padding(16.dp)
+        Column(
+            modifier =
+                Modifier
+                    .padding(16.dp),
         ) {
             DDayListHeader(viewModel = viewModel)
             LazyColumn(
                 state = listState,
-                modifier = Modifier
+                modifier = Modifier,
             ) {
                 items(currentItems) { item ->
                     DDayListItem(item = item)

@@ -5,7 +5,7 @@ import android.util.Log
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class DaysApplication: Application() {
+class DaysApplication : Application() {
     companion object {
         const val TAG = "DAYS_APPLICATION"
 

@@ -11,10 +11,11 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 
 val LocalAppColors = staticCompositionLocalOf<AppColors> { error("AppTheme 밖에서 AppThemeTokens를 사용했습니다.") }
+val LocalAppTypography = staticCompositionLocalOf<AppTypography> { error("AppTheme 밖에서 AppThemeTokens를 사용했습니다.") }
 
 /**
  * 앱 테마. 선택한 테마 · 모드는 DataStore에 저장하고 위젯도 같은 팔레트를 쓴다 (theme-guide.md).
- * Material 컴포넌트도 토큰 색을 쓰도록 colorScheme을 매핑한다.
+ * Material 컴포넌트도 토큰 색 · 글자 스타일을 쓰도록 colorScheme · typography를 매핑한다.
  */
 @Composable
 fun AppTheme(
@@ -29,9 +30,13 @@ fun AppTheme(
             AppThemeMode.SYSTEM -> isSystemInDarkTheme()
         }
     val colors = palette(type, dark)
-    CompositionLocalProvider(LocalAppColors provides colors) {
+    CompositionLocalProvider(
+        LocalAppColors provides colors,
+        LocalAppTypography provides DefaultTypography,
+    ) {
         MaterialTheme(
             colorScheme = colors.toColorScheme(dark),
+            typography = DefaultTypography.toMaterialTypography(),
             content = content,
         )
     }
@@ -42,6 +47,11 @@ object AppThemeTokens {
         @Composable
         @ReadOnlyComposable
         get() = LocalAppColors.current
+
+    val typography: AppTypography
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalAppTypography.current
 }
 
 private fun AppColors.toColorScheme(dark: Boolean): ColorScheme {

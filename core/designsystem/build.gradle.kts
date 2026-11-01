@@ -6,3 +6,8 @@ plugins {
 android {
     namespace = "jpark.bro.days.core.designsystem"
 }
+
+dependencies {
+    // ThemeTokensSyncTest: theme-tokens.json 파싱
+    testImplementation(libs.kotlinx.serialization.json)
+}

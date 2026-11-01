@@ -10,7 +10,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import jpark.bro.days.core.designsystem.AppTheme
-import jpark.bro.days.core.model.ItemType
 import jpark.bro.days.core.ui.ObserveEvents
 import jpark.bro.days.feature.item.api.ItemDetailKey
 import jpark.bro.days.feature.item.api.ItemEditKey

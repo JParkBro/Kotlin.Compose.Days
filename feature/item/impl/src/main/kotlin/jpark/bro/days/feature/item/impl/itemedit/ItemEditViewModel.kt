@@ -1,8 +1,6 @@
 package jpark.bro.days.feature.item.impl.itemedit
 
-import jpark.bro.days.core.model.ItemType
 import jpark.bro.days.core.ui.MviViewModel
-import jpark.bro.days.feature.item.api.ItemDetailKey
 import jpark.bro.days.feature.item.api.ItemEditKey
 
 internal class ItemEditViewModel(

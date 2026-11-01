@@ -2,7 +2,6 @@ package jpark.bro.days.feature.onboarding.impl.di
 
 import jpark.bro.days.core.navigation.Navigator
 import jpark.bro.days.feature.onboarding.api.OnboardingKey
-import jpark.bro.days.feature.onboarding.api.OnboardingResult
 import jpark.bro.days.feature.onboarding.api.OnboardingResultHandler
 import jpark.bro.days.feature.onboarding.impl.LoginKey
 import jpark.bro.days.feature.onboarding.impl.StartModeKey

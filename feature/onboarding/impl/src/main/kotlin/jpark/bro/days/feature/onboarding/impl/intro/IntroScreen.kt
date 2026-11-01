@@ -10,14 +10,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import jpark.bro.days.core.designsystem.AppTheme
-import jpark.bro.days.core.model.ItemType
 import jpark.bro.days.core.ui.ObserveEvents
-import jpark.bro.days.feature.onboarding.api.OnboardingKey
 import jpark.bro.days.feature.onboarding.impl.LoginKey
-import jpark.bro.days.feature.onboarding.impl.StartModeKey
-import jpark.bro.days.feature.onboarding.impl.TermsKey
 import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 
 @Composable
 internal fun IntroRoot(

@@ -2,11 +2,9 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-
-    id("kotlin-kapt")
-    id("com.google.dagger.hilt.android")
+    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.ksp)
 
     // oss-licenses
     id("com.google.android.gms.oss-licenses-plugin")
@@ -14,18 +12,13 @@ plugins {
 
 android {
     namespace = "jpark.bro.days"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
-        ndkVersion = "28.0.12674087"
-        ndk {
-            debugSymbolLevel = "FULL"
-        }
-
         applicationId = "jpark.bro.days"
-        minSdk = 28
-        targetSdk = 35
-        versionCode = 9
+        minSdk = 30
+        targetSdk = 37
+        versionCode = 11
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -60,11 +53,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions {
-        jvmTarget = "11"
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
         compose = true
@@ -96,11 +86,11 @@ dependencies {
 
     // Hilt
     implementation(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
+    ksp(libs.hilt.android.compiler)
 
     // Room
     implementation(libs.androidx.room.runtime)
-    annotationProcessor(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
 
     // Datastore
@@ -110,11 +100,12 @@ dependencies {
     implementation(libs.kotlinx.datetime)
 
     // oss-licenses
-    implementation (libs.androidx.appcompat)
+    implementation(libs.androidx.appcompat)
     implementation(libs.play.services.oss.licenses)
 }
 
-// Allow references to generated code
-kapt {
-    correctErrorTypes = true
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+    }
 }

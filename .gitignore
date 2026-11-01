@@ -1,12 +1,8 @@
 *.iml
+# Android Studio 설정 (개인 · 자동 생성)
+.idea/
 .gradle
 /local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
 .DS_Store
 build/
 /captures

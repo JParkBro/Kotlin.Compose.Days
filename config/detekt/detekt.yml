@@ -36,4 +36,5 @@ naming:
   FunctionNaming:
     ignoreAnnotated: ['Composable']
   TopLevelPropertyNaming:
-    constantPattern: '[A-Z][A-Za-z0-9]*'
+    # SCREAMING_SNAKE_CASE(기본) + Compose 스타일 PascalCase 둘 다 허용
+    constantPattern: '[A-Z][_A-Za-z0-9]*'

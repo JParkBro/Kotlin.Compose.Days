@@ -62,11 +62,11 @@
 
 ## 비밀 정보
 
-다음을 커밋하거나 코드에 넣지 않는다. 필요하면 환경 변수 · `local.properties` · GitHub Secrets · `wrangler secret`을 쓴다.
+다음을 커밋하거나 코드에 넣지 않는다. 필요하면 환경 변수 · `local.properties` · `keystore.properties` · GitHub Secrets · `wrangler secret`을 쓴다.
 
-- 키스토어(`*.jks`, `*.keystore`)와 비밀번호
+- 키스토어(`*.jks`, `*.keystore`)와 비밀번호 (`keystore.properties`)
 - 서비스 계정 JSON, API 비밀 키, 토큰
-- `local.properties`, `.env`, `.dev.vars`
+- `local.properties`, `keystore.properties`, `.env`, `.dev.vars`
 
 개인정보(토큰, 이메일, 사용자 입력 원문)를 로그에 남기지 않는다.
 

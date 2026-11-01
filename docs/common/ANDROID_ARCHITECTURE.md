@@ -716,6 +716,14 @@ include(":feature:home:api", ":feature:home:impl")
 
 ```toml
 [versions]
+# 앱 · SDK 값 (convention plugin이 읽음)
+projectApplicationId = "{base.package}"
+projectVersionCode = "1"
+projectVersionName = "1.0.0"
+projectCompileSdkVersion = "x"
+projectMinSdkVersion = "x"
+projectTargetSdkVersion = "x"
+
 agp = "x.y.z"
 kotlin = "x.y.z"
 ksp = "x.y.z"
@@ -729,13 +737,24 @@ datastore = "x.y.z"
 workmanager = "x.y.z"
 serialization = "x.y.z"
 coroutines = "x.y.z"
+turbine = "x.y.z"
 
 [libraries]
+androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
+androidx-compose-ui = { module = "androidx.compose.ui:ui" }
+androidx-compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
+androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
+androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+androidx-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
+androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
+androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
+
 androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3" }
 androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
 androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycle" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 
+# Koin은 BOM으로 버전을 맞춘다
 koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin" }
 koin-android = { module = "io.insert-koin:koin-android" }
 koin-compose = { module = "io.insert-koin:koin-compose" }
@@ -758,6 +777,14 @@ room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
+
+# build-logic이 compileOnly로 참조하는 Gradle 플러그인
+android-gradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "agp" }
+compose-gradlePlugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
+kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+ksp-gradlePlugin = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
+room-gradlePlugin = { module = "androidx.room:room-gradle-plugin", version.ref = "room" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -768,27 +795,42 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room" }
 
-# convention plugins
-{app}-android-application = { id = "{app}.android.application" }
-{app}-android-library = { id = "{app}.android.library" }
-{app}-android-compose = { id = "{app}.android.compose" }
-{app}-jvm-library = { id = "{app}.jvm.library" }
-{app}-feature-api = { id = "{app}.feature.api" }
-{app}-feature-impl = { id = "{app}.feature.impl" }
-{app}-koin = { id = "{app}.koin" }
-{app}-room = { id = "{app}.room" }
+# convention plugins (build-logic). 버전은 "unspecified"로 둔다
+{app}-android-application = { id = "{app}.android.application", version = "unspecified" }
+{app}-android-library = { id = "{app}.android.library", version = "unspecified" }
+{app}-android-compose = { id = "{app}.android.compose", version = "unspecified" }
+{app}-jvm-library = { id = "{app}.jvm.library", version = "unspecified" }
+{app}-jvm-ktor = { id = "{app}.jvm.ktor", version = "unspecified" }
+{app}-feature-api = { id = "{app}.feature.api", version = "unspecified" }
+{app}-feature-impl = { id = "{app}.feature.impl", version = "unspecified" }
+{app}-koin = { id = "{app}.koin", version = "unspecified" }
+{app}-room = { id = "{app}.room", version = "unspecified" }
+
+[bundles]
+# convention plugin이 한 번에 추가하는 묶음
+compose = ["androidx-compose-ui", "androidx-compose-ui-graphics", "androidx-compose-ui-tooling-preview", "androidx-compose-material3"]
+compose-debug = ["androidx-compose-ui-tooling", "androidx-compose-ui-test-manifest"]
+navigation3 = ["androidx-navigation3-runtime", "androidx-navigation3-ui", "androidx-lifecycle-viewmodel-navigation3"]
+koin-compose = ["koin-compose", "koin-compose-viewmodel", "koin-compose-navigation3"]
+ktor = ["ktor-client-core", "ktor-client-okhttp", "ktor-client-content-negotiation", "ktor-client-auth", "ktor-client-logging", "ktor-serialization-kotlinx-json"]
+room = ["room-runtime", "room-ktx"]
+test = ["junit", "kotlinx-coroutines-test", "turbine"]
 ```
+
+- SDK · 앱 ID · 버전은 `project*` 항목 한 곳에서 관리하고, 모듈 `build.gradle.kts`에 숫자를 쓰지 않습니다.
+- 루트 `build.gradle.kts`에는 convention plugin이 내부에서 적용하는 플러그인(`android-application`, `android-library`, `kotlin-jvm`, `kotlin-compose`, `kotlin-serialization`, `ksp`, `room`)을 모두 `apply false`로 선언합니다. build-logic은 이 플러그인들을 `compileOnly`로만 참조하므로, 실행 시 클래스는 루트 빌드의 클래스패스에서 옵니다.
 
 ### 9-3. Convention Plugin 구성
 
 | 플러그인 ID | 적용 대상 | 하는 일 |
 |---|---|---|
-| `{app}.android.application` | app | compileSdk · minSdk · targetSdk, Java 버전, 빌드 타입 |
-| `{app}.android.library` | Android 라이브러리 모듈 전체 | compileSdk · minSdk, Java 버전, 공통 테스트 의존성 |
-| `{app}.android.compose` | Compose 쓰는 모듈 | Compose 컴파일러, Compose BOM |
-| `{app}.jvm.library` | core:model, common, domain | `kotlin("jvm")`, Java 버전 |
-| `{app}.koin` | Koin 쓰는 모듈 | Koin BOM, koin-android, koin-test |
-| `{app}.room` | core:database | Room 플러그인, KSP, 스키마 경로 |
+| `{app}.android.application` | app | 앱 ID · SDK · 버전(`project*`), Java 17, BuildConfig, flavor, release 빌드 타입 · 서명(`keystore.properties`), 공통 테스트 의존성 |
+| `{app}.android.library` | Android 라이브러리 모듈 전체 | compileSdk · minSdk, Java 17, flavor(app과 같은 차원), testInstrumentationRunner, 공통 테스트 의존성 |
+| `{app}.android.compose` | Compose 쓰는 모듈 (app · 라이브러리 공용) | Compose 컴파일러, Compose BOM, `compose` · `compose-debug` 번들, ui-test-junit4 |
+| `{app}.jvm.library` | core:model, common, domain | `kotlin("jvm")`, Java 17, 공통 테스트 의존성 |
+| `{app}.jvm.ktor` | 네트워크 쓰는 모듈 (core:network) | kotlinx.serialization 플러그인, `ktor` 번들(OkHttp 엔진), serialization-json, ktor-client-mock(테스트) |
+| `{app}.koin` | Koin 쓰는 모듈 | Koin BOM, koin-android, koin-test-junit4 |
+| `{app}.room` | core:database | Room 플러그인, KSP(`room.generateKotlin`), 스키마 경로 `schemas/`, `room` 번들, room-compiler(`ksp`만), room-testing |
 | `{app}.feature.api` | feature:*:api | android.library + serialization + navigation3-runtime **만** |
 | `{app}.feature.impl` | feature:*:impl | android.library + compose + koin + navigation3 + core 공통 의존성 |
 
@@ -837,6 +879,59 @@ class FeatureApiConventionPlugin : Plugin<Project> {
 
 `libs`는 convention 모듈에서 `extensions.getByType<VersionCatalogsExtension>().named("libs")`로 가져오는 확장 프로퍼티로 정의합니다.
 
+- 공통 테스트 의존성은 `test` 번들(junit, kotlinx-coroutines-test, Turbine)입니다.
+- `{app}.android.compose`는 `{app}.android.application` 또는 `{app}.android.library` **다음에** 적용합니다 (`CommonExtension`을 찾아 `buildFeatures.compose`를 켬).
+- `{app}.jvm.ktor`는 Kotlin 플러그인을 적용하지 않습니다. `{app}.jvm.library` 또는 `{app}.android.library`와 함께 씁니다.
+- Timber · Coil 같은 선택 라이브러리는 convention plugin에 넣지 않고 쓰는 모듈에서 직접 추가합니다.
+
+**build-logic 구성**
+
+```
+build-logic/
+├─ settings.gradle.kts           # 루트 version catalog 공유
+├─ gradle.properties             # parallel · caching · configureondemand
+└─ convention/
+   ├─ build.gradle.kts           # kotlin-dsl, compileOnly 플러그인, gradlePlugin 등록
+   └─ src/main/kotlin/
+      ├─ *ConventionPlugin.kt    # 플러그인 (기본 패키지)
+      └─ {base.package}/convention/   # 공통 설정 함수 (KotlinAndroid, Flavors, BuildTypes, ProjectExt …)
+```
+
+```kotlin
+// build-logic/settings.gradle.kts
+dependencyResolutionManagement {
+    repositories { google(); mavenCentral() }
+    versionCatalogs {
+        create("libs") { from(files("../gradle/libs.versions.toml")) }
+    }
+}
+rootProject.name = "build-logic"
+include(":convention")
+
+// build-logic/convention/build.gradle.kts
+plugins { `kotlin-dsl` }
+group = "{base.package}.buildlogic"
+kotlin { compilerOptions { jvmTarget = JvmTarget.JVM_17 } }
+
+dependencies {
+    compileOnly(libs.android.gradlePlugin)
+    compileOnly(libs.compose.gradlePlugin)
+    compileOnly(libs.kotlin.gradlePlugin)
+    compileOnly(libs.ksp.gradlePlugin)
+    compileOnly(libs.room.gradlePlugin)
+}
+
+gradlePlugin {
+    plugins {
+        register("androidApplication") {
+            id = libs.plugins.{app}.android.application.get().pluginId   // ID는 catalog 한 곳에서
+            implementationClass = "AndroidApplicationConventionPlugin"
+        }
+        // 나머지 플러그인도 같은 방식으로 등록
+    }
+}
+```
+
 ### 9-4. 기능 모듈 build.gradle.kts
 
 ```kotlin
@@ -862,7 +957,20 @@ dependencies {
 | `dev` | 개발 서버 · 에뮬레이터 연결, 로그 활성화, 앱 ID 접미사 `.dev` |
 | `prod` | 실서버, 로그 비활성화 |
 
-API 주소 · 키는 `buildConfigField`로 flavor마다 다르게 주입하고, 비밀 값은 `local.properties` 또는 CI 비밀 변수에서 읽습니다.
+- flavor는 `{app}.android.application`과 `{app}.android.library`가 **같은 차원(`env`) · 같은 이름**으로 선언합니다. 이름이 맞아야 app과 라이브러리 변형이 맞물리고, 모든 모듈에 `testDevDebugUnitTest` 같은 작업이 생깁니다.
+- API 주소 · 키는 `buildConfigField`로 flavor마다 다르게 주입하고, 비밀 값은 `local.properties` 또는 CI 비밀 변수에서 읽습니다.
+
+**release 서명**
+
+서명 정보는 루트의 `keystore.properties`(커밋 금지)에 두고 `{app}.android.application`이 읽습니다. 파일이 없으면 서명 없이 빌드합니다(CI · 다른 개발자 환경).
+
+```properties
+# keystore.properties
+storeFile=/절대/경로/release.jks
+storePassword=…
+keyAlias=…
+keyPassword=…
+```
 
 ---
 

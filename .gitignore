@@ -13,3 +13,12 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# 비밀 정보 (CLAUDE.md "비밀 정보")
+*.jks
+*.keystore
+.env
+.env.*
+.dev.vars
+*-firebase-adminsdk-*.json
+service-account*.json

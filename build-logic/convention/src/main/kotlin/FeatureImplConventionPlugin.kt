@@ -20,6 +20,7 @@ class FeatureImplConventionPlugin : Plugin<Project> {
                 add("implementation", project(":core:data"))
                 add("implementation", project(":core:domain"))
                 add("implementation", project(":core:model"))
+                add("testImplementation", project(":core:testing"))
 
                 add("implementation", libs.findBundle("navigation3").get())
                 add("implementation", libs.findLibrary("androidx-lifecycle-runtime-compose").get())

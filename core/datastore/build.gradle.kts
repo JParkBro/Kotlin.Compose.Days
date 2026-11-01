@@ -6,3 +6,8 @@ plugins {
 android {
     namespace = "jpark.bro.days.core.datastore"
 }
+
+dependencies {
+    api(projects.core.model)
+    implementation(libs.androidx.datastore.preferences)
+}

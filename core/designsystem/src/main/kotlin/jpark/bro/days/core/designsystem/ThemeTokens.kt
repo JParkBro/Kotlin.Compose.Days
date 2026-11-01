@@ -5,6 +5,7 @@
 package jpark.bro.days.core.designsystem
 
 import androidx.compose.ui.graphics.Color
+import jpark.bro.days.core.model.AppThemeType
 
 /** 로맨틱 핑크 · 라이트 */
 internal val PinkLight =

@@ -41,6 +41,7 @@ def main():
         "package jpark.bro.days.core.designsystem",
         "",
         "import androidx.compose.ui.graphics.Color",
+        "import jpark.bro.days.core.model.AppThemeType",
         "",
     ]
     names = {}

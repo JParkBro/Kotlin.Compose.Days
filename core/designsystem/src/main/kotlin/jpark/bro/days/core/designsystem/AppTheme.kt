@@ -9,6 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
+import jpark.bro.days.core.model.AppThemeMode
+import jpark.bro.days.core.model.AppThemeType
 
 val LocalAppColors = staticCompositionLocalOf<AppColors> { error("AppTheme 밖에서 AppThemeTokens를 사용했습니다.") }
 val LocalAppTypography = staticCompositionLocalOf<AppTypography> { error("AppTheme 밖에서 AppThemeTokens를 사용했습니다.") }
@@ -23,12 +25,7 @@ fun AppTheme(
     mode: AppThemeMode = AppThemeMode.SYSTEM,
     content: @Composable () -> Unit,
 ) {
-    val dark =
-        when (mode) {
-            AppThemeMode.LIGHT -> false
-            AppThemeMode.DARK -> true
-            AppThemeMode.SYSTEM -> isSystemInDarkTheme()
-        }
+    val dark = isDarkTheme(mode)
     val colors = palette(type, dark)
     CompositionLocalProvider(
         LocalAppColors provides colors,
@@ -41,6 +38,21 @@ fun AppTheme(
         )
     }
 }
+
+/** 화면 모드를 실제 다크 여부로 바꾼다. SYSTEM은 기기 설정을 따른다. */
+@Composable
+fun isDarkTheme(mode: AppThemeMode): Boolean =
+    when (mode) {
+        AppThemeMode.LIGHT -> false
+        AppThemeMode.DARK -> true
+        AppThemeMode.SYSTEM -> isSystemInDarkTheme()
+    }
+
+/** 테마 미리보기(테마 선택 시트)처럼 현재 테마가 아닌 팔레트가 필요할 때 */
+fun themePalette(
+    type: AppThemeType,
+    dark: Boolean,
+): AppColors = palette(type, dark)
 
 object AppThemeTokens {
     val colors: AppColors

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<baseline version="1.0">
+    <file name="src/androidTest/java/jpark/bro/days/ExampleInstrumentedTest.kt">
+        <error line="5" column="1" source="standard:no-wildcard-imports" />
+    </file>
+    <file name="src/main/java/jpark/bro/days/core/database/AppDatabase.kt">
+        <error line="1" column="1" source="standard:no-empty-file" />
+    </file>
+    <file name="src/main/java/jpark/bro/days/core/di/DatabaseModule.kt">
+        <error line="1" column="1" source="standard:no-empty-file" />
+    </file>
+    <file name="src/main/java/jpark/bro/days/core/util/DateUtils.kt">
+        <error line="1" column="1" source="standard:filename" />
+    </file>
+    <file name="src/main/java/jpark/bro/days/data/local/CoupleDateDao.kt">
+        <error line="1" column="1" source="standard:no-empty-file" />
+    </file>
+    <file name="src/main/java/jpark/bro/days/data/local/CoupleDateEntity.kt">
+        <error line="1" column="1" source="standard:no-empty-file" />
+    </file>
+    <file name="src/main/java/jpark/bro/days/domain/model/CoupleDate.kt">
+        <error line="1" column="1" source="standard:no-empty-file" />
+    </file>
+    <file name="src/main/java/jpark/bro/days/ui/view/coupleDate/CoupleDateScreen.kt">
+        <error line="7" column="1" source="standard:no-wildcard-imports" />
+    </file>
+    <file name="src/test/java/jpark/bro/days/ExampleUnitTest.kt">
+        <error line="3" column="1" source="standard:no-wildcard-imports" />
+    </file>
+</baseline>

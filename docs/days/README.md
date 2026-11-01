@@ -16,6 +16,7 @@
 | [ads-strategy.md](ads-strategy.md) | 광고 배치 판단, 빈도 규칙, 광고 제거 구매, AdMob 정책 | 수익화 작업 |
 | `assets/theme-tokens.json` | 테마 색상 값 원본 (8 팔레트 × 27 토큰) | 디자인 시스템 코드 생성 |
 | `assets/theme-tokens.css` | 같은 값의 CSS 변수 (정책 페이지 · 웹 미리보기) | 웹 작업 |
+| `design/{화면}/` | Stitch 시안: `screen.png` + `code.html` (화면별 폴더). 색 · 글꼴 · 기능 범위는 이 폴더 문서가 기준이고 시안은 레이아웃 참고용 | 화면 구현 |
 
 ## AI 도구 지침 (Claude Code)
 

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "primary": "#b02051", "inverse-primary": "#ffb1c0", "on-tertiary": "#ffffff", "tertiary-container": "#cb456d", "on-secondary-container": "#752c13", "surface-container": "#faeaef", "on-background": "#21191d", "secondary-container": "#fd9573", "on-primary-fixed": "#3f0016", "surface-container-low": "#fff0f5", "on-error": "#ffffff", "on-tertiary-fixed-variant": "#8b103f", "outline-variant": "#dfbec3", "on-primary": "#ffffff", "outline": "#8c7074", "inverse-on-surface": "#fdedf2", "on-error-container": "#93000a", "on-secondary-fixed-variant": "#7a2f16", "on-tertiary-fixed": "#3f0017", "tertiary-fixed": "#ffd9df", "on-secondary": "#ffffff", "surface-variant": "#eedfe4", "on-primary-container": "#fffeff", "on-surface": "#21191d", "on-tertiary-container": "#ffffff", "surface-container-high": "#f4e4ea", "background": "#fff8f8", "surface-container-highest": "#eedfe4", "error-container": "#ffdad6", "inverse-surface": "#372e32", "on-secondary-fixed": "#3a0b00", "primary-fixed": "#ffd9df", "secondary-fixed": "#ffdbd0", "error": "#ba1a1a", "surface-tint": "#b22252", "on-primary-fixed-variant": "#90003c", "surface-dim": "#e5d6dc", "surface-bright": "#fff8f8", "surface": "#fff8f8", "primary-fixed-dim": "#ffb1c0", "tertiary-fixed-dim": "#ffb1c1", "primary-container": "#d23c69", "secondary": "#98462a", "tertiary": "#aa2b55", "secondary-fixed-dim": "#ffb59e", "on-surface-variant": "#584145", "surface-container-lowest": "#ffffff" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "gutter": "1rem", "space-xs": "0.25rem", "space-sm": "0.5rem", "margin-mobile": "1rem", "margin": "1.25rem", "space-2xl": "2.5rem", "space-lg": "1.25rem", "space-xl": "1.75rem", "gutter-compact": "0.75rem", "space-md": "0.875rem" }, fontFamily: { "label-md": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "display-hero-mobile": ["Plus Jakarta Sans"], "headline-lg": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"], "display-hero": ["Plus Jakarta Sans"], "metric-tabular": ["Plus Jakarta Sans"], "body-sm": ["Plus Jakarta Sans"], "body-lg": ["Plus Jakarta Sans"], "label-lg": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"] }, fontSize: { "label-md": ["13px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "600" }], "headline-md": ["22px", { "lineHeight": "30px", "letterSpacing": "-0.015em", "fontWeight": "700" }], "display-hero-mobile": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "800" }], "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "600" }], "display-hero": ["44px", { "lineHeight": "52px", "letterSpacing": "-0.03em", "fontWeight": "800" }], "metric-tabular": ["24px", { "lineHeight": "28px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }], "body-lg": ["17px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400" }], "label-lg": ["15px", { "lineHeight": "20px", "letterSpacing": "-0.005em", "fontWeight": "600" }], "body-md": ["15px", { "lineHeight": "22px", "letterSpacing": "-0.005em", "fontWeight": "400" }], "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }] } } } }</script><style>body { min-height: max(884px, 100dvh); }</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-on-surface flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(210,60,105,0.04)]"><div class="h-14 px-margin-mobile flex items-center justify-between"><div class="flex items-center gap-space-xs"><button aria-label="뒤로가기" class="min-w-[44px] min-h-[44px] flex items-center justify-center text-on-surface hover:text-primary transition-colors -ml-space-xs active:scale-95" onclick="history.back()" type="button"><span class="material-symbols-outlined text-[22px]">arrow_back_ios_new</span></button><h1 class="font-headline-sm text-headline-sm text-on-surface tracking-tight font-bold">위젯 설정</h1></div><div class="flex items-center gap-space-xs"><button aria-label="헤더 액션" class="min-w-[44px] min-h-[44px] px-space-xs text-primary font-label-md text-label-md flex items-center justify-center hover:opacity-80 transition-opacity" type="button"><span class="material-symbols-outlined text-[20px]">done_all</span></button></div></div></header><main class="flex flex-col relative w-full pt-14 pb-safe px-margin-mobile bg-surface"><div class="flex flex-col w-full pb-10">
+<!-- Live Widget Stage / Ambient Studio -->
+<section class="flex flex-col items-center justify-center pt-2 pb-6">
+<div class="relative w-full max-w-[320px] aspect-[4/3] flex items-center justify-center rounded-3xl bg-surface-container-low shadow-sm p-4 overflow-hidden">
+<!-- Decorative Backdrop Blur Elements -->
+<div class="absolute -top-10 -right-10 w-36 h-36 rounded-full bg-primary-fixed blur-2xl opacity-60 pointer-events-none"></div>
+<div class="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-secondary-fixed blur-2xl opacity-50 pointer-events-none"></div>
+<!-- Live iOS Widget Surface (Small 160x160 preview) -->
+<div class="relative w-[164px] h-[164px] rounded-[28px] overflow-hidden shadow-xl transform transition-all duration-300 active:scale-95 flex flex-col justify-between p-3.5 select-none bg-surface-container-lowest" id="liveWidgetCard">
+<!-- Widget Background Image (Default: Photo Mode) -->
+<div class="absolute inset-0 bg-cover bg-center transition-opacity duration-300" data-alt="A warm and intimate portrait of a loving young East Asian couple softly laughing together under golden hour sunlight in a serene park with romantic pastel rose tones." id="widgetPhotoBg" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBTrVBCNRT-c2EfDfBVRo7WHJ-U4vKZnVwZR9ya5rwTu7OdkiaBADBrmUIffxKwovXN6FF-D4C1Cwqk6Z86wXMfdHcnxuFiYCTrRMIuHm3mWkQG4WCxYpXMy5f4hVcyRcTWVL9jph98YKE_GJ8EaFIOkOjDfnNa7ijDG650ztOBt93tF6AMvJG1jkcY6SH_DoxYTbuLhI7EPDS9e_yTpG4TBCCXrUhSDijeVevqRYw')">
+<div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/35"></div>
+</div>
+<!-- Solid/Gradient Alternate Backgrounds (hidden by default) -->
+<div class="absolute inset-0 bg-gradient-to-br from-[#ffd9df] via-[#faeaef] to-[#fd9573] opacity-0 transition-opacity duration-300" id="widgetPinkBg"></div>
+<div class="absolute inset-0 bg-gradient-to-b from-[#21191d] to-[#120c0f] opacity-0 transition-opacity duration-300" id="widgetDarkBg"></div>
+<div class="absolute inset-0 bg-surface-container-lowest opacity-0 transition-opacity duration-300" id="widgetWhiteBg"></div>
+<!-- Widget Top Row -->
+<div class="relative z-10 flex items-center justify-between w-full">
+<div class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-white shadow-xs" id="widgetCategoryTag">
+<span class="material-symbols-outlined text-[11px] text-[#ffd9df]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<span class="font-label-sm text-label-sm tracking-tight drop-shadow-xs">우리 만난 날</span>
+</div>
+<!-- Couple Mini Avatar Badge -->
+<div class="relative flex items-center transition-all duration-200" id="widgetAvatarWrapper">
+<div class="w-6 h-6 rounded-full overflow-hidden shadow-sm bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Close up warm profile avatar of smiling young Korean partner with soft radiant skin and delicate natural makeup in romantic daylight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuALEtKKLRZvvWY8CpkAifOByi0TVsd4tx5odqYnnoVgOCGHdIwHIyQD4QJMSqT_-nfj3vUVTkGoHOqAfuR6gnMX-YQUa9K4RSdzpOdJYe0ijehowgzaI_ZvYAS5OhbNJTYauPPi01ToQzu3ihs3Y3uNlxStsmb3TByREECFlfx-7HpIkwA7CCZJeIRNzh1OadVzR8LDnAKmBF8vKL6FK6HxzITJj7xTf3LvU_7la-8"/>
+</div>
+<div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-primary flex items-center justify-center shadow-xs">
+<span class="material-symbols-outlined text-[7px] text-on-primary" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+</div>
+</div>
+<!-- Widget Bottom Content -->
+<div class="relative z-10 flex flex-col items-start w-full">
+<div class="flex items-baseline gap-1">
+<span class="font-display-hero-mobile text-display-hero-mobile font-extrabold text-white tracking-tighter drop-shadow-sm leading-none" id="widgetCountText">D+510</span>
+</div>
+<p class="font-label-sm text-label-sm text-white/90 font-medium tracking-tight mt-1 line-clamp-1 drop-shadow-xs" id="widgetSubDesc">우리 만난 지 510일째</p>
+</div>
+</div>
+</div>
+<!-- Live Preview Sub-caption -->
+<div class="flex items-center gap-1.5 mt-3 text-on-surface-variant">
+<span class="material-symbols-outlined text-[15px] text-primary" style="font-variation-settings: 'FILL' 1;">arrow_back_ios_new</span>
+<span class="font-body-sm text-body-sm">홈 화면에 표시될 위젯의 실제 모습이에요</span>
+</div>
+</section>
+<!-- Configuration Sections Stack -->
+<div class="flex flex-col gap-5 w-full mt-2">
+<!-- 1. Size Selection Segmented Control -->
+<section class="flex flex-col gap-2">
+<div class="flex items-center justify-between px-1">
+<label class="font-label-lg text-label-lg text-on-surface font-bold">위젯 크기</label>
+<span class="font-label-sm text-label-sm text-on-surface-variant">iOS 홈 화면 위젯 규격</span>
+</div>
+<div class="grid grid-cols-3 p-1 rounded-full bg-surface-container shadow-inner gap-1">
+<!-- Small Option (Active) -->
+<button class="size-pill-btn flex items-center justify-center gap-1.5 py-2 px-3 rounded-full bg-surface-container-lowest text-primary shadow-sm font-label-md text-label-md transition-all active:scale-95" id="sizeSmallBtn" onclick="selectWidgetSize('small')" type="button">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">crop_square</span>
+<span>작게 (2×2)</span>
+</button>
+<!-- Medium Option -->
+<button class="size-pill-btn flex items-center justify-center gap-1.5 py-2 px-3 rounded-full text-on-surface-variant font-label-md text-label-md transition-all active:scale-95 hover:text-on-surface" id="sizeMediumBtn" onclick="selectWidgetSize('medium')" type="button">
+<span class="material-symbols-outlined text-[16px]">crop_16_9</span>
+<span>중간 (2×4)</span>
+</button>
+<!-- Lock Screen Option -->
+<button class="size-pill-btn flex items-center justify-center gap-1.5 py-2 px-3 rounded-full text-on-surface-variant font-label-md text-label-md transition-all active:scale-95 hover:text-on-surface" id="sizeLockBtn" onclick="selectWidgetSize('lock')" type="button">
+<span class="material-symbols-outlined text-[16px]">lock</span>
+<span>잠금화면</span>
+</button>
+</div>
+</section>
+<!-- 2. Target D-Day Selector -->
+<section class="flex flex-col gap-2">
+<div class="flex items-center justify-between px-1">
+<label class="font-label-lg text-label-lg text-on-surface font-bold">표시할 디데이</label>
+<button class="font-label-sm text-label-sm text-primary flex items-center gap-0.5 hover:opacity-80" type="button">
+<span>디데이 목록 관리</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+</button>
+</div>
+<div class="relative w-full rounded-2xl bg-surface-container-lowest p-3.5 shadow-sm active:bg-surface-container-low transition-colors cursor-pointer flex items-center justify-between">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-2xl bg-primary-fixed flex items-center justify-center shrink-0 text-primary shadow-xs">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-2">
+<span class="font-label-lg text-label-lg text-on-surface font-bold truncate">우리 만난 날</span>
+<span class="px-2 py-0.5 rounded-full bg-primary-container text-on-primary font-label-sm text-label-sm font-bold shrink-0">D+510</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">2023.10.15 부터 연애 중</span>
+</div>
+</div>
+<div class="flex items-center text-outline shrink-0 ml-2">
+<span class="material-symbols-outlined text-[20px]">unfold_more</span>
+</div>
+</div>
+</section>
+<!-- 3. Background Options -->
+<section class="flex flex-col gap-2">
+<div class="flex items-center justify-between px-1">
+<label class="font-label-lg text-label-lg text-on-surface font-bold">위젯 배경 스타일</label>
+<span class="font-label-sm text-label-sm text-primary font-medium">사진 변경 가능</span>
+</div>
+<div class="grid grid-cols-4 gap-2.5">
+<!-- 1: Photo Background Option (Default Active) -->
+<button class="theme-option-btn group relative flex flex-col items-center gap-1.5 p-1.5 rounded-2xl bg-surface-container-lowest shadow-sm transition-all duration-200" id="themeBtn-photo" onclick="setWidgetTheme('photo')" type="button">
+<div class="relative w-full aspect-square rounded-xl overflow-hidden shadow-xs">
+<img class="w-full h-full object-cover" data-alt="Miniature couple photo thumbnail framed softly with pink ambient sunlight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8bELGYDBC_jI8g8ShS2Rxo9FVhkNi40bzDo8sPmJURFwbuMJOgSXMv8DzcFDZpY6aVdhKlT_qTFwcKzehyMlHmzVS_yvPxS_PJhcGCPbtOQoR_SS8CG8BjXDOPpdmlVJfJre3rw9Em9G3Jp67Rxw6pifWTqiizgwM2aW9sDYggHolDMqShFIMGhwcGrDomEfXosdYnkBVL_Xi61h9G_ZJm0_KUwvlOepZeNtQkdw"/>
+<div class="absolute inset-0 bg-primary/20 backdrop-blur-[1px] flex items-center justify-center">
+<div class="w-5 h-5 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-xs">
+<span class="material-symbols-outlined text-[13px] font-bold">check</span>
+</div>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-primary font-bold">사진</span>
+</button>
+<!-- 2: Soft Theme Pink -->
+<button class="theme-option-btn group relative flex flex-col items-center gap-1.5 p-1.5 rounded-2xl bg-surface-container-lowest shadow-sm transition-all duration-200" id="themeBtn-pink" onclick="setWidgetTheme('pink')" type="button">
+<div class="relative w-full aspect-square rounded-xl bg-gradient-to-br from-[#ffd9df] via-[#faeaef] to-[#fd9573] shadow-xs flex items-center justify-center">
+<span class="material-symbols-outlined text-primary/70 text-[20px]">palette</span>
+<div class="theme-check-badge hidden absolute inset-0 bg-primary/20 rounded-xl items-center justify-center">
+<div class="w-5 h-5 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-xs">
+<span class="material-symbols-outlined text-[13px] font-bold">check</span>
+</div>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium">테마 핑크</span>
+</button>
+<!-- 3: Dark Mode -->
+<button class="theme-option-btn group relative flex flex-col items-center gap-1.5 p-1.5 rounded-2xl bg-surface-container-lowest shadow-sm transition-all duration-200" id="themeBtn-dark" onclick="setWidgetTheme('dark')" type="button">
+<div class="relative w-full aspect-square rounded-xl bg-[#21191d] shadow-xs flex items-center justify-center">
+<span class="material-symbols-outlined text-primary-fixed text-[20px]">dark_mode</span>
+<div class="theme-check-badge hidden absolute inset-0 bg-primary/20 rounded-xl items-center justify-center">
+<div class="w-5 h-5 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-xs">
+<span class="material-symbols-outlined text-[13px] font-bold">check</span>
+</div>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium">다크</span>
+</button>
+<!-- 4: Pure White Minimal -->
+<button class="theme-option-btn group relative flex flex-col items-center gap-1.5 p-1.5 rounded-2xl bg-surface-container-lowest shadow-sm transition-all duration-200" id="themeBtn-white" onclick="setWidgetTheme('white')" type="button">
+<div class="relative w-full aspect-square rounded-xl bg-surface-container shadow-inner flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">light_mode</span>
+<div class="theme-check-badge hidden absolute inset-0 bg-primary/20 rounded-xl items-center justify-center">
+<div class="w-5 h-5 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-xs">
+<span class="material-symbols-outlined text-[13px] font-bold">check</span>
+</div>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium">화이트</span>
+</button>
+</div>
+</section>
+<!-- 4. Detail Display Toggles -->
+<section class="flex flex-col gap-2">
+<label class="font-label-lg text-label-lg text-on-surface font-bold px-1">상세 표시 옵션</label>
+<div class="flex flex-col rounded-2xl bg-surface-container-lowest shadow-sm overflow-hidden">
+<!-- Toggle 1: Partner Avatar -->
+<div class="flex items-center justify-between p-3.5 hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-3 min-w-0 pr-3">
+<div class="w-9 h-9 rounded-xl bg-surface-container-low flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[20px]">account_circle</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-lg text-label-lg text-on-surface font-semibold truncate">프로필 사진 표시</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">위젯 코너에 두 사람의 프로필을 함께 보여줘요</span>
+</div>
+</div>
+<!-- iOS Pill Toggle Switch -->
+<button aria-checked="true" class="relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full bg-primary transition-colors duration-200 ease-in-out focus:outline-hidden p-0.5" id="toggleAvatarBtn" onclick="toggleAvatarSetting()" role="switch" type="button">
+<span class="pointer-events-none inline-block h-6 w-6 transform translate-x-5 rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out" id="toggleAvatarThumb"></span>
+</button>
+</div>
+<div class="h-px bg-surface-container-highest mx-4"></div>
+<!-- Toggle 2: D-Day Calculation Format -->
+<div class="flex items-center justify-between p-3.5 hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-3 min-w-0 pr-3">
+<div class="w-9 h-9 rounded-xl bg-surface-container-low flex items-center justify-center text-secondary shrink-0">
+<span class="material-symbols-outlined text-[20px]">pin</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-lg text-label-lg text-on-surface font-semibold truncate">날짜 계산 방식 표시</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">'D+510' 형식으로 카운트 표시</span>
+</div>
+</div>
+<!-- iOS Pill Toggle Switch -->
+<button aria-checked="true" class="relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full bg-primary transition-colors duration-200 ease-in-out focus:outline-hidden p-0.5" id="toggleFormatBtn" onclick="toggleFormatSetting()" role="switch" type="button">
+<span class="pointer-events-none inline-block h-6 w-6 transform translate-x-5 rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out" id="toggleFormatThumb"></span>
+</button>
+</div>
+</div>
+</section>
+<!-- 5. Bottom Actions & Guide Link -->
+<div class="flex flex-col items-center gap-3.5 mt-2 w-full">
+<!-- Primary Save CTA -->
+<button class="w-full py-3.5 rounded-full bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg font-bold shadow-md shadow-primary/20 flex items-center justify-center gap-2 active:scale-[0.98] transition-all" id="saveWidgetBtn" onclick="saveWidgetSettings()" type="button">
+<span class="material-symbols-outlined text-[20px]">check</span>
+<span>위젯 설정 저장하기</span>
+</button>
+<!-- Secondary Help Link -->
+<button class="flex items-center gap-1.5 text-on-surface-variant hover:text-primary transition-colors py-1 group" type="button">
+<span class="material-symbols-outlined text-[17px] text-primary group-hover:scale-110 transition-transform">help_outline</span>
+<span class="font-body-sm text-body-sm underline decoration-outline-variant underline-offset-4">위젯 추가 방법 가이드 보기</span>
+</button>
+</div>
+</div>
+</div>
+<script>
+  let currentTheme = 'photo';
+  let showAvatar = true;
+  let useStandardFormat = true;
+  let currentSize = 'small';
+
+  function setWidgetTheme(theme) {
+    currentTheme = theme;
+    const photoBg = document.getElementById('widgetPhotoBg');
+    const pinkBg = document.getElementById('widgetPinkBg');
+    const darkBg = document.getElementById('widgetDarkBg');
+    const whiteBg = document.getElementById('widgetWhiteBg');
+
+    const countText = document.getElementById('widgetCountText');
+    const subDesc = document.getElementById('widgetSubDesc');
+    const catTag = document.getElementById('widgetCategoryTag');
+
+    // Reset backgrounds
+    photoBg.classList.add('opacity-0');
+    pinkBg.classList.add('opacity-0');
+    darkBg.classList.add('opacity-0');
+    whiteBg.classList.add('opacity-0');
+
+    // Update active theme & text contrast
+    if (theme === 'photo') {
+      photoBg.classList.remove('opacity-0');
+      countText.className = 'font-display-hero-mobile text-display-hero-mobile font-extrabold text-white tracking-tighter drop-shadow-sm leading-none';
+      subDesc.className = 'font-label-sm text-label-sm text-white/90 font-medium tracking-tight mt-1 line-clamp-1 drop-shadow-xs';
+      catTag.className = 'flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-white shadow-xs';
+    } else if (theme === 'pink') {
+      pinkBg.classList.remove('opacity-0');
+      countText.className = 'font-display-hero-mobile text-display-hero-mobile font-extrabold text-primary tracking-tighter leading-none';
+      subDesc.className = 'font-label-sm text-label-sm text-on-surface-variant font-medium tracking-tight mt-1 line-clamp-1';
+      catTag.className = 'flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/70 backdrop-blur-md text-primary shadow-xs';
+    } else if (theme === 'dark') {
+      darkBg.classList.remove('opacity-0');
+      countText.className = 'font-display-hero-mobile text-display-hero-mobile font-extrabold text-[#ffd9df] tracking-tighter leading-none';
+      subDesc.className = 'font-label-sm text-label-sm text-[#dfbec3] font-medium tracking-tight mt-1 line-clamp-1';
+      catTag.className = 'flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/10 backdrop-blur-md text-[#ffd9df] shadow-xs';
+    } else if (theme === 'white') {
+      whiteBg.classList.remove('opacity-0');
+      countText.className = 'font-display-hero-mobile text-display-hero-mobile font-extrabold text-primary tracking-tighter leading-none';
+      subDesc.className = 'font-label-sm text-label-sm text-on-surface-variant font-medium tracking-tight mt-1 line-clamp-1';
+      catTag.className = 'flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant shadow-xs';
+    }
+
+    // Update bottom selection state styles
+    ['photo', 'pink', 'dark', 'white'].forEach(t => {
+      const btn = document.getElementById(`themeBtn-${t}`);
+      const label = btn.querySelector('span:last-child');
+      const badge = btn.querySelector('.theme-check-badge');
+      if (t === theme) {
+        btn.classList.add('shadow-md');
+        label.classList.remove('text-on-surface-variant', 'font-medium');
+        label.classList.add('text-primary', 'font-bold');
+        if (badge) {
+          badge.classList.remove('hidden');
+          badge.classList.add('flex');
+        }
+      } else {
+        btn.classList.remove('shadow-md');
+        label.classList.remove('text-primary', 'font-bold');
+        label.classList.add('text-on-surface-variant', 'font-medium');
+        if (badge) {
+          badge.classList.remove('flex');
+          badge.classList.add('hidden');
+        }
+      }
+    });
+  }
+
+  function toggleAvatarSetting() {
+    showAvatar = !showAvatar;
+    const btn = document.getElementById('toggleAvatarBtn');
+    const thumb = document.getElementById('toggleAvatarThumb');
+    const avatarWrapper = document.getElementById('widgetAvatarWrapper');
+
+    btn.setAttribute('aria-checked', showAvatar);
+    if (showAvatar) {
+      btn.classList.remove('bg-surface-container-highest');
+      btn.classList.add('bg-primary');
+      thumb.classList.remove('translate-x-0');
+      thumb.classList.add('translate-x-5');
+      avatarWrapper.style.opacity = '1';
+      avatarWrapper.style.transform = 'scale(1)';
+    } else {
+      btn.classList.remove('bg-primary');
+      btn.classList.add('bg-surface-container-highest');
+      thumb.classList.remove('translate-x-5');
+      thumb.classList.add('translate-x-0');
+      avatarWrapper.style.opacity = '0';
+      avatarWrapper.style.transform = 'scale(0.7)';
+    }
+  }
+
+  function toggleFormatSetting() {
+    useStandardFormat = !useStandardFormat;
+    const btn = document.getElementById('toggleFormatBtn');
+    const thumb = document.getElementById('toggleFormatThumb');
+    const countText = document.getElementById('widgetCountText');
+
+    btn.setAttribute('aria-checked', useStandardFormat);
+    if (useStandardFormat) {
+      btn.classList.remove('bg-surface-container-highest');
+      btn.classList.add('bg-primary');
+      thumb.classList.remove('translate-x-0');
+      thumb.classList.add('translate-x-5');
+      countText.textContent = 'D+510';
+    } else {
+      btn.classList.remove('bg-primary');
+      btn.classList.add('bg-surface-container-highest');
+      thumb.classList.remove('translate-x-5');
+      thumb.classList.add('translate-x-0');
+      countText.textContent = '510일';
+    }
+  }
+
+  function selectWidgetSize(size) {
+    currentSize = size;
+    const card = document.getElementById('liveWidgetCard');
+    const smallBtn = document.getElementById('sizeSmallBtn');
+    const medBtn = document.getElementById('sizeMediumBtn');
+    const lockBtn = document.getElementById('sizeLockBtn');
+
+    // Style buttons
+    [smallBtn, medBtn, lockBtn].forEach(b => {
+      b.classList.remove('bg-surface-container-lowest', 'text-primary', 'shadow-sm');
+      b.classList.add('text-on-surface-variant');
+    });
+
+    if (size === 'small') {
+      smallBtn.classList.add('bg-surface-container-lowest', 'text-primary', 'shadow-sm');
+      smallBtn.classList.remove('text-on-surface-variant');
+      card.style.width = '164px';
+      card.style.height = '164px';
+      card.style.borderRadius = '28px';
+    } else if (size === 'medium') {
+      medBtn.classList.add('bg-surface-container-lowest', 'text-primary', 'shadow-sm');
+      medBtn.classList.remove('text-on-surface-variant');
+      card.style.width = '240px';
+      card.style.height = '120px';
+      card.style.borderRadius = '24px';
+    } else if (size === 'lock') {
+      lockBtn.classList.add('bg-surface-container-lowest', 'text-primary', 'shadow-sm');
+      lockBtn.classList.remove('text-on-surface-variant');
+      card.style.width = '140px';
+      card.style.height = '72px';
+      card.style.borderRadius = '18px';
+    }
+  }
+
+  function saveWidgetSettings() {
+    const saveBtn = document.getElementById('saveWidgetBtn');
+    const originalContent = saveBtn.innerHTML;
+    saveBtn.innerHTML = `
+      <span class="material-symbols-outlined text-[20px] animate-spin">sync</span>
+      <span>저장 중...</span>
+    `;
+    saveBtn.disabled = true;
+
+    setTimeout(() => {
+      saveBtn.innerHTML = `
+        <span class="material-symbols-outlined text-[20px]">check_circle</span>
+        <span>설정이 저장되었습니다!</span>
+      `;
+      saveBtn.classList.remove('bg-primary');
+      saveBtn.classList.add('bg-primary-container');
+
+      setTimeout(() => {
+        saveBtn.innerHTML = originalContent;
+        saveBtn.disabled = false;
+        saveBtn.classList.remove('bg-primary-container');
+        saveBtn.classList.add('bg-primary');
+      }, 1600);
+    }, 600);
+  }
+</script></main></body></html>

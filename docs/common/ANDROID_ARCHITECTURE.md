@@ -202,7 +202,10 @@ class Navigator(startKey: NavKey) {
 }
 ```
 
-**하단 탭이 있는 앱:** 탭마다 백스택을 따로 두는 `TopLevelNavigator`(탭 키 → 백스택 맵 + 현재 탭)로 확장합니다. 탭을 바꿔도 각 탭의 화면 위치가 유지되고, 현재 탭의 백스택이 비면 시작 탭으로 돌아가게 합니다.
+**하단 탭이 있는 앱:** `Navigator(startKey, topLevelKeys)`처럼 탭 키 목록을 받아 탭마다 백스택을 따로 둡니다 (탭 키 → 백스택 맵 + `currentTab`). 기능 모듈이 쓰는 `goTo` · `goBack` · `replaceAll`은 그대로이고, `goTo(탭 키)`는 탭 전환이 됩니다.
+- `backStack`(NavDisplay에 넘기는 목록) = 시작 탭 스택 + (현재 탭이 시작 탭이 아니면) 현재 탭 스택
+- 탭의 첫 화면에서 뒤로 가면 시작 탭으로 돌아갑니다.
+- 탭을 바꾸면 다른 탭 화면은 `backStack`에서 빠지므로 그 화면의 ViewModel · 저장 상태는 정리됩니다. 화면 위치(어느 화면까지 들어갔는지)만 유지됩니다.
 
 **프로세스 종료 대비:** `mutableStateListOf`는 프로세스가 종료되면 사라집니다. 복원이 중요하면 백스택을 `rememberNavBackStack()`(직렬화 저장 지원)으로 만들고 Navigator가 그것을 감싸도록 구성합니다.
 

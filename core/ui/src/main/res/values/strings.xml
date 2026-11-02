@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 일정 시간 (product-spec 2-4) -->
+    <string name="common_time_all_day">종일</string>
+    <string name="common_time_morning">아침</string>
+    <string name="common_time_lunch">점심</string>
+    <string name="common_time_evening">저녁</string>
+    <string name="common_time_exact">시간 지정</string>
+
+    <!-- 반복 (product-spec 2-2) -->
+    <string name="common_repeat_none">없음</string>
+    <string name="common_repeat_yearly">매년</string>
+    <string name="common_repeat_monthly">매월</string>
+</resources>

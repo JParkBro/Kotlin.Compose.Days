@@ -20,3 +20,6 @@ keystore.properties
 *-firebase-adminsdk-*.json
 service-account*.json
 google-services.json
+
+# Kotlin 컴파일러 캐시
+.kotlin/

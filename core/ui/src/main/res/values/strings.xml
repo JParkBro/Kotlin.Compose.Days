@@ -11,4 +11,15 @@
     <string name="common_repeat_none">없음</string>
     <string name="common_repeat_yearly">매년</string>
     <string name="common_repeat_monthly">매월</string>
+
+    <!-- + 선택 시트 (product-spec 4-2, 홈 · 캘린더 공용) -->
+    <string name="common_add_sheet_title">무엇을 추가할까요?</string>
+    <string name="common_add_sheet_close">닫기</string>
+    <string name="common_add_sheet_dday">디데이</string>
+    <string name="common_add_sheet_dday_desc">날짜를 세어요</string>
+    <string name="common_add_sheet_plan">일정</string>
+    <string name="common_add_sheet_plan_desc">약속이나 할 일을 적어요</string>
+
+    <!-- 디데이 줄 -->
+    <string name="common_since">%1$s부터</string>
 </resources>

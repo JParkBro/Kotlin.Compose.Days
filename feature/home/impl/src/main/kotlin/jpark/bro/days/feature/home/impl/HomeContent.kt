@@ -1,6 +1,7 @@
 package jpark.bro.days.feature.home.impl
 
 import jpark.bro.days.core.domain.dday.ddayOn
+import jpark.bro.days.core.domain.dday.sortTime
 import jpark.bro.days.core.model.DdayCount
 import jpark.bro.days.core.model.Item
 import jpark.bro.days.core.model.ItemType
@@ -28,7 +29,7 @@ internal data class HomeContent(
 /**
  * - 리스트: 디데이 + "디데이로 세기" 켠 일정. 다가오는 것(가까운 순) → 지난 것(최근 순). 히어로 항목은 뺀다
  * - 히어로: 대표로 고정한 디데이, 없으면 가장 가까운 다가오는 항목, 그것도 없으면 없음
- * - 다가오는 일정: 오늘 이후 미완료 일정 중 가장 빠른 것 (날짜 → 시각 순, 종일 · 시간대만 있는 일정이 먼저)
+ * - 다가오는 일정: 오늘 이후 미완료 일정 중 가장 빠른 것 (날짜 → 시각 순, [sortTime])
  */
 internal fun buildHomeContent(
     items: List<Item>,
@@ -50,7 +51,7 @@ internal fun buildHomeContent(
         items
             .filter { it.content.type == ItemType.PLAN && !it.content.isDone }
             .filter { item -> item.content.date?.let { !it.isBefore(today) } ?: false }
-            .minWithOrNull(compareBy<Item>({ it.content.date }).thenBy(nullsFirst()) { it.content.time })
+            .minWithOrNull(compareBy<Item>({ it.content.date }).thenBy { it.content.sortTime })
 
     return HomeContent(
         hero = hero,

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 캘린더 (product-spec 4-3) -->
+    <string name="calendar_main_title">캘린더</string>
+    <string name="calendar_month_previous">이전 달</string>
+    <string name="calendar_month_next">다음 달</string>
+    <string name="calendar_today">오늘</string>
+    <string name="calendar_tomorrow">내일</string>
+    <string name="calendar_list_month">이번 달</string>
+    <string name="calendar_list_count">%1$d건</string>
+    <string name="calendar_list_add_for_date">이 날 추가</string>
+    <string name="calendar_list_empty_month">이번 달에는 등록한 디데이 · 일정이 없어요</string>
+    <string name="calendar_list_empty_date">이 날은 등록한 디데이 · 일정이 없어요</string>
+    <string name="calendar_legend_plan">일정</string>
+    <string name="calendar_legend_dday">디데이</string>
+    <string name="calendar_add">추가</string>
+    <string name="calendar_done_failed">완료 표시를 저장하지 못했어요. 잠시 후 다시 시도해 주세요.</string>
+</resources>

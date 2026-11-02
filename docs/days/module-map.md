@@ -122,6 +122,7 @@ days/
 | 디데이 · 일정 추가 | 있음 | 저장 후 뒤로, 사진 선택기, 전면광고 |
 | 알림 목록 | 있음 | 상세 이동 |
 | 설정 | 있음 | 하위 화면 이동 |
+| 위젯 하나 설정 (:widget Activity) | 있음 | 닫기, 저장 실패 안내 |
 | 커플 관리 | 있음 | 연결 해제 완료 |
 | 계정 관리 · 탈퇴 | 있음 | 결과 전달 (세션 종료) |
 | 정책 문서 보기 | 없음 (`Nothing`) | – |
@@ -165,7 +166,7 @@ Firebase 프로젝트는 dev · prod를 분리해 개발 중 실수가 실제 �
 
 ## 10. widget 모듈 (Glance)
 
-> 상태: **진행 중.** 위젯 본체(#20) 완료, 위젯 설정 화면 · 상세의 "위젯 추가"는 다음 PR. 기획은 `product-spec.md` 8장, 시안은 `design/settings-widget/`.
+> 상태: **진행 중.** 위젯 본체(#20) · 위젯 하나 설정 화면(#21) 완료, 앱 설정의 위젯 목록 · 상세의 "위젯 추가"는 다음 PR. 기획은 `product-spec.md` 8장, 시안은 `design/settings-widget/`.
 
 **모듈 · 빌드**
 - [x] `:widget` 모듈 (`days.android.library` + `days.android.compose` + `days.koin`), catalog에 `glance-appwidget` · `glance-preview` · `work-runtime`
@@ -181,8 +182,11 @@ Firebase 프로젝트는 dev · prod를 분리해 개발 중 실수가 실제 �
 **설정 · 데이터**
 - [x] Room `widget_config` (widget_id, item_id, size, background_type, show_profile), `WidgetConfigRepository`. 위젯을 지우면 설정도 지움
 - [x] 갱신: 항목 · 대표 고정 · 테마 · 위젯 설정이 바뀌면 전체 갱신(`WidgetUpdater`, 앱 프로세스가 살아 있는 동안), 자정마다 WorkManager 1회 작업을 다시 예약, 시각 · 시간대 변경 브로드캐스트
-- [ ] 위젯 설정 화면: 위젯을 놓을 때 · 앱 설정 → 위젯 설정(놓인 위젯 목록 → 하나씩 수정)
-- [ ] 디데이 상세의 "위젯 추가": `AppWidgetManager.requestPinAppWidget`
+- [x] 위젯 설정 화면 `WidgetConfigActivity`(:widget): 미리보기 · 표시할 디데이(자동 포함) · 배경 · 저장. 런처(길게 눌러 설정, Android 11은 놓을 때)에서 연다. 넘어온 위젯 id가 이 앱 위젯인지 확인
+- [x] 놓을 때는 설정 없이 바로(`widgetFeatures="reconfigurable|configuration_optional"`), 놓이면 기본 설정 저장(`saveConfigIfAbsent`)
+- [x] feature는 widget 모듈을 모르므로 `core:data`의 `HomeWidgets` 인터페이스(놓인 위젯 · 추가 요청 · 설정 열기)로 쓰고 구현은 widget 모듈. 추가 요청이 놓이면 `WidgetPinnedReceiver`가 고른 디데이로 설정
+- [ ] 앱 설정 → 위젯 설정(`feature:settings`): 놓인 위젯 목록 → 누르면 설정 화면, 없으면 안내 + "위젯 추가"
+- [ ] 디데이 상세의 "위젯 추가": 크기 고르기 → `HomeWidgets.requestPin`
 
 **검증**
 - [x] 크기별 Glance Preview, 표시 규칙 · 자정 예약 시간(자정 · 윤년 · 서머타임) 테스트

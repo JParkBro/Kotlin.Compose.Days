@@ -24,12 +24,7 @@ fun DdayText(
 ) {
     val colors = AppThemeTokens.colors
     Text(
-        text =
-            when (count) {
-                is DdayCount.Remaining -> stringResource(R.string.common_dday_remaining, count.days)
-                DdayCount.Today -> stringResource(R.string.common_dday_today)
-                is DdayCount.Elapsed -> stringResource(R.string.common_dday_elapsed, count.days)
-            },
+        text = ddayLabel(count),
         style = style.copy(fontFeatureSettings = "tnum"),
         color =
             when (tone) {
@@ -41,6 +36,15 @@ fun DdayText(
         modifier = modifier,
     )
 }
+
+/** D-N · D-Day · D+N 문구 (색 없이 글자만 필요할 때) */
+@Composable
+fun ddayLabel(count: DdayCount): String =
+    when (count) {
+        is DdayCount.Remaining -> stringResource(R.string.common_dday_remaining, count.days)
+        DdayCount.Today -> stringResource(R.string.common_dday_today)
+        is DdayCount.Elapsed -> stringResource(R.string.common_dday_elapsed, count.days)
+    }
 
 /** product-spec 9장 샘플 (오늘 = 2026.11.05) */
 @ComponentPreviews

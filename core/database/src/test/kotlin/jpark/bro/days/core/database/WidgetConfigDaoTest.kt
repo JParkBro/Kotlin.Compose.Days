@@ -39,4 +39,16 @@ internal class WidgetConfigDaoTest : DatabaseTest() {
             assertEquals(listOf(2), dao.observeConfigs().first().map { it.widgetId })
             assertNull(dao.getConfig(1))
         }
+
+    @Test
+    fun `기본값 저장은 이미 고른 설정을 덮어쓰지 않음`() =
+        runTest {
+            dao.upsertConfig(config(7, itemId = "discharge"))
+
+            dao.insertConfigIfAbsent(config(7))
+            dao.insertConfigIfAbsent(config(8))
+
+            assertEquals("discharge", dao.getConfig(7)?.itemId)
+            assertEquals(listOf(7, 8), dao.observeConfigs().first().map { it.widgetId })
+        }
 }

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- 중간 4×2 (product-spec 8장). 갱신은 WidgetUpdater가 하므로 updatePeriodMillis는 0 -->
-<!-- targetCell*은 API 31부터 쓰이고, API 30은 minWidth · minHeight로 크기를 잡는다 -->
+<!-- targetCell* · widgetFeatures는 API 31부터 쓰인다. API 30은 minWidth · minHeight로 크기를 잡고, 놓을 때 설정 화면이 뜬다 -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:configure="jpark.bro.days.widget.config.WidgetConfigActivity"
     android:description="@string/widget_medium_description"
     android:initialLayout="@layout/glance_default_loading_layout"
     android:minWidth="250dp"
@@ -12,4 +13,5 @@
     android:targetCellHeight="2"
     android:updatePeriodMillis="0"
     android:widgetCategory="home_screen"
+    android:widgetFeatures="reconfigurable|configuration_optional"
     tools:ignore="UnusedAttribute" />

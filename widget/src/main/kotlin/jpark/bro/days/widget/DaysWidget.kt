@@ -43,10 +43,10 @@ abstract class DaysWidget(
                 today = LocalDate.now(clock),
             )
         val colors =
-            widgetColors(
+            widgetColorScheme(
                 theme = settingsRepository.observeThemeSetting().first().type,
                 background = config?.background ?: WidgetBackground.THEME,
-            )
+            ).toGlance()
         provideContent { DaysWidgetContent(display = display, size = size, colors = colors) }
     }
 }

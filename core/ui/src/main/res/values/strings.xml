@@ -22,4 +22,10 @@
 
     <!-- 디데이 줄 -->
     <string name="common_since">%1$s부터</string>
+
+    <!-- 위젯 크기 (product-spec 8장, 상세 · 위젯 설정 공용) -->
+    <string name="common_widget_size_small">작게 (2×2)</string>
+    <string name="common_widget_size_medium">중간 (4×2)</string>
+    <string name="common_widget_size_sheet_title">어떤 크기로 추가할까요?</string>
+    <string name="common_widget_size_sheet_desc">홈 화면에 놓을 위치를 고르면 추가돼요.</string>
 </resources>

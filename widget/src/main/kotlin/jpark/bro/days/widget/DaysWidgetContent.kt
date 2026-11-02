@@ -181,7 +181,7 @@ private fun SmallWidgetPreview() {
     DaysWidgetContent(
         WidgetDisplay.Dday(PreviewEntry),
         WidgetSize.SMALL,
-        widgetColors(AppThemeType.PINK, WidgetBackground.THEME),
+        widgetColorScheme(AppThemeType.PINK, WidgetBackground.THEME).toGlance(),
     )
 }
 
@@ -192,7 +192,7 @@ private fun MediumWidgetPreview() {
     DaysWidgetContent(
         WidgetDisplay.Dday(PreviewEntry),
         WidgetSize.MEDIUM,
-        widgetColors(AppThemeType.NAVY, WidgetBackground.DARK),
+        widgetColorScheme(AppThemeType.NAVY, WidgetBackground.DARK).toGlance(),
     )
 }
 
@@ -200,5 +200,9 @@ private fun MediumWidgetPreview() {
 @Preview(widthDp = 110, heightDp = 110)
 @Composable
 private fun EmptyWidgetPreview() {
-    DaysWidgetContent(WidgetDisplay.Empty, WidgetSize.SMALL, widgetColors(AppThemeType.SAGE, WidgetBackground.WHITE))
+    DaysWidgetContent(
+        WidgetDisplay.Empty,
+        WidgetSize.SMALL,
+        widgetColorScheme(AppThemeType.SAGE, WidgetBackground.WHITE).toGlance(),
+    )
 }

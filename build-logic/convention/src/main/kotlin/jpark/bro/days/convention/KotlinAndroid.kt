@@ -22,6 +22,17 @@ internal fun Project.configureKotlinAndroid(commonExtension: CommonExtension) {
             sourceCompatibility = JavaVersion.VERSION_17
             targetCompatibility = JavaVersion.VERSION_17
         }
+
+        // Robolectric 단위 테스트 (DAO · Repository): 리소스 포함, JDK 17+에서 FileDescriptor · SharedSecrets 접근 허용
+        testOptions.unitTests.apply {
+            isIncludeAndroidResources = true
+            all {
+                it.jvmArgs(
+                    "--add-exports=java.base/jdk.internal.access=ALL-UNNAMED",
+                    "--add-opens=java.base/java.io=ALL-UNNAMED",
+                )
+            }
+        }
     }
 
     configureKotlin()

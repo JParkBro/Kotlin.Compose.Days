@@ -147,6 +147,11 @@ room = [
     "room-runtime",
     "room-ktx",
 ]
+robolectric = [
+    "robolectric",
+    "androidx-test-core",
+    "androidx-test-ext-junit",
+]
 test = [
     "junit",
     "kotlinx-coroutines-test",

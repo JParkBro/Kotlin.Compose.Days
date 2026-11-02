@@ -145,7 +145,7 @@ di/{Feature}Module.kt  viewModelOf + navigation<{Feature}Key>
 - suspend 블록 예외 처리는 `runCatching` 대신 `suspendRunCatching` (CancellationException을 삼키지 않기 위해).
 - 공유 항목 저장은 Room에 `sync_state = PENDING`으로 쓰고 SyncManager가 올린다. 화면에서 Firestore를 직접 호출하지 않는다.
 - 삭제는 soft delete(`deleted_at`). Firestore 문서를 실제로 지우지 않는다.
-- Room 컬럼명은 snake_case + `@ColumnInfo(name = …)`. 스키마를 바꾸면 Migration + 스키마 JSON 커밋 + 마이그레이션 테스트.
+- Room 컬럼명은 snake_case + `@ColumnInfo(name = …)`. 스키마를 바꾸면 Migration + 스키마 JSON 커밋 + 마이그레이션 테스트. 단, **출시 전까지는 version 1을 고쳐 쓴다** (`docs/days/README.md` 예외 항목).
 - 현재 시각은 주입받은 `Clock`, 디스패처도 주입받는다.
 
 ### UI

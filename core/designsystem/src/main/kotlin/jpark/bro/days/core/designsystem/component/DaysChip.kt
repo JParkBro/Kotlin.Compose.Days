@@ -37,13 +37,17 @@ import jpark.bro.days.core.designsystem.R
 import jpark.bro.days.core.designsystem.preview.ComponentPreviews
 import jpark.bro.days.core.designsystem.preview.DaysPreviewSurface
 
-/** 필터 칩 (공개 범위 필터 등). 활성 text-primary 배경 + bg 글자, 비활성 fill + text-secondary */
+/**
+ * 필터 칩. 활성 text-primary 배경 + bg 글자, 비활성 fill + text-secondary.
+ * 여러 개를 고를 수 있는 묶음(알림 등)은 [role]에 [Role.Checkbox]를 넘긴다.
+ */
 @Composable
 fun DaysFilterChip(
     text: String,
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    role: Role = Role.RadioButton,
 ) {
     val colors = AppThemeTokens.colors
     Box(
@@ -52,7 +56,7 @@ fun DaysFilterChip(
                 .heightIn(min = 36.dp)
                 .clip(AppShapes.full)
                 .background(if (selected) colors.textPrimary else colors.fill)
-                .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
+                .selectable(selected = selected, role = role, onClick = onClick)
                 .padding(horizontal = AppSpacing.md, vertical = AppSpacing.xs),
         contentAlignment = Alignment.Center,
     ) {

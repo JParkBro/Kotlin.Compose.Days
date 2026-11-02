@@ -15,6 +15,9 @@ import jpark.bro.days.core.model.AppThemeType
 val LocalAppColors = staticCompositionLocalOf<AppColors> { error("AppTheme 밖에서 AppThemeTokens를 사용했습니다.") }
 val LocalAppTypography = staticCompositionLocalOf<AppTypography> { error("AppTheme 밖에서 AppThemeTokens를 사용했습니다.") }
 
+/** 지금 그리는 팔레트가 다크인지. 항목 색처럼 다른 테마의 팔레트를 같은 밝기로 고를 때 쓴다 */
+val LocalIsDarkTheme = staticCompositionLocalOf { false }
+
 /**
  * 앱 테마. 선택한 테마 · 모드는 DataStore에 저장하고 위젯도 같은 팔레트를 쓴다 (theme-guide.md).
  * Material 컴포넌트도 토큰 색 · 글자 스타일을 쓰도록 colorScheme · typography를 매핑한다.
@@ -30,6 +33,7 @@ fun AppTheme(
     CompositionLocalProvider(
         LocalAppColors provides colors,
         LocalAppTypography provides DefaultTypography,
+        LocalIsDarkTheme provides dark,
     ) {
         MaterialTheme(
             colorScheme = colors.toColorScheme(dark),

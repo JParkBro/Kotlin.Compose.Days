@@ -49,16 +49,8 @@
     <string name="item_edit_count_first_day_desc">시작한 날을 0일이 아닌 1일로 카운트해요.</string>
 
     <string name="item_edit_repeat">반복</string>
-    <string name="item_edit_repeat_none">없음</string>
-    <string name="item_edit_repeat_yearly">매년</string>
-    <string name="item_edit_repeat_monthly">매월</string>
 
     <string name="item_edit_time">시간</string>
-    <string name="item_edit_time_all_day">종일</string>
-    <string name="item_edit_time_morning">아침</string>
-    <string name="item_edit_time_lunch">점심</string>
-    <string name="item_edit_time_evening">저녁</string>
-    <string name="item_edit_time_exact">시간 지정</string>
 
     <string name="item_edit_place">장소 (선택)</string>
     <string name="item_edit_place_placeholder">예: 성수동 카페거리</string>

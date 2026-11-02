@@ -1,10 +1,11 @@
 package jpark.bro.days.feature.item.impl.itemedit
 
-import jpark.bro.days.core.domain.dday.calculateDday
+import jpark.bro.days.core.domain.dday.ddayOn
 import jpark.bro.days.core.model.AppThemeType
 import jpark.bro.days.core.model.Category
 import jpark.bro.days.core.model.CountMode
 import jpark.bro.days.core.model.DdayCount
+import jpark.bro.days.core.model.ItemContent
 import jpark.bro.days.core.model.ItemIcon
 import jpark.bro.days.core.model.ItemType
 import jpark.bro.days.core.model.RepeatRule
@@ -65,10 +66,14 @@ internal data class ItemEditState(
     /** 위쪽 미리보기 카드의 D-day. 날짜가 없으면 null */
     val previewDday: DdayCount?
         get() =
-            date?.let {
-                when (type) {
-                    ItemType.DDAY -> calculateDday(it, countMode, countFirstDayAsOne, repeatRule, today)
-                    ItemType.PLAN -> calculateDday(it, CountMode.DDAY, false, RepeatRule.NONE, today)
-                }
-            }
+            ItemContent(
+                type = type,
+                title = title,
+                colorKey = color.name,
+                iconKey = icon.name,
+                date = date,
+                countMode = countMode,
+                countFirstDayAsOne = countFirstDayAsOne,
+                repeatRule = repeatRule,
+            ).ddayOn(today)
 }

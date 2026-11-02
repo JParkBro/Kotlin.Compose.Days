@@ -41,6 +41,7 @@ import jpark.bro.days.core.model.ItemType
 import jpark.bro.days.core.model.RepeatRule
 import jpark.bro.days.core.model.TimeSlot
 import jpark.bro.days.core.ui.ObserveEvents
+import jpark.bro.days.core.ui.label
 import jpark.bro.days.core.ui.toDisplayText
 import jpark.bro.days.feature.item.api.ItemEditKey
 import jpark.bro.days.feature.item.impl.R

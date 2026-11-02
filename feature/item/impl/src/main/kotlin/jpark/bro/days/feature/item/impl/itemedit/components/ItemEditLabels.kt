@@ -4,8 +4,6 @@ import androidx.annotation.StringRes
 import jpark.bro.days.core.model.AppThemeType
 import jpark.bro.days.core.model.Category
 import jpark.bro.days.core.model.ItemIcon
-import jpark.bro.days.core.model.RepeatRule
-import jpark.bro.days.core.model.TimeSlot
 import jpark.bro.days.feature.item.impl.R
 
 @get:StringRes
@@ -42,24 +40,4 @@ internal val AppThemeType.colorLabel: Int
             AppThemeType.NAVY -> R.string.item_edit_color_navy
             AppThemeType.SAGE -> R.string.item_edit_color_sage
             AppThemeType.LAVENDER -> R.string.item_edit_color_lavender
-        }
-
-@get:StringRes
-internal val RepeatRule.label: Int
-    get() =
-        when (this) {
-            RepeatRule.NONE -> R.string.item_edit_repeat_none
-            RepeatRule.YEARLY -> R.string.item_edit_repeat_yearly
-            RepeatRule.MONTHLY -> R.string.item_edit_repeat_monthly
-        }
-
-@get:StringRes
-internal val TimeSlot.label: Int
-    get() =
-        when (this) {
-            TimeSlot.ALL_DAY -> R.string.item_edit_time_all_day
-            TimeSlot.MORNING -> R.string.item_edit_time_morning
-            TimeSlot.LUNCH -> R.string.item_edit_time_lunch
-            TimeSlot.EVENING -> R.string.item_edit_time_evening
-            TimeSlot.EXACT -> R.string.item_edit_time_exact
         }

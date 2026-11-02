@@ -14,6 +14,27 @@
     <string name="home_empty_quick_discharge">전역일</string>
     <string name="home_empty_add">디데이 추가</string>
 
+    <!-- 항목이 있을 때 -->
+    <string name="home_hero_pinned">고정된 디데이</string>
+    <string name="home_hero_nearest">가장 가까운 디데이</string>
+    <string name="home_next_plan">다가오는 일정</string>
+    <string name="home_next_plan_empty">아직 일정이 없어요</string>
+    <string name="home_next_plan_add">일정 추가</string>
+    <string name="home_list_title">디데이</string>
+    <string name="home_list_count">%1$d개</string>
+    <string name="home_list_since">%1$s부터</string>
+    <string name="home_repeat_yearly">매년</string>
+    <string name="home_repeat_monthly">매월</string>
+    <string name="home_add">추가</string>
+
+    <!-- + 선택 시트 (product-spec 4-2) -->
+    <string name="home_add_sheet_title">무엇을 추가할까요?</string>
+    <string name="home_add_sheet_close">닫기</string>
+    <string name="home_add_sheet_dday">디데이</string>
+    <string name="home_add_sheet_dday_desc">날짜를 세어요</string>
+    <string name="home_add_sheet_plan">일정</string>
+    <string name="home_add_sheet_plan_desc">약속이나 할 일을 적어요</string>
+
     <!-- 커플 연결 카드 (솔로) -->
     <string name="home_couple_banner_title">커플 코드로 연결하기</string>
     <string name="home_couple_banner_desc">둘만의 디데이와 일정을 함께 공유해보세요</string>

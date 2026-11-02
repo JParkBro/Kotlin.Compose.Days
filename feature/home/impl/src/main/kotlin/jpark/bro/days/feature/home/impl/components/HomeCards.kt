@@ -33,6 +33,7 @@ import jpark.bro.days.core.designsystem.component.DaysListItem
 import jpark.bro.days.core.designsystem.component.DaysSoftButton
 import jpark.bro.days.core.designsystem.component.DdayText
 import jpark.bro.days.core.designsystem.component.DdayTone
+import jpark.bro.days.core.domain.dday.FeaturedItem
 import jpark.bro.days.core.domain.dday.isImminent
 import jpark.bro.days.core.model.DdayCount
 import jpark.bro.days.core.model.Item
@@ -43,20 +44,18 @@ import jpark.bro.days.core.model.itemColorFromKey
 import jpark.bro.days.core.ui.label
 import jpark.bro.days.core.ui.scheduleText
 import jpark.bro.days.core.ui.toDisplayText
-import jpark.bro.days.feature.home.impl.HomeHero
-import jpark.bro.days.feature.home.impl.HomeRow
 import jpark.bro.days.feature.home.impl.R
 import jpark.bro.days.core.designsystem.R as DesignR
 
 /** 히어로 (product-spec 4-1): primary-soft 카드 + 큰 D-day (theme-guide 6장) */
 @Composable
 internal fun HeroCard(
-    hero: HomeHero,
+    hero: FeaturedItem,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val colors = AppThemeTokens.colors
-    val content = hero.row.item.content
+    val content = hero.entry.item.content
     Column(
         modifier =
             modifier
@@ -81,7 +80,7 @@ internal fun HeroCard(
             overflow = TextOverflow.Ellipsis,
         )
         DdayText(
-            count = hero.row.dday,
+            count = hero.entry.dday,
             tone = DdayTone.HIGHLIGHT,
             style = AppThemeTokens.typography.displayHeroMobile,
         )

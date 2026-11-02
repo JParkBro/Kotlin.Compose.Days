@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 홈 화면 위젯 (product-spec 8장) -->
+    <string name="widget_small_label">디데이 (작게)</string>
+    <string name="widget_medium_label">디데이 (중간)</string>
+    <string name="widget_small_description">디데이 하나를 크게 보여줘요</string>
+    <string name="widget_medium_description">디데이와 기준일을 함께 보여줘요</string>
+    <string name="widget_empty">첫 디데이를 등록해보세요</string>
+    <string name="widget_missing">위젯에 보여줄 디데이를 다시 골라주세요</string>
+</resources>

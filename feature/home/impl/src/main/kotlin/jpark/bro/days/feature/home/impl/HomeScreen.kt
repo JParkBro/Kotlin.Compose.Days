@@ -197,7 +197,7 @@ private fun ColumnScope.HomeList(
         verticalArrangement = Arrangement.spacedBy(AppSpacing.md),
     ) {
         content.hero?.let { hero ->
-            item(key = "hero") { HeroCard(hero = hero, onClick = { openItem(hero.row.item) }) }
+            item(key = "hero") { HeroCard(hero = hero, onClick = { openItem(hero.entry.item) }) }
         }
         item(key = "next_plan") {
             NextPlanCard(

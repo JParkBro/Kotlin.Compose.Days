@@ -49,7 +49,7 @@ class HomeViewModelTest {
         assertEquals(
             DdayCount.Remaining(58),
             state.content.hero
-                ?.row
+                ?.entry
                 ?.dday,
         )
         assertEquals(listOf(Discharge), state.content.rows.map { it.item })
@@ -66,7 +66,7 @@ class HomeViewModelTest {
             assertEquals(
                 Discharge,
                 viewModel.state.value.content.hero
-                    ?.row
+                    ?.entry
                     ?.item,
             )
             assertTrue(

@@ -178,7 +178,7 @@ erDiagram
 | image | `local_path`, `upload_state` |
 | `sync_cursor` | `key` (예: `items:{coupleId}`), `last_pulled_at` |
 | `activity_log` | 상대 활동 알림 목록 (id, type, item_id, actor_user_id, created_at, is_read) |
-| `widget_config` | widget_id, item_id, size, background_type, show_profile |
+| `widget_config` | widget_id, item_id, size, background_type, show_profile. widget_id는 시스템이 주는 appWidgetId(정수)라 UUID 원칙의 예외 (기기 밖으로 나가지 않음) |
 
 ## 4. Firestore · Cloudflare 저장 구조
 

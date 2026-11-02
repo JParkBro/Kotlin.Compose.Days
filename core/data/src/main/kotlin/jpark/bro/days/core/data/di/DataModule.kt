@@ -4,8 +4,10 @@ import jpark.bro.days.core.common.IdGenerator
 import jpark.bro.days.core.common.UuidIdGenerator
 import jpark.bro.days.core.data.repository.DefaultItemRepository
 import jpark.bro.days.core.data.repository.DefaultSettingsRepository
+import jpark.bro.days.core.data.repository.DefaultWidgetConfigRepository
 import jpark.bro.days.core.data.repository.ItemRepository
 import jpark.bro.days.core.data.repository.SettingsRepository
+import jpark.bro.days.core.data.repository.WidgetConfigRepository
 import jpark.bro.days.core.data.session.LocalUserSession
 import jpark.bro.days.core.data.session.UserSession
 import org.koin.core.module.dsl.singleOf
@@ -20,4 +22,5 @@ val dataModule =
         singleOf(::LocalUserSession) bind UserSession::class
         singleOf(::DefaultSettingsRepository) bind SettingsRepository::class
         singleOf(::DefaultItemRepository) bind ItemRepository::class
+        singleOf(::DefaultWidgetConfigRepository) bind WidgetConfigRepository::class
     }

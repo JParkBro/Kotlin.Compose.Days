@@ -51,7 +51,8 @@ data class AppTypography(
     val metricTabular: TextStyle,
 )
 
-internal val DefaultTypography =
+/** 앱 글자 스타일. Compose 테마 밖(Glance 위젯)에서는 이 값을 직접 쓴다 */
+val DefaultTypography =
     AppTypography(
         displayHero =
             TextStyle(

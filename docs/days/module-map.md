@@ -103,7 +103,7 @@ days/
 | `item:impl` | – |
 | `notifications:impl` | `item` |
 | `settings:impl` | `couple` (커플 관리 · 연결) |
-| `widget` | `item` (위젯 탭 시 상세로 진입하는 딥링크) |
+| `widget` | – (탭하면 `core:navigation`의 `AppIntents.EXTRA_OPEN_ITEM_ID`로 앱을 열고, app이 상세 백스택을 만든다) |
 
 ## 6. 화면별 MVI 구성
 
@@ -163,27 +163,28 @@ Firebase 프로젝트는 dev · prod를 분리해 개발 중 실수가 실제 �
 8. `core:ads`, 광고 제거 구매
 9. `policy-site/`, 출시 체크리스트 (`infra-and-billing-protection.md`)
 
-## 10. TODO: widget 모듈 (Glance)
+## 10. widget 모듈 (Glance)
 
-> 상태: **미착수.** 솔로 모드(9장 4단계)를 마친 뒤 만든다. 기획은 `product-spec.md` 8장, 시안은 `design/settings-widget/`.
+> 상태: **진행 중.** 위젯 본체(#20) 완료, 위젯 설정 화면 · 상세의 "위젯 추가"는 다음 PR. 기획은 `product-spec.md` 8장, 시안은 `design/settings-widget/`.
 
 **모듈 · 빌드**
-- [ ] `:widget` 모듈 추가 (`days.android.library` + `days.android.compose` + `days.koin`), `settings.gradle.kts` include
-- [ ] catalog에 `androidx.glance:glance-appwidget`(+ `glance-material3`) 추가
-- [ ] app에 `implementation(projects.widget)`, `appModule`에 `widgetModule` 포함
+- [x] `:widget` 모듈 (`days.android.library` + `days.android.compose` + `days.koin`), catalog에 `glance-appwidget` · `glance-preview` · `work-runtime`
+- [x] app에 `implementation(projects.widget)`, `appModule`에 `widgetModule`
 
 **위젯**
-- [ ] 크기 3종: 작게(2×2) · 중간(4×2) · 잠금화면 — `GlanceAppWidget` + `GlanceAppWidgetReceiver`, `appwidget-provider` XML(크기별 `minWidth/minHeight`, `previewLayout`)
-- [ ] 표시: 디데이 제목 · D-day 숫자 · 기준일. 계산은 `core:domain`만 사용 (화면 · 위젯 · 알림 공통)
-- [ ] 배경: 사진 · 테마색 · 다크 · 화이트, 프로필 사진 표시 여부. 색은 테마 토큰만 (`theme-guide.md`)
-- [ ] 탭 시 디데이 상세로 이동: `item:api`의 `ItemDetailKey` 딥링크 → app에서 백스택 구성
+- [x] 크기 2종: 작게(2×2) · 중간(4×2). 크기마다 `GlanceAppWidget` 하위 클래스 + 리시버 + `appwidget-provider` XML. 잠금화면은 Android 휴대폰이 지원하지 않아 뺌
+- [x] 표시: 아이콘 · 제목 · D-day(+ 중간은 기준일). 고른 디데이가 없으면 홈 히어로와 같은 규칙(`core:domain` `featured`)
+- [x] 배경: 테마색(기기 다크 모드를 따름) · 다크 · 화이트. 앱과 같은 팔레트
+- [x] 탭: 앱을 `AppIntents.EXTRA_OPEN_ITEM_ID`와 함께 열고, `MainActivity`가 `[HomeKey, ItemDetailKey]` 백스택을 만든다 (`singleTop` + `onNewIntent`)
+- [ ] 사진 배경 · 프로필 사진 표시 (이미지 저장소 · 커플 프로필 단계)
 
 **설정 · 데이터**
-- [ ] 위젯 설정 Activity (위젯 추가 시 표시할 디데이 · 배경 선택), 설정 화면의 `WidgetSettings`와 같은 값 사용
-- [ ] Room `widget_config` (widget_id, item_id, size, background_type, show_profile) — `data-model-erd.md`
-- [ ] 갱신: 항목 수정 · 날짜 변경(자정) 시 `GlanceAppWidgetManager`로 업데이트, 필요하면 WorkManager 주기 작업
-- [ ] 디데이 상세의 "위젯 추가" Event: `AppWidgetManager.requestPinAppWidget`
+- [x] Room `widget_config` (widget_id, item_id, size, background_type, show_profile), `WidgetConfigRepository`. 위젯을 지우면 설정도 지움
+- [x] 갱신: 항목 · 대표 고정 · 테마 · 위젯 설정이 바뀌면 전체 갱신(`WidgetUpdater`, 앱 프로세스가 살아 있는 동안), 자정마다 WorkManager 1회 작업을 다시 예약, 시각 · 시간대 변경 브로드캐스트
+- [ ] 위젯 설정 화면: 위젯을 놓을 때 · 앱 설정 → 위젯 설정(놓인 위젯 목록 → 하나씩 수정)
+- [ ] 디데이 상세의 "위젯 추가": `AppWidgetManager.requestPinAppWidget`
 
 **검증**
-- [ ] 위젯 크기별 Preview(Glance), 날짜 경계(자정 · 윤년) 갱신 테스트
-- [ ] 공유 항목이 삭제 · 연결 해제됐을 때 위젯 표시 처리
+- [x] 크기별 Glance Preview, 표시 규칙 · 자정 예약 시간(자정 · 윤년 · 서머타임) 테스트
+- [x] 고른 디데이가 삭제되면 "다시 골라주세요" 안내
+- [ ] 공유 항목이 연결 해제됐을 때 위젯 표시 처리 (커플 모드 단계)

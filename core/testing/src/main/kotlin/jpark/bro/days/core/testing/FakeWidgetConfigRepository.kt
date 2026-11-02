@@ -21,6 +21,11 @@ class FakeWidgetConfigRepository(
         return Result.success(Unit)
     }
 
+    override suspend fun saveConfigIfAbsent(config: WidgetConfig): Result<Unit> {
+        configs.update { if (config.widgetId in it) it else it + (config.widgetId to config) }
+        return Result.success(Unit)
+    }
+
     override suspend fun deleteConfigs(widgetIds: List<Int>): Result<Unit> {
         configs.update { it - widgetIds.toSet() }
         return Result.success(Unit)

@@ -21,6 +21,9 @@ internal class DefaultWidgetConfigRepository(
             widgetConfigDao.upsertConfig(config.toEntity())
         }
 
+    override suspend fun saveConfigIfAbsent(config: WidgetConfig): Result<Unit> =
+        suspendRunCatching { widgetConfigDao.insertConfigIfAbsent(config.toEntity()) }
+
     override suspend fun deleteConfigs(widgetIds: List<Int>): Result<Unit> =
         suspendRunCatching { widgetConfigDao.deleteConfigs(widgetIds) }
 }

@@ -7,4 +7,19 @@
     <string name="widget_medium_description">디데이와 기준일을 함께 보여줘요</string>
     <string name="widget_empty">첫 디데이를 등록해보세요</string>
     <string name="widget_missing">위젯에 보여줄 디데이를 다시 골라주세요</string>
+
+    <!-- 위젯 설정 (product-spec 8장, 시안 design/settings-widget) -->
+    <string name="widget_config_title">위젯 설정</string>
+    <string name="widget_config_close">닫기</string>
+    <string name="widget_config_preview_hint">홈 화면에 보일 모습이에요</string>
+    <string name="widget_config_item">표시할 디데이</string>
+    <string name="widget_config_item_auto">자동</string>
+    <string name="widget_config_item_auto_desc">대표로 고정한 디데이, 없으면 가장 가까운 디데이</string>
+    <string name="widget_config_item_selected">선택됨</string>
+    <string name="widget_config_background">배경 스타일</string>
+    <string name="widget_config_background_theme">테마색</string>
+    <string name="widget_config_background_dark">다크</string>
+    <string name="widget_config_background_white">화이트</string>
+    <string name="widget_config_save">저장하기</string>
+    <string name="widget_config_save_failed">저장하지 못했어요. 잠시 후 다시 시도해 주세요.</string>
 </resources>

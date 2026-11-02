@@ -12,5 +12,8 @@ interface WidgetConfigRepository {
 
     suspend fun saveConfig(config: WidgetConfig): Result<Unit>
 
+    /** 설정이 없을 때만 [config]를 저장한다 (위젯이 처음 놓일 때) */
+    suspend fun saveConfigIfAbsent(config: WidgetConfig): Result<Unit>
+
     suspend fun deleteConfigs(widgetIds: List<Int>): Result<Unit>
 }

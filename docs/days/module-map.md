@@ -72,7 +72,7 @@ days/
 | `home:api` | `HomeKey` | – |
 | `calendar:api` | `CalendarKey` | – |
 | `item:api` | `ItemDetailKey` | `id: String` |
-| | `ItemEditKey` | `itemId: String?`, `type: ItemType`, `presetDate: String?` |
+| | `ItemEditKey` | `itemId: String?`, `type: ItemType`, `presetDate: String?`, `presetCategory: Category?`, `presetTitle: String?` (빠른 시작) |
 | `notifications:api` | `NotificationsKey` | – |
 | `settings:api` | `SettingsKey` | – |
 

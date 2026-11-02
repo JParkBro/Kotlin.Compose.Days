@@ -24,4 +24,11 @@ internal class DefaultSettingsRepository(
     override fun setThemePreview(setting: ThemeSetting?) {
         themePreview.value = setting
     }
+
+    override fun observeCoupleBannerDismissed(): Flow<Boolean> = settingsDataStore.coupleBannerDismissed
+
+    override suspend fun dismissCoupleBanner(): Result<Unit> =
+        suspendRunCatching {
+            settingsDataStore.setCoupleBannerDismissed()
+        }
 }

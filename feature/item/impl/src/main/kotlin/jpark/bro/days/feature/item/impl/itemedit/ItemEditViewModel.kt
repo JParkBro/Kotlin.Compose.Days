@@ -2,6 +2,7 @@ package jpark.bro.days.feature.item.impl.itemedit
 
 import androidx.lifecycle.viewModelScope
 import jpark.bro.days.core.data.repository.ItemRepository
+import jpark.bro.days.core.model.Category
 import jpark.bro.days.core.model.CountMode
 import jpark.bro.days.core.model.Item
 import jpark.bro.days.core.model.ItemContent
@@ -193,17 +194,21 @@ private fun ItemEditState.reduce(action: ItemEditAction.PlanInput): ItemEditStat
         }
     }
 
-/** 새 항목 기본값: 디데이는 기준일이 필수라 오늘(또는 캘린더에서 고른 날)로 채운다 */
+/** 새 항목 기본값: 디데이는 기준일이 필수라 오늘(또는 캘린더에서 고른 날)로 채운다. 빠른 시작이면 카테고리 · 제목도 */
 private fun initialState(
     key: ItemEditKey,
     today: LocalDate,
 ): ItemEditState {
     val presetDate = key.presetDate?.let(LocalDate::parse)
+    val category = key.presetCategory ?: Category.ETC
     return ItemEditState(
         itemId = key.itemId,
         type = key.type,
         today = today,
         isLoading = key.itemId != null,
+        title = key.presetTitle.orEmpty(),
+        category = category,
+        icon = category.defaultIcon,
         date = presetDate ?: today.takeIf { key.type == ItemType.DDAY },
     )
 }

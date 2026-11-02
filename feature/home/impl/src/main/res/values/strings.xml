@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 홈 (product-spec 4-1) -->
+    <string name="home_main_title">데이즈</string>
+    <string name="home_main_notifications">알림</string>
+
+    <!-- 빈 상태 -->
+    <string name="home_empty_title">첫 디데이를 등록해보세요</string>
+    <string name="home_empty_subtitle">기억하고 싶은 기념일이나\n중요한 날을 기록해요</string>
+    <string name="home_empty_quick_start">자주 찾는 추천 디데이</string>
+    <string name="home_empty_quick_birthday">생일</string>
+    <string name="home_empty_quick_travel">여행</string>
+    <string name="home_empty_quick_exam">시험</string>
+    <string name="home_empty_quick_discharge">전역일</string>
+    <string name="home_empty_add">디데이 추가</string>
+
+    <!-- 커플 연결 카드 (솔로) -->
+    <string name="home_couple_banner_title">커플 코드로 연결하기</string>
+    <string name="home_couple_banner_desc">둘만의 디데이와 일정을 함께 공유해보세요</string>
+    <string name="home_couple_banner_connect">연결하기</string>
+    <string name="home_couple_banner_close">커플 연결 카드 닫기</string>
+</resources>

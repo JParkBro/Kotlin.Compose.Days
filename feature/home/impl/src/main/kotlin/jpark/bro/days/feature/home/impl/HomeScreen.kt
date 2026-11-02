@@ -33,13 +33,13 @@ import jpark.bro.days.core.designsystem.component.DaysTopBar
 import jpark.bro.days.core.designsystem.preview.ScreenPreviews
 import jpark.bro.days.core.model.Item
 import jpark.bro.days.core.model.ItemType
+import jpark.bro.days.core.ui.AddItemSheet
+import jpark.bro.days.core.ui.DdayItemRow
 import jpark.bro.days.core.ui.ObserveEvents
 import jpark.bro.days.feature.couple.api.PairingKey
-import jpark.bro.days.feature.home.impl.components.AddItemSheet
 import jpark.bro.days.feature.home.impl.components.CoupleBanner
 import jpark.bro.days.feature.home.impl.components.HeroCard
 import jpark.bro.days.feature.home.impl.components.HomeEmptyContent
-import jpark.bro.days.feature.home.impl.components.HomeItemRow
 import jpark.bro.days.feature.home.impl.components.HomeListHeader
 import jpark.bro.days.feature.home.impl.components.NextPlanCard
 import jpark.bro.days.feature.home.impl.components.label
@@ -219,7 +219,12 @@ private fun ColumnScope.HomeList(
                 HomeListHeader(count = content.rows.size, modifier = Modifier.padding(top = AppSpacing.sm))
             }
             items(items = content.rows, key = { it.item.id }) { row ->
-                HomeItemRow(row = row, onClick = { openItem(row.item) })
+                DdayItemRow(
+                    content = row.item.content,
+                    dday = row.dday,
+                    onClick = { openItem(row.item) },
+                    modifier = Modifier.testTag("home_item_${row.item.id}"),
+                )
             }
         }
     }

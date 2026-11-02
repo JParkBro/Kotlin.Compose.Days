@@ -38,6 +38,7 @@ import jpark.bro.days.core.model.TimeSlot
 import jpark.bro.days.core.model.Visibility
 import jpark.bro.days.core.model.itemColorFromKey
 import jpark.bro.days.core.ui.label
+import jpark.bro.days.core.ui.scheduleText
 import jpark.bro.days.core.ui.toDisplayText
 import jpark.bro.days.feature.item.impl.R
 import jpark.bro.days.feature.item.impl.itemdetail.DetailMilestone
@@ -129,18 +130,7 @@ private fun Item.metaText(dday: DdayCount?): String {
             }
 
             ItemType.PLAN -> {
-                val slot = content.timeSlot
-                listOf(
-                    date,
-                    if (slot ==
-                        TimeSlot.EXACT
-                    ) {
-                        content.time?.toDisplayText()
-                    } else {
-                        slot?.let { stringResource(it.label) }
-                    },
-                    content.place,
-                )
+                listOf(content.scheduleText(showPlace = true).ifEmpty { null })
             }
         }
     val visibility =

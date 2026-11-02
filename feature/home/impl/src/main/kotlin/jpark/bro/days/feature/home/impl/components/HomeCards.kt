@@ -41,6 +41,7 @@ import jpark.bro.days.core.model.RepeatRule
 import jpark.bro.days.core.model.TimeSlot
 import jpark.bro.days.core.model.itemColorFromKey
 import jpark.bro.days.core.ui.label
+import jpark.bro.days.core.ui.scheduleText
 import jpark.bro.days.core.ui.toDisplayText
 import jpark.bro.days.feature.home.impl.HomeHero
 import jpark.bro.days.feature.home.impl.HomeRow
@@ -119,7 +120,7 @@ internal fun NextPlanCard(
     ) {
         DaysListItem(
             title = plan?.content?.title ?: stringResource(R.string.home_next_plan),
-            subtitle = plan?.scheduleText() ?: stringResource(R.string.home_next_plan_empty),
+            subtitle = plan?.content?.scheduleText() ?: stringResource(R.string.home_next_plan_empty),
             leading = { DaysIconBadge(icon = DesignR.drawable.ic_calendar) },
             trailing =
                 if (plan == null) {
@@ -135,41 +136,6 @@ internal fun NextPlanCard(
                 } else {
                     null
                 },
-        )
-    }
-}
-
-/** 2026.11.06 (금) · 저녁 / 2026.11.06 (금) · 오후 07:00 */
-@Composable
-private fun Item.scheduleText(): String {
-    val date = content.date?.toDisplayText().orEmpty()
-    val slot = content.timeSlot ?: return date
-    val time = if (slot == TimeSlot.EXACT) content.time?.toDisplayText() else stringResource(slot.label)
-    return listOfNotNull(date, time).joinToString(" · ")
-}
-
-/** 디데이 리스트 한 줄. 숫자는 7일 이내면 danger, 나머지는 text-primary (theme-guide 5.5) */
-@Composable
-internal fun HomeItemRow(
-    row: HomeRow,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val content = row.item.content
-    val date = content.date?.toDisplayText().orEmpty()
-    DaysCard(modifier = modifier.testTag("home_item_${row.item.id}"), onClick = onClick) {
-        DaysListItem(
-            title = content.title,
-            subtitle = if (row.dday is DdayCount.Elapsed) stringResource(R.string.home_list_since, date) else date,
-            leading = {
-                DaysItemIcon(icon = ItemIcon.fromKey(content.iconKey), color = itemColorFromKey(content.colorKey))
-            },
-            trailing = {
-                if (content.repeatRule != RepeatRule.NONE) {
-                    DaysBadge(text = stringResource(content.repeatRule.label), tone = DaysBadgeTone.CATEGORY)
-                }
-                DdayText(count = row.dday, tone = if (row.dday.isImminent()) DdayTone.SOON else DdayTone.DEFAULT)
-            },
         )
     }
 }

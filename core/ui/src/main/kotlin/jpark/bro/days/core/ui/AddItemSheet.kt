@@ -1,4 +1,4 @@
-package jpark.bro.days.feature.home.impl.components
+package jpark.bro.days.core.ui
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
@@ -25,12 +25,11 @@ import jpark.bro.days.core.designsystem.component.DaysIconButton
 import jpark.bro.days.core.designsystem.component.DaysListItem
 import jpark.bro.days.core.designsystem.preview.ComponentPreviews
 import jpark.bro.days.core.model.ItemType
-import jpark.bro.days.feature.home.impl.R
 import jpark.bro.days.core.designsystem.R as DesignR
 
-/** + 버튼 시트: [디데이 / 일정] 선택 (product-spec 4-2, 시안 design/home-add-sheet) */
+/** + 버튼 시트: [디데이 / 일정] 선택 (product-spec 4-2, 시안 design/home-add-sheet). 홈 · 캘린더 공용 */
 @Composable
-internal fun AddItemSheet(
+fun AddItemSheet(
     onSelect: (ItemType) -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -40,7 +39,7 @@ internal fun AddItemSheet(
 }
 
 @Composable
-internal fun AddItemSheetContent(
+fun AddItemSheetContent(
     onSelect: (ItemType) -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
@@ -55,32 +54,32 @@ internal fun AddItemSheetContent(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = stringResource(R.string.home_add_sheet_title),
+                text = stringResource(R.string.common_add_sheet_title),
                 style = AppThemeTokens.typography.headlineMd,
                 color = AppThemeTokens.colors.textPrimary,
                 modifier = Modifier.weight(1f),
             )
             DaysIconButton(
                 icon = DesignR.drawable.ic_close,
-                contentDescription = stringResource(R.string.home_add_sheet_close),
+                contentDescription = stringResource(R.string.common_add_sheet_close),
                 onClick = onClose,
             )
         }
         AddOption(
-            title = stringResource(R.string.home_add_sheet_dday),
-            description = stringResource(R.string.home_add_sheet_dday_desc),
+            title = stringResource(R.string.common_add_sheet_dday),
+            description = stringResource(R.string.common_add_sheet_dday_desc),
             icon = DesignR.drawable.ic_favorite,
             tone = DaysIconBadgeTone.SHARED,
             onClick = { onSelect(ItemType.DDAY) },
-            modifier = Modifier.testTag("home_add_dday"),
+            modifier = Modifier.testTag("add_sheet_dday"),
         )
         AddOption(
-            title = stringResource(R.string.home_add_sheet_plan),
-            description = stringResource(R.string.home_add_sheet_plan_desc),
+            title = stringResource(R.string.common_add_sheet_plan),
+            description = stringResource(R.string.common_add_sheet_plan_desc),
             icon = DesignR.drawable.ic_event,
             tone = DaysIconBadgeTone.REPEAT,
             onClick = { onSelect(ItemType.PLAN) },
-            modifier = Modifier.testTag("home_add_plan"),
+            modifier = Modifier.testTag("add_sheet_plan"),
         )
     }
 }

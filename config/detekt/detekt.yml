@@ -28,9 +28,9 @@ style:
       - value: 'android.util.Log'
         reason: '로그 래퍼를 사용한다.'
   MagicNumber:
-    ignoreAnnotated: ['Preview']
+    ignoreAnnotated: ['Preview', 'ComponentPreviews', 'ScreenPreviews']
   UnusedPrivateMember:
-    ignoreAnnotated: ['Preview']
+    ignoreAnnotated: ['Preview', 'ComponentPreviews', 'ScreenPreviews']
 
 naming:
   FunctionNaming:

@@ -18,6 +18,7 @@
 8. 기존 값에서 변경된 부분
 9. 타이포그래피
 10. 모서리 · 간격
+11. 공통 컴포넌트
 
 ## 1. 테마 전환 방식
 
@@ -415,6 +416,31 @@ WCAG 기준: 일반 텍스트 4.5:1 이상, 큰 텍스트(24px 이상 또는 18.
 | | | | `gutter` · `gutterCompact` | 16dp · 12dp (카드 사이) |
 
 아이콘은 Material Symbols Outlined(Apache 2.0)를 VectorDrawable로 `core:designsystem`의 `res/drawable/ic_*`에 둡니다.
+
+## 11. 공통 컴포넌트
+
+6장 토큰 매핑을 구현한 컴포넌트입니다. 경로는 `core/designsystem/.../component/`. 기능 모듈에서 같은 역할의 컴포넌트를 새로 만들지 않습니다.
+
+| 파일 | 컴포넌트 | 6장 항목 |
+|---|---|---|
+| `DaysButton.kt` · `DaysButtonSize.kt` | `DaysPrimaryButton` · `DaysSecondaryButton` · `DaysSoftButton` · `DaysOutlineButton` · `DaysDangerButton(filled)`, 크기 `LARGE`(56dp) · `SMALL`(36dp) | 주 · 보조 · 아웃라인 · 위험 버튼 (Soft는 Stitch DESIGN.md "Soft Accent Action") |
+| `DaysIconButton.kt` | `DaysIconButton`(fill 원형) · `DaysFab` | FAB |
+| `DaysChip.kt` | `DaysFilterChip` · `DaysSegmentedControl` | 필터 칩 · 세그먼트 컨트롤 |
+| `DaysBadge.kt` | `DaysBadge(tone = SHARED · PRIVATE · CATEGORY · SOON · SUCCESS, showDot)` | 뱃지 5종 |
+| `DdayText.kt` · `DdayTone.kt` | `DdayText(count, tone = HIGHLIGHT · DEFAULT · SOON · PASSED)` | 5.5 디데이 숫자 색, tnum |
+| `DaysCard.kt` | `DaysCard` · `DaysSection` · `DaysListItem` · `DaysIconBadge(tone)` · `DaysDivider` | 카드 · 리스트 · 아이콘 배경 · 구분선 |
+| `DaysTextField.kt` | `DaysTextField` (포커스 링) | 입력창 |
+| `DaysSelectionControls.kt` | `DaysSwitch` · `DaysCheckbox` | 토글 · 체크박스 |
+| `DaysProgressBar.kt` | `DaysProgressBar` | 진행바 (5.6) |
+| `DaysBars.kt` | `DaysTopBar(isScrolled)` · `DaysBottomBar` | 상단 헤더 · 하단 탭바 |
+| `DaysBottomSheet.kt` | `DaysBottomSheet` · `DaysSheetHandle` | 바텀시트 · 드래그 핸들 |
+| `DaysFeedback.kt` · `DaysInfoBoxTone.kt` | `DaysInfoBox(TIP · WARNING)` · `DaysToast` · `DaysToastHost` | 안내 박스 · 토스트 |
+
+화면 전용 모양(히어로 카드, 캘린더 날짜 셀)은 각 feature에 둡니다.
+
+**Preview** (`core/designsystem/.../preview/DaysPreviews.kt`)
+- `@ComponentPreviews`: 라이트 · 다크 · 글꼴 2배. 컴포넌트 견본은 `DaysPreviewSurface { }` 안에 둡니다.
+- `@ScreenPreviews`: 핸드폰(411×891dp) 라이트 · 다크 · 글꼴 2배 · 가로. 태블릿은 대상이 아니라서 넣지 않습니다.
 
 ## Android(Compose) 적용
 

@@ -118,7 +118,7 @@ Kotlin · Jetpack Compose · Navigation 3 · Koin(`koin-compose-navigation3`) ·
 {Feature}State.kt      data class — 모든 프로퍼티 val + 기본값
 {Feature}Event.kt      sealed interface — 일회성 효과 (NavigateBack, ShowSnackbar). 없으면 파일 생략, 타입 인자는 Nothing
 {Feature}ViewModel.kt  MviViewModel<S, A, E> 상속
-{Feature}Screen.kt     internal {Feature}Root + private {Feature}Screen + private Preview(라이트·다크)
+{Feature}Screen.kt     internal {Feature}Root + private {Feature}Screen + private Preview(@ScreenPreviews)
 di/{Feature}Module.kt  viewModelOf + navigation<{Feature}Key>
 ```
 
@@ -151,6 +151,8 @@ di/{Feature}Module.kt  viewModelOf + navigation<{Feature}Key>
 ### UI
 
 - 색은 `AppThemeTokens.colors.*`만 사용. 보조 버튼 · 트랙 · 비활성 칩은 `fill`.
+- 버튼 · 칩 · 뱃지 · 카드 · 입력창 · 시트 등은 `core:designsystem`의 `component/Days*`를 쓴다. 기능 모듈에 비슷한 컴포넌트를 새로 만들지 않는다 (목록: `theme-guide.md` 11장).
+- Preview: 화면은 `@ScreenPreviews`(라이트 · 다크 · 글꼴 2배 · 가로), 공통 컴포넌트는 `@ComponentPreviews`(라이트 · 다크 · 글꼴 2배).
 - 디데이 숫자: 대표 · 다음 기념일은 `primary`, 리스트는 `textPrimary`, 7일 이내 `danger`, 지난 기념일 `textTertiary`. 숫자에 tabular-nums.
 - 문자열은 `strings.xml` (`{feature}_{screen}_{purpose}`), 아이콘에 `contentDescription`.
 - `LazyColumn` 항목에 `key`.

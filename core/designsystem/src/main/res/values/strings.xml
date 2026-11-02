@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 디데이 숫자 (DdayText) -->
+    <string name="common_dday_remaining">D-%1$d</string>
+    <string name="common_dday_today">D-Day</string>
+    <string name="common_dday_elapsed">D+%1$d</string>
+</resources>

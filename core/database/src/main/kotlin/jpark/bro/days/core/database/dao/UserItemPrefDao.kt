@@ -37,6 +37,18 @@ interface UserItemPrefDao {
         updatedAt: Long,
     )
 
+    @Query(
+        """
+        UPDATE user_item_pref SET is_pinned = 0, updated_at = :updatedAt
+        WHERE user_id = :userId AND item_id = :itemId
+        """,
+    )
+    suspend fun unpinItem(
+        userId: String,
+        itemId: String,
+        updatedAt: Long,
+    )
+
     @Upsert
     suspend fun upsertPref(pref: UserItemPrefEntity)
 }

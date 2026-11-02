@@ -47,6 +47,6 @@ data class ItemEntity(
     @ColumnInfo(name = "updated_at") val updatedAt: Long,
     @ColumnInfo(name = "server_updated_at") val serverUpdatedAt: Long?,
     @ColumnInfo(name = "deleted_at") val deletedAt: Long?,
-    /** Room 전용. PENDING | SYNCED | FAILED */
-    @ColumnInfo(name = "sync_state") val syncState: String = "PENDING",
+    /** Room 전용. [SyncState.name] */
+    @ColumnInfo(name = "sync_state") val syncState: String = SyncState.PENDING.name,
 )

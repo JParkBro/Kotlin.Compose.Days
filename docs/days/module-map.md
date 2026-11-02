@@ -155,6 +155,7 @@ Firebase 프로젝트는 dev · prod를 분리해 개발 중 실수가 실제 �
 2. `core:designsystem` (테마 토큰 8 팔레트)
 3. `core:database`, `core:datastore`, `core:data`
    - `core:database` v1: `item`, `user_item_pref`, `item_reminder` + DAO 테스트 (#11). 나머지 테이블은 해당 단계에서 추가
+   - `core:data` `ItemRepository` · `ItemMapper` + Repository 테스트 (#14). 사용자 id는 로그인 전까지 `LocalUserSession`(기기 UUID), 로그인을 만들면 Firebase uid로 교체
 4. `feature:home`, `feature:item`, `feature:calendar` → **솔로 모드 완성**
 5. `widget` (아래 10장 TODO)
 6. `core:firebase`, `core:network`, `core:sync`, `feature:couple`, `workers/`, `firebase/` 규칙 → **커플 모드**

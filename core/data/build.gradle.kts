@@ -14,4 +14,8 @@ dependencies {
     implementation(projects.core.datastore)
     implementation(projects.core.network)
     implementation(projects.core.firebase)
+
+    // Repository 테스트: Robolectric + in-memory Room (TESTING.md 5-6)
+    testImplementation(libs.bundles.robolectric)
+    testImplementation(libs.bundles.room)
 }

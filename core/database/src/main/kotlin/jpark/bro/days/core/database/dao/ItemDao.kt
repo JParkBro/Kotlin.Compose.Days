@@ -22,6 +22,10 @@ interface ItemDao {
     @Query("SELECT * FROM item WHERE id = :id AND deleted_at IS NULL")
     fun observeItem(id: String): Flow<ItemEntity?>
 
+    /** 삭제된 행도 돌려준다 (수정 · 동기화에서 기존 값을 확인할 때) */
+    @Query("SELECT * FROM item WHERE id = :id")
+    suspend fun getItem(id: String): ItemEntity?
+
     @Upsert
     suspend fun upsertItem(item: ItemEntity)
 

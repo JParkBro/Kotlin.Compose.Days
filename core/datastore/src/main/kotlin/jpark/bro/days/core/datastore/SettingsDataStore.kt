@@ -2,6 +2,7 @@ package jpark.bro.days.core.datastore
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import jpark.bro.days.core.model.ThemeSetting
@@ -21,6 +22,13 @@ class SettingsDataStore(
             )
         }
 
+    /** 홈의 "커플 코드로 연결하기" 카드를 닫았는지 (product-spec 4-1) */
+    val coupleBannerDismissed: Flow<Boolean> = dataStore.data.map { prefs -> prefs[COUPLE_BANNER_DISMISSED] ?: false }
+
+    suspend fun setCoupleBannerDismissed() {
+        dataStore.edit { prefs -> prefs[COUPLE_BANNER_DISMISSED] = true }
+    }
+
     suspend fun setThemeSetting(setting: ThemeSetting) {
         dataStore.edit { prefs ->
             prefs[THEME_TYPE] = setting.type.name
@@ -31,6 +39,7 @@ class SettingsDataStore(
     private companion object {
         val THEME_TYPE = stringPreferencesKey("theme_type")
         val THEME_MODE = stringPreferencesKey("theme_mode")
+        val COUPLE_BANNER_DISMISSED = booleanPreferencesKey("couple_banner_dismissed")
     }
 }
 

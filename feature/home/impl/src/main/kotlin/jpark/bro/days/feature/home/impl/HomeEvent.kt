@@ -7,8 +7,10 @@ internal sealed interface HomeEvent {
         val id: String,
     ) : HomeEvent
 
+    /** [quickStart]가 있으면 카테고리 · 제목을 채워서 연다 */
     data class OpenItemEdit(
         val type: ItemType,
+        val quickStart: QuickStart? = null,
     ) : HomeEvent
 
     data object OpenNotifications : HomeEvent

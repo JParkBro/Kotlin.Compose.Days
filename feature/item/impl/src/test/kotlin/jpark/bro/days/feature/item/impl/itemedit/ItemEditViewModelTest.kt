@@ -82,6 +82,22 @@ class ItemEditViewModelTest {
     }
 
     @Test
+    fun `빠른 시작으로 열면 카테고리 제목 아이콘이 채워져 바로 저장 가능`() {
+        val state =
+            ItemEditViewModel(
+                ItemEditKey(null, ItemType.DDAY, null, presetCategory = Category.GOAL, presetTitle = "전역일"),
+                repository,
+                clock,
+            ).state.value
+
+        assertEquals(Category.GOAL, state.category)
+        assertEquals("전역일", state.title)
+        assertEquals(ItemIcon.SCHOOL, state.icon)
+        assertFalse(state.isIconChosen)
+        assertTrue(state.canSave)
+    }
+
+    @Test
     fun `새 일정은 날짜 없이 시작하고 제목만 있으면 저장 가능`() {
         val viewModel = viewModel(type = ItemType.PLAN)
 

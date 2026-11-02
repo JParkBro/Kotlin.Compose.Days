@@ -11,7 +11,13 @@ internal sealed interface HomeAction {
         val type: ItemType,
     ) : HomeAction
 
+    data class QuickStartClicked(
+        val quickStart: QuickStart,
+    ) : HomeAction
+
     data object NotificationsClicked : HomeAction
 
     data object ConnectCoupleClicked : HomeAction
+
+    data object CoupleBannerDismissed : HomeAction
 }

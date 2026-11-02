@@ -11,6 +11,7 @@ class FakeSettingsRepository(
 ) : SettingsRepository {
     private val theme = MutableStateFlow(initial)
     private val preview = MutableStateFlow<ThemeSetting?>(null)
+    private val coupleBannerDismissed = MutableStateFlow(false)
 
     /** 현재 미리보기 값 (null이면 미리보기 아님) */
     val themePreview: ThemeSetting? get() = preview.value
@@ -33,5 +34,12 @@ class FakeSettingsRepository(
 
     override fun setThemePreview(setting: ThemeSetting?) {
         preview.value = setting
+    }
+
+    override fun observeCoupleBannerDismissed(): Flow<Boolean> = coupleBannerDismissed
+
+    override suspend fun dismissCoupleBanner(): Result<Unit> {
+        coupleBannerDismissed.value = true
+        return Result.success(Unit)
     }
 }

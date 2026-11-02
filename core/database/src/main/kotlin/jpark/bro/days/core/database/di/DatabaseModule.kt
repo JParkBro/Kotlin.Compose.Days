@@ -13,4 +13,5 @@ val databaseModule =
         single { get<DaysDatabase>().itemDao() }
         single { get<DaysDatabase>().userItemPrefDao() }
         single { get<DaysDatabase>().itemReminderDao() }
+        single { get<DaysDatabase>().widgetConfigDao() }
     }

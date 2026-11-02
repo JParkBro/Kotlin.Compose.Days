@@ -15,9 +15,9 @@ class HomeContentTest {
     fun `고정한 디데이가 히어로가 되고 리스트에서는 빠짐`() {
         val content = buildHomeContent(all, pinnedItemId = Discharge.id, today = Today)
 
-        assertEquals(Discharge, content.hero?.row?.item)
+        assertEquals(Discharge, content.hero?.entry?.item)
         assertTrue(content.hero!!.isPinned)
-        assertEquals(DdayCount.Remaining(134), content.hero!!.row.dday)
+        assertEquals(DdayCount.Remaining(134), content.hero!!.entry.dday)
         assertFalse(content.rows.any { it.item == Discharge })
     }
 
@@ -38,7 +38,7 @@ class HomeContentTest {
         val titles =
             content.rows.map { it.item.content.title } +
                 content.hero!!
-                    .row.item.content.title
+                    .entry.item.content.title
         assertFalse("성수 저녁" in titles)
         assertFalse("캠핑 가기" in titles)
     }
@@ -47,7 +47,7 @@ class HomeContentTest {
     fun `고정이 없으면 가장 가까운 다가오는 항목이 히어로`() {
         val content = buildHomeContent(all, pinnedItemId = null, today = Today)
 
-        assertEquals(Toeic, content.hero?.row?.item)
+        assertEquals(Toeic, content.hero?.entry?.item)
         assertFalse(content.hero!!.isPinned)
     }
 
@@ -63,7 +63,7 @@ class HomeContentTest {
     fun `삭제됐거나 일정인 고정 id는 무시함`() {
         val content = buildHomeContent(listOf(Toeic, JejuTrip), pinnedItemId = JejuTrip.id, today = Today)
 
-        assertEquals(Toeic, content.hero?.row?.item)
+        assertEquals(Toeic, content.hero?.entry?.item)
         assertFalse(content.hero!!.isPinned)
     }
 

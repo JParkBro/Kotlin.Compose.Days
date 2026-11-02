@@ -1,5 +1,6 @@
 package jpark.bro.days
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,14 +12,22 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import jpark.bro.days.core.designsystem.AppTheme
 import jpark.bro.days.core.designsystem.isDarkTheme
+import jpark.bro.days.core.navigation.AppIntents
+import jpark.bro.days.core.navigation.Navigator
+import jpark.bro.days.feature.home.api.HomeKey
+import jpark.bro.days.feature.item.api.ItemDetailKey
 import jpark.bro.days.navigation.DaysApp
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
     private val viewModel: MainViewModel by viewModel()
+    private val navigator: Navigator by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // 회전 등으로 다시 만들어질 때는 이미 이동한 백스택을 유지한다
+        if (savedInstanceState == null) openItemFrom(intent)
         enableEdgeToEdge()
         setContent {
             val theme by viewModel.themeSetting.collectAsStateWithLifecycle()
@@ -37,5 +46,18 @@ class MainActivity : ComponentActivity() {
                 DaysApp()
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        openItemFrom(intent)
+    }
+
+    /** 위젯에서 열면 [홈, 항목 상세] 백스택으로 (module-map 10장) */
+    private fun openItemFrom(intent: Intent) {
+        val itemId = intent.getStringExtra(AppIntents.EXTRA_OPEN_ITEM_ID) ?: return
+        intent.removeExtra(AppIntents.EXTRA_OPEN_ITEM_ID)
+        navigator.replaceAll(HomeKey)
+        navigator.goTo(ItemDetailKey(itemId))
     }
 }

@@ -5,9 +5,11 @@ import androidx.room.RoomDatabase
 import jpark.bro.days.core.database.dao.ItemDao
 import jpark.bro.days.core.database.dao.ItemReminderDao
 import jpark.bro.days.core.database.dao.UserItemPrefDao
+import jpark.bro.days.core.database.dao.WidgetConfigDao
 import jpark.bro.days.core.database.entity.ItemEntity
 import jpark.bro.days.core.database.entity.ItemReminderEntity
 import jpark.bro.days.core.database.entity.UserItemPrefEntity
+import jpark.bro.days.core.database.entity.WidgetConfigEntity
 
 /**
  * 출시 전까지 version 1을 고쳐 쓴다 (docs/days/README.md "공통 문서와 다르게 가는 부분").
@@ -18,6 +20,7 @@ import jpark.bro.days.core.database.entity.UserItemPrefEntity
         ItemEntity::class,
         UserItemPrefEntity::class,
         ItemReminderEntity::class,
+        WidgetConfigEntity::class,
     ],
     version = 1,
     exportSchema = true,
@@ -28,4 +31,6 @@ abstract class DaysDatabase : RoomDatabase() {
     abstract fun userItemPrefDao(): UserItemPrefDao
 
     abstract fun itemReminderDao(): ItemReminderDao
+
+    abstract fun widgetConfigDao(): WidgetConfigDao
 }

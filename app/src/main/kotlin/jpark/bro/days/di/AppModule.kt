@@ -23,6 +23,7 @@ import jpark.bro.days.feature.settings.impl.di.settingsModule
 import jpark.bro.days.navigation.AppOnboardingResultHandler
 import jpark.bro.days.navigation.AppSessionEndedHandler
 import jpark.bro.days.navigation.TopLevelDestination
+import jpark.bro.days.widget.di.widgetModule
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
@@ -46,6 +47,7 @@ val appModule =
             syncModule,
             notificationModule,
             adsModule,
+            widgetModule,
             // feature
             onboardingModule,
             coupleModule,

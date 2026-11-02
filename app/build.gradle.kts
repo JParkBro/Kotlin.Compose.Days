@@ -27,6 +27,7 @@ dependencies {
     implementation(projects.core.sync)
     implementation(projects.core.notification)
     implementation(projects.core.ads)
+    implementation(projects.widget)
 
     // feature
     implementation(projects.feature.onboarding.api)

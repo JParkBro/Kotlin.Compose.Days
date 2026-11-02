@@ -18,4 +18,7 @@ internal data class ItemDetailState(
     val item: Item? = null,
     val dday: DdayCount? = null,
     val milestones: List<DetailMilestone> = emptyList(),
+    /** 런처가 앱에서 위젯 추가 요청을 받을 때만 "위젯 추가" (product-spec 4-4) */
+    val canAddWidget: Boolean = false,
+    val isWidgetSheetOpen: Boolean = false,
 )

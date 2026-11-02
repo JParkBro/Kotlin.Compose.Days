@@ -86,4 +86,6 @@
     <string name="item_detail_milestone_next">다음 기념일</string>
     <string name="item_detail_memo">메모</string>
     <string name="item_detail_place">장소</string>
+    <string name="item_detail_add_widget">위젯 추가</string>
+    <string name="item_detail_widget_add_failed">이 홈 화면 앱은 바로 추가를 지원하지 않아요. 홈 화면을 길게 눌러 추가해 주세요.</string>
 </resources>

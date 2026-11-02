@@ -51,4 +51,19 @@
     <string name="settings_theme_lavender">라벤더 선셋</string>
     <string name="settings_theme_lavender_desc">몽환적인 노을빛 감성</string>
     <string name="settings_theme_lavender_tag">로맨스</string>
+
+    <!-- 위젯 설정 목록 (product-spec 8장) -->
+    <string name="settings_widget_title">위젯 설정</string>
+    <string name="settings_widget_back">뒤로</string>
+    <string name="settings_widget_list">홈 화면에 놓인 위젯</string>
+    <string name="settings_widget_item_auto">자동 (대표 · 가장 가까운 디데이)</string>
+    <string name="settings_widget_item_missing">삭제된 디데이 · 다시 골라주세요</string>
+    <string name="settings_widget_background_theme">테마색</string>
+    <string name="settings_widget_background_dark">다크</string>
+    <string name="settings_widget_background_white">화이트</string>
+    <string name="settings_widget_row_desc">%1$s · %2$s</string>
+    <string name="settings_widget_guide">홈 화면의 빈 곳을 길게 누른 뒤 위젯에서 데이즈를 골라 추가하세요. 놓은 위젯은 길게 눌러서도 설정할 수 있어요.</string>
+    <string name="settings_widget_empty">아직 홈 화면에 놓인 위젯이 없어요</string>
+    <string name="settings_widget_add">위젯 추가</string>
+    <string name="settings_widget_add_failed">이 홈 화면 앱은 바로 추가를 지원하지 않아요. 홈 화면을 길게 눌러 추가해 주세요.</string>
 </resources>

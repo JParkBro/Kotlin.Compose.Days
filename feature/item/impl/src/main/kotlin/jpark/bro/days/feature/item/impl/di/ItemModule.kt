@@ -15,7 +15,9 @@ import org.koin.dsl.navigation3.navigation
 @OptIn(KoinExperimentalAPI::class)
 val itemModule =
     module {
-        viewModel { params -> ItemDetailViewModel(key = params.get(), itemRepository = get(), clock = get()) }
+        viewModel { params ->
+            ItemDetailViewModel(key = params.get(), itemRepository = get(), homeWidgets = get(), clock = get())
+        }
         viewModel { params -> ItemEditViewModel(key = params.get(), itemRepository = get(), clock = get()) }
 
         navigation<ItemDetailKey> { key ->

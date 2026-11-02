@@ -1,6 +1,7 @@
 package jpark.bro.days.feature.item.impl.itemdetail
 
 import androidx.lifecycle.viewModelScope
+import jpark.bro.days.core.data.repository.HomeWidgets
 import jpark.bro.days.core.data.repository.ItemRepository
 import jpark.bro.days.core.domain.anniversary.itemMilestones
 import jpark.bro.days.core.domain.dday.calculateDday
@@ -18,6 +19,7 @@ import java.time.LocalDate
 internal class ItemDetailViewModel(
     key: ItemDetailKey,
     itemRepository: ItemRepository,
+    private val homeWidgets: HomeWidgets,
     private val clock: Clock,
 ) : MviViewModel<ItemDetailState, ItemDetailAction, ItemDetailEvent>(ItemDetailState(id = key.id)) {
     init {
@@ -28,7 +30,12 @@ internal class ItemDetailViewModel(
                 if (item == null) {
                     sendEvent(ItemDetailEvent.NavigateBack)
                 } else {
-                    setState { item.toDetailState(today = LocalDate.now(clock)) }
+                    setState {
+                        item.toDetailState(today = LocalDate.now(clock)).copy(
+                            canAddWidget = homeWidgets.isPinSupported(),
+                            isWidgetSheetOpen = isWidgetSheetOpen,
+                        )
+                    }
                 }
             }.launchIn(viewModelScope)
     }
@@ -41,6 +48,25 @@ internal class ItemDetailViewModel(
 
             ItemDetailAction.BackClicked -> {
                 sendEvent(ItemDetailEvent.NavigateBack)
+            }
+
+            ItemDetailAction.AddWidgetClicked -> {
+                setState { copy(isWidgetSheetOpen = true) }
+            }
+
+            is ItemDetailAction.WidgetSizeSelected -> {
+                setState { copy(isWidgetSheetOpen = false) }
+                if (!homeWidgets.requestPin(
+                        itemId = currentState.id,
+                        size = action.size,
+                    )
+                ) {
+                    sendEvent(ItemDetailEvent.WidgetAddFailed)
+                }
+            }
+
+            ItemDetailAction.WidgetSheetDismissed -> {
+                setState { copy(isWidgetSheetOpen = false) }
             }
         }
     }

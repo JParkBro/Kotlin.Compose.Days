@@ -1,7 +1,10 @@
 package jpark.bro.days.feature.item.impl.itemedit
 
 internal sealed interface ItemEditEvent {
-    data object Saved : ItemEditEvent
-
+    /** 저장 · 삭제 · 취소 후, 또는 수정할 항목이 없을 때 */
     data object NavigateBack : ItemEditEvent
+
+    data object SaveFailed : ItemEditEvent
+
+    data object DeleteFailed : ItemEditEvent
 }

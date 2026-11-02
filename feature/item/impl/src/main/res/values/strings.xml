@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 디데이 · 일정 추가 · 수정 (product-spec 4-5) -->
+    <string name="item_edit_title_add_dday">디데이 추가</string>
+    <string name="item_edit_title_edit_dday">디데이 수정</string>
+    <string name="item_edit_title_add_plan">일정 추가</string>
+    <string name="item_edit_title_edit_plan">일정 수정</string>
+    <string name="item_edit_save">저장</string>
+    <string name="item_edit_save_failed">저장하지 못했어요. 잠시 후 다시 시도해 주세요.</string>
+    <string name="item_edit_delete_failed">삭제하지 못했어요. 잠시 후 다시 시도해 주세요.</string>
+
+    <string name="item_edit_name_dday">디데이 이름</string>
+    <string name="item_edit_name_plan">일정 제목</string>
+    <string name="item_edit_name_placeholder_dday">예: 우리가 처음 만난 날</string>
+    <string name="item_edit_name_placeholder_plan">예: 성수 맛집 데이트</string>
+    <string name="item_edit_preview_untitled">제목 없음</string>
+
+    <string name="item_edit_icon_color">아이콘 · 색</string>
+    <string name="item_edit_icon_heart">하트</string>
+    <string name="item_edit_icon_cake">케이크</string>
+    <string name="item_edit_icon_flight">비행기</string>
+    <string name="item_edit_icon_school">학사모</string>
+    <string name="item_edit_icon_star">별</string>
+    <string name="item_edit_icon_event">달력</string>
+    <string name="item_edit_icon_gift">선물</string>
+    <string name="item_edit_icon_flag">깃발</string>
+    <string name="item_edit_color_pink">핑크</string>
+    <string name="item_edit_color_navy">네이비</string>
+    <string name="item_edit_color_sage">세이지</string>
+    <string name="item_edit_color_lavender">라벤더</string>
+
+    <string name="item_edit_category">카테고리</string>
+    <string name="item_edit_category_anniversary">기념일</string>
+    <string name="item_edit_category_birthday">생일</string>
+    <string name="item_edit_category_travel">여행</string>
+    <string name="item_edit_category_goal">시험·목표</string>
+    <string name="item_edit_category_daily">일상</string>
+    <string name="item_edit_category_etc">기타</string>
+
+    <string name="item_edit_date">날짜</string>
+    <string name="item_edit_date_base">기준일</string>
+    <string name="item_edit_date_none">날짜 없음</string>
+    <string name="item_edit_date_clear">날짜 지우기</string>
+
+    <string name="item_edit_count_mode">계산 방식</string>
+    <string name="item_edit_count_mode_dday">D-Day</string>
+    <string name="item_edit_count_mode_dplus">D+</string>
+    <string name="item_edit_count_first_day">시작일을 1일로 세기</string>
+    <string name="item_edit_count_first_day_desc">시작한 날을 0일이 아닌 1일로 카운트해요.</string>
+
+    <string name="item_edit_repeat">반복</string>
+    <string name="item_edit_repeat_none">없음</string>
+    <string name="item_edit_repeat_yearly">매년</string>
+    <string name="item_edit_repeat_monthly">매월</string>
+
+    <string name="item_edit_time">시간</string>
+    <string name="item_edit_time_all_day">종일</string>
+    <string name="item_edit_time_morning">아침</string>
+    <string name="item_edit_time_lunch">점심</string>
+    <string name="item_edit_time_evening">저녁</string>
+    <string name="item_edit_time_exact">시간 지정</string>
+
+    <string name="item_edit_place">장소 (선택)</string>
+    <string name="item_edit_place_placeholder">예: 성수동 카페거리</string>
+    <string name="item_edit_memo">메모 (선택)</string>
+    <string name="item_edit_memo_placeholder">기억하고 싶은 내용을 적어보세요</string>
+    <string name="item_edit_show_as_dday">디데이로 세기</string>
+    <string name="item_edit_show_as_dday_desc">홈 리스트와 위젯에 D-day로 보여요.</string>
+
+    <string name="item_edit_reminder">알림</string>
+    <string name="item_edit_reminder_time">오전 9시 발송</string>
+    <string name="item_edit_reminder_same_day">당일</string>
+    <string name="item_edit_reminder_days_before">%1$d일 전</string>
+
+    <string name="item_edit_pin">홈 대표로 고정</string>
+    <string name="item_edit_pin_desc">홈 화면 맨 위 대표 디데이 카드로 보여요.</string>
+
+    <string name="item_edit_delete_confirm_title">이 항목을 삭제할까요?</string>
+    <string name="item_edit_delete_confirm_message">삭제하면 되돌릴 수 없어요.</string>
+</resources>

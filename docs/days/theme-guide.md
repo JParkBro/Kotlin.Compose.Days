@@ -425,7 +425,7 @@ WCAG 기준: 일반 텍스트 4.5:1 이상, 큰 텍스트(24px 이상 또는 18.
 |---|---|---|
 | `DaysButton.kt` · `DaysButtonSize.kt` | `DaysPrimaryButton` · `DaysSecondaryButton` · `DaysSoftButton` · `DaysOutlineButton` · `DaysDangerButton(filled)`, 크기 `LARGE`(56dp) · `SMALL`(36dp) | 주 · 보조 · 아웃라인 · 위험 버튼 (Soft는 Stitch DESIGN.md "Soft Accent Action") |
 | `DaysIconButton.kt` | `DaysIconButton`(fill 원형) · `DaysFab` | FAB |
-| `DaysChip.kt` | `DaysFilterChip` · `DaysSegmentedControl` | 필터 칩 · 세그먼트 컨트롤 |
+| `DaysChip.kt` | `DaysFilterChip`(여러 개 고르는 묶음은 `role = Role.Checkbox`) · `DaysSegmentedControl` | 필터 칩 · 세그먼트 컨트롤 |
 | `DaysBadge.kt` | `DaysBadge(tone = SHARED · PRIVATE · CATEGORY · SOON · SUCCESS, showDot)` | 뱃지 5종 |
 | `DdayText.kt` · `DdayTone.kt` | `DdayText(count, tone = HIGHLIGHT · DEFAULT · SOON · PASSED)` | 5.5 디데이 숫자 색, tnum |
 | `DaysCard.kt` | `DaysCard` · `DaysSection` · `DaysListItem` · `DaysIconBadge(tone)` · `DaysDivider` | 카드 · 리스트 · 아이콘 배경 · 구분선 |
@@ -434,6 +434,7 @@ WCAG 기준: 일반 텍스트 4.5:1 이상, 큰 텍스트(24px 이상 또는 18.
 | `DaysProgressBar.kt` | `DaysProgressBar` | 진행바 (5.6) |
 | `DaysBars.kt` | `DaysTopBar(isScrolled)` · `DaysBottomBar` | 상단 헤더 · 하단 탭바 |
 | `DaysBottomSheet.kt` | `DaysBottomSheet` · `DaysSheetHandle` | 바텀시트 · 드래그 핸들 |
+| `DaysItemIcon.kt` | `DaysItemIcon(icon, color)` · `itemColor(color)` · `ItemIcon.iconRes` | 항목 아이콘 · 색 (product-spec 4-5). 항목 색 테마의 primary-soft 배경 + primary 아이콘 |
 | `DaysFeedback.kt` · `DaysInfoBoxTone.kt` | `DaysInfoBox(TIP · WARNING)` · `DaysToast` · `DaysToastHost` | 안내 박스 · 토스트 |
 
 화면 전용 모양(히어로 카드, 캘린더 날짜 셀)은 각 feature에 둡니다.

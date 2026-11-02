@@ -2,13 +2,17 @@ package jpark.bro.days.feature.item.impl.itemdetail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -20,9 +24,11 @@ import jpark.bro.days.core.designsystem.AppThemeTokens
 import jpark.bro.days.core.designsystem.component.DaysButtonSize
 import jpark.bro.days.core.designsystem.component.DaysIconButton
 import jpark.bro.days.core.designsystem.component.DaysSoftButton
+import jpark.bro.days.core.designsystem.component.DaysToastHost
 import jpark.bro.days.core.designsystem.component.DaysTopBar
 import jpark.bro.days.core.designsystem.preview.ScreenPreviews
 import jpark.bro.days.core.ui.ObserveEvents
+import jpark.bro.days.core.ui.WidgetSizeSheet
 import jpark.bro.days.feature.item.api.ItemDetailKey
 import jpark.bro.days.feature.item.api.ItemEditKey
 import jpark.bro.days.feature.item.impl.R
@@ -41,6 +47,8 @@ internal fun ItemDetailRoot(
     viewModel: ItemDetailViewModel = koinViewModel { parametersOf(key) },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val toastHostState = remember { SnackbarHostState() }
+    val widgetAddFailed = stringResource(R.string.item_detail_widget_add_failed)
 
     ObserveEvents(viewModel.event) { event ->
         when (event) {
@@ -53,13 +61,17 @@ internal fun ItemDetailRoot(
             ItemDetailEvent.NavigateBack -> {
                 onBack()
             }
+
+            ItemDetailEvent.WidgetAddFailed -> {
+                toastHostState.showSnackbar(widgetAddFailed)
+            }
         }
     }
 
-    ItemDetailScreen(
-        state = state,
-        onAction = viewModel::onAction,
-    )
+    Box(modifier = Modifier.fillMaxSize()) {
+        ItemDetailScreen(state = state, onAction = viewModel::onAction)
+        DaysToastHost(hostState = toastHostState, modifier = Modifier.align(Alignment.BottomCenter))
+    }
 }
 
 /** 디데이 상세 (product-spec 4-4) */
@@ -91,6 +103,14 @@ private fun ItemDetailScreen(
                 )
             },
             actions = {
+                if (state.item != null && state.canAddWidget) {
+                    DaysIconButton(
+                        icon = DesignR.drawable.ic_widgets,
+                        contentDescription = stringResource(R.string.item_detail_add_widget),
+                        onClick = { onAction(ItemDetailAction.AddWidgetClicked) },
+                        modifier = Modifier.testTag("item_detail_add_widget"),
+                    )
+                }
                 if (state.item != null) {
                     DaysSoftButton(
                         text = stringResource(R.string.item_detail_edit),
@@ -117,6 +137,12 @@ private fun ItemDetailScreen(
             }
             if (state.milestones.isNotEmpty()) MilestoneTimeline(milestones = state.milestones)
         }
+    }
+    if (state.isWidgetSheetOpen) {
+        WidgetSizeSheet(
+            onSelect = { onAction(ItemDetailAction.WidgetSizeSelected(it)) },
+            onDismiss = { onAction(ItemDetailAction.WidgetSheetDismissed) },
+        )
     }
 }
 

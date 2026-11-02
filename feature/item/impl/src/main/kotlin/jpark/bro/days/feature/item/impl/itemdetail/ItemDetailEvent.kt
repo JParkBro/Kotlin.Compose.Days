@@ -9,4 +9,7 @@ internal sealed interface ItemDetailEvent {
     ) : ItemDetailEvent
 
     data object NavigateBack : ItemDetailEvent
+
+    /** 런처가 위젯 추가 요청을 받지 못함 */
+    data object WidgetAddFailed : ItemDetailEvent
 }

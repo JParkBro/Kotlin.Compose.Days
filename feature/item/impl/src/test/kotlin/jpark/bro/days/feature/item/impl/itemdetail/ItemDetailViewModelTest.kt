@@ -7,6 +7,8 @@ import jpark.bro.days.core.model.DdayCount
 import jpark.bro.days.core.model.Item
 import jpark.bro.days.core.model.ItemContent
 import jpark.bro.days.core.model.ItemType
+import jpark.bro.days.core.model.WidgetSize
+import jpark.bro.days.core.testing.FakeHomeWidgets
 import jpark.bro.days.core.testing.FakeItemRepository
 import jpark.bro.days.core.testing.MainDispatcherRule
 import jpark.bro.days.feature.item.api.ItemDetailKey
@@ -54,8 +56,9 @@ class ItemDetailViewModelTest {
     private val discharge = item("discharge", dday("전역일", LocalDate.of(2027, 3, 19)))
 
     private val repository = FakeItemRepository(listOf(together, discharge))
+    private val homeWidgets = FakeHomeWidgets()
 
-    private fun viewModel(id: String) = ItemDetailViewModel(ItemDetailKey(id), repository, clock)
+    private fun viewModel(id: String) = ItemDetailViewModel(ItemDetailKey(id), repository, homeWidgets, clock)
 
     @Test
     fun `항목과 오늘 기준 D-day를 불러옴`() {
@@ -129,5 +132,39 @@ class ItemDetailViewModelTest {
             val viewModel = viewModel("missing")
 
             viewModel.event.test { assertEquals(ItemDetailEvent.NavigateBack, awaitItem()) }
+        }
+
+    @Test
+    fun `위젯 추가를 지원하면 버튼이 보이고 크기를 고르면 그 디데이로 추가를 요청함`() =
+        runTest {
+            val viewModel = viewModel(discharge.id)
+            assertTrue(viewModel.state.value.canAddWidget)
+
+            viewModel.onAction(ItemDetailAction.AddWidgetClicked)
+            assertTrue(viewModel.state.value.isWidgetSheetOpen)
+
+            viewModel.onAction(ItemDetailAction.WidgetSizeSelected(WidgetSize.MEDIUM))
+
+            assertFalse(viewModel.state.value.isWidgetSheetOpen)
+            assertEquals(listOf(discharge.id to WidgetSize.MEDIUM), homeWidgets.pinRequests)
+        }
+
+    @Test
+    fun `위젯 추가를 지원하지 않으면 버튼이 없음`() {
+        homeWidgets.pinSupported = false
+
+        assertFalse(viewModel(discharge.id).state.value.canAddWidget)
+    }
+
+    @Test
+    fun `위젯 추가 요청이 실패하면 안내함`() =
+        runTest {
+            val viewModel = viewModel(discharge.id)
+            homeWidgets.pinResult = false
+
+            viewModel.event.test {
+                viewModel.onAction(ItemDetailAction.WidgetSizeSelected(WidgetSize.SMALL))
+                assertEquals(ItemDetailEvent.WidgetAddFailed, awaitItem())
+            }
         }
 }

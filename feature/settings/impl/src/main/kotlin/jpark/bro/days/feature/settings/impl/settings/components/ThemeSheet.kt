@@ -35,6 +35,13 @@ import androidx.compose.ui.unit.dp
 import jpark.bro.days.core.designsystem.AppShapes
 import jpark.bro.days.core.designsystem.AppSpacing
 import jpark.bro.days.core.designsystem.AppThemeTokens
+import jpark.bro.days.core.designsystem.component.DaysBadge
+import jpark.bro.days.core.designsystem.component.DaysBadgeTone
+import jpark.bro.days.core.designsystem.component.DaysBottomSheet
+import jpark.bro.days.core.designsystem.component.DaysIconButton
+import jpark.bro.days.core.designsystem.component.DaysPrimaryButton
+import jpark.bro.days.core.designsystem.component.DaysSegment
+import jpark.bro.days.core.designsystem.component.DaysSegmentedControl
 import jpark.bro.days.core.designsystem.themePalette
 import jpark.bro.days.core.model.AppThemeMode
 import jpark.bro.days.core.model.AppThemeType
@@ -44,19 +51,12 @@ import jpark.bro.days.feature.settings.impl.settings.ThemeSheetState
 import jpark.bro.days.core.designsystem.R as DesignR
 
 /** 테마 선택 바텀시트 (product-spec 6장, 시안 design/settings-theme-sheet) */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ThemeSheet(
     sheet: ThemeSheetState,
     onAction: (SettingsAction) -> Unit,
 ) {
-    val colors = AppThemeTokens.colors
-    ModalBottomSheet(
-        onDismissRequest = { onAction(SettingsAction.ThemeSheetDismissed) },
-        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        containerColor = colors.surfaceRaised,
-        scrimColor = colors.overlay,
-    ) {
+    DaysBottomSheet(onDismissRequest = { onAction(SettingsAction.ThemeSheetDismissed) }) {
         ThemeSheetContent(sheet = sheet, onAction = onAction)
     }
 }
@@ -91,19 +91,11 @@ internal fun ThemeSheetContent(
                     color = colors.textSecondary,
                 )
             }
-            IconButton(
+            DaysIconButton(
+                icon = DesignR.drawable.ic_close,
+                contentDescription = stringResource(R.string.settings_theme_close),
                 onClick = { onAction(SettingsAction.ThemeSheetDismissed) },
-                modifier =
-                    Modifier
-                        .clip(AppShapes.full)
-                        .background(colors.fill),
-            ) {
-                Icon(
-                    painter = painterResource(DesignR.drawable.ic_close),
-                    contentDescription = stringResource(R.string.settings_theme_close),
-                    tint = colors.textPrimary,
-                )
-            }
+            )
         }
 
         Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.md)) {
@@ -140,9 +132,34 @@ internal fun ThemeSheetContent(
                 style = typography.headlineSm,
                 color = colors.textPrimary,
             )
-            ModeSegmentedControl(
-                selected = sheet.mode,
-                onSelect = { onAction(SettingsAction.ThemeModeSelected(it)) },
+            DaysSegmentedControl(
+                segments =
+                    AppThemeMode.entries.map { mode ->
+                        when (mode) {
+                            AppThemeMode.LIGHT -> {
+                                DaysSegment(
+                                    stringResource(R.string.settings_theme_mode_light),
+                                    DesignR.drawable.ic_light_mode,
+                                )
+                            }
+
+                            AppThemeMode.DARK -> {
+                                DaysSegment(
+                                    stringResource(R.string.settings_theme_mode_dark),
+                                    DesignR.drawable.ic_dark_mode,
+                                )
+                            }
+
+                            AppThemeMode.SYSTEM -> {
+                                DaysSegment(
+                                    stringResource(R.string.settings_theme_mode_system),
+                                    DesignR.drawable.ic_brightness_auto,
+                                )
+                            }
+                        }
+                    },
+                selectedIndex = sheet.mode.ordinal,
+                onSelect = { onAction(SettingsAction.ThemeModeSelected(AppThemeMode.entries[it])) },
             )
             Text(
                 stringResource(R.string.settings_theme_mode_hint),
@@ -151,33 +168,13 @@ internal fun ThemeSheetContent(
             )
         }
 
-        Button(
+        DaysPrimaryButton(
+            text = stringResource(R.string.settings_theme_apply),
             onClick = { onAction(SettingsAction.ThemeApplyClicked) },
             enabled = !sheet.isSaving,
-            shape = AppShapes.full,
-            colors =
-                ButtonDefaults.buttonColors(
-                    containerColor = colors.primary,
-                    contentColor = colors.onPrimary,
-                    disabledContainerColor = colors.fill,
-                    disabledContentColor = colors.textTertiary,
-                ),
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-        ) {
-            Icon(
-                painter = painterResource(DesignR.drawable.ic_palette),
-                contentDescription = null,
-                modifier = Modifier.size(20.dp),
-            )
-            Text(
-                text = stringResource(R.string.settings_theme_apply),
-                style = typography.labelLg,
-                modifier = Modifier.padding(start = AppSpacing.sm),
-            )
-        }
+            icon = DesignR.drawable.ic_palette,
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 
@@ -218,16 +215,7 @@ private fun ThemeCard(
                     .height(CheckSize),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text = stringResource(label.tag),
-                style = typography.labelSm,
-                color = colors.textSecondary,
-                modifier =
-                    Modifier
-                        .clip(AppShapes.full)
-                        .background(colors.fill)
-                        .padding(horizontal = AppSpacing.sm, vertical = 2.dp),
-            )
+            DaysBadge(text = stringResource(label.tag), tone = DaysBadgeTone.PRIVATE)
             Box(modifier = Modifier.weight(1f))
             if (selected) {
                 Box(
@@ -263,59 +251,6 @@ private fun ThemeCard(
         Column {
             Text(stringResource(label.name), style = typography.labelLg, color = colors.textPrimary)
             Text(stringResource(label.description), style = typography.bodySm, color = colors.textSecondary)
-        }
-    }
-}
-
-@Composable
-private fun ModeSegmentedControl(
-    selected: AppThemeMode,
-    onSelect: (AppThemeMode) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val colors = AppThemeTokens.colors
-    Row(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .clip(AppShapes.full)
-                .background(colors.fill)
-                .padding(AppSpacing.xs),
-    ) {
-        AppThemeMode.entries.forEach { mode ->
-            val isSelected = mode == selected
-            val (icon, text) =
-                when (mode) {
-                    AppThemeMode.LIGHT -> DesignR.drawable.ic_light_mode to R.string.settings_theme_mode_light
-                    AppThemeMode.DARK -> DesignR.drawable.ic_dark_mode to R.string.settings_theme_mode_dark
-                    AppThemeMode.SYSTEM -> DesignR.drawable.ic_brightness_auto to R.string.settings_theme_mode_system
-                }
-            Row(
-                modifier =
-                    Modifier
-                        .weight(1f)
-                        .clip(AppShapes.full)
-                        .background(if (isSelected) colors.surface else colors.fill)
-                        .semantics { this.selected = isSelected }
-                        .clickable(role = Role.Tab) { onSelect(mode) }
-                        .padding(vertical = AppSpacing.sm + 2.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                val tint = if (isSelected) colors.primary else colors.textSecondary
-                Icon(
-                    painter = painterResource(icon),
-                    contentDescription = null,
-                    tint = tint,
-                    modifier = Modifier.size(18.dp),
-                )
-                Text(
-                    text = stringResource(text),
-                    style = AppThemeTokens.typography.labelLg,
-                    color = tint,
-                    modifier = Modifier.padding(start = AppSpacing.xs),
-                )
-            }
         }
     }
 }

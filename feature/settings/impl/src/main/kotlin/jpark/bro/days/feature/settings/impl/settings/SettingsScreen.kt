@@ -5,11 +5,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,7 +20,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,6 +37,18 @@ import androidx.navigation3.runtime.NavKey
 import jpark.bro.days.core.designsystem.AppSpacing
 import jpark.bro.days.core.designsystem.AppTheme
 import jpark.bro.days.core.designsystem.AppThemeTokens
+import jpark.bro.days.core.designsystem.component.DaysBadge
+import jpark.bro.days.core.designsystem.component.DaysBadgeSize
+import jpark.bro.days.core.designsystem.component.DaysBadgeTone
+import jpark.bro.days.core.designsystem.component.DaysDivider
+import jpark.bro.days.core.designsystem.component.DaysIconBadge
+import jpark.bro.days.core.designsystem.component.DaysIconBadgeTone
+import jpark.bro.days.core.designsystem.component.DaysListItem
+import jpark.bro.days.core.designsystem.component.DaysSection
+import jpark.bro.days.core.designsystem.component.DaysToastHost
+import jpark.bro.days.core.designsystem.component.DaysTopBar
+import jpark.bro.days.core.designsystem.preview.ComponentPreviews
+import jpark.bro.days.core.designsystem.preview.ScreenPreviews
 import jpark.bro.days.core.model.AppThemeMode
 import jpark.bro.days.core.model.AppThemeType
 import jpark.bro.days.core.ui.ObserveEvents
@@ -47,11 +60,7 @@ import jpark.bro.days.feature.settings.impl.PolicyListKey
 import jpark.bro.days.feature.settings.impl.ProfileEditKey
 import jpark.bro.days.feature.settings.impl.R
 import jpark.bro.days.feature.settings.impl.WidgetSettingsKey
-import jpark.bro.days.feature.settings.impl.settings.components.DotChip
-import jpark.bro.days.feature.settings.impl.settings.components.ProfileCard
-import jpark.bro.days.feature.settings.impl.settings.components.SettingsDivider
-import jpark.bro.days.feature.settings.impl.settings.components.SettingsRow
-import jpark.bro.days.feature.settings.impl.settings.components.SettingsSection
+import jpark.bro.days.feature.settings.impl.settings.components.SettingsMenu
 import jpark.bro.days.feature.settings.impl.settings.components.ThemeSheet
 import jpark.bro.days.feature.settings.impl.settings.components.ThemeSheetContent
 import jpark.bro.days.feature.settings.impl.settings.components.label
@@ -106,7 +115,7 @@ internal fun SettingsRoot(
             appVersion = remember(context) { context.versionName() },
             onAction = viewModel::onAction,
         )
-        SnackbarHost(hostState = snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
+        DaysToastHost(hostState = snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
     }
 }
 
@@ -117,142 +126,28 @@ private fun SettingsScreen(
     onAction: (SettingsAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val colors = AppThemeTokens.colors
-    val typography = AppThemeTokens.typography
+    val scrollState = rememberScrollState()
     Column(
         modifier =
             modifier
                 .fillMaxSize()
-                .background(colors.bg)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = AppSpacing.marginMobile),
-        verticalArrangement = Arrangement.spacedBy(AppSpacing.lg),
+                .background(AppThemeTokens.colors.bg),
     ) {
-        Box(
+        DaysTopBar(
+            title = stringResource(R.string.settings_main_title),
+            isScrolled = scrollState.canScrollBackward,
+        )
+        Column(
             modifier =
                 Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-            contentAlignment = Alignment.CenterStart,
+                    .weight(1f)
+                    .verticalScroll(scrollState)
+                    .padding(horizontal = AppSpacing.marginMobile),
+            verticalArrangement = Arrangement.spacedBy(AppSpacing.lg),
         ) {
-            Text(
-                stringResource(R.string.settings_main_title),
-                style = typography.headlineMd,
-                color = colors.textPrimary,
-            )
+            SettingsMenu(state = state, onAction = onAction)
+            AppVersionFooter(version = appVersion)
         }
-
-        ProfileCard(
-            profile = state.profile,
-            onEditClick = { onAction(SettingsAction.MenuClicked(SettingsDestination.PROFILE)) },
-        )
-
-        SettingsSection(title = stringResource(R.string.settings_main_section_couple)) {
-            SettingsRow(
-                icon = DesignR.drawable.ic_favorite,
-                title = stringResource(R.string.settings_main_couple_manage),
-                onClick = { onAction(SettingsAction.MenuClicked(SettingsDestination.COUPLE)) },
-                trailing = {
-                    val partner = state.partnerName
-                    if (partner != null) {
-                        DotChip(
-                            text = stringResource(R.string.settings_main_couple_connected, partner),
-                            dotColor = colors.success,
-                            textColor = colors.success,
-                            background = colors.successSoft,
-                        )
-                    } else {
-                        Text(
-                            stringResource(R.string.settings_main_couple_connect),
-                            style = typography.labelMd,
-                            color = colors.primary,
-                        )
-                    }
-                },
-            )
-        }
-
-        SettingsSection(title = stringResource(R.string.settings_main_section_app)) {
-            SettingsRow(
-                icon = DesignR.drawable.ic_palette,
-                title = stringResource(R.string.settings_main_theme),
-                onClick = { onAction(SettingsAction.ThemeClicked) },
-                trailing = {
-                    DotChip(
-                        text = stringResource(state.themeSetting.type.label.name),
-                        dotColor = colors.primary,
-                        textColor = colors.onPrimarySoft,
-                        background = colors.primarySoft,
-                    )
-                },
-            )
-            SettingsDivider()
-            SettingsRow(
-                icon = DesignR.drawable.ic_notifications,
-                title = stringResource(R.string.settings_main_notification),
-                subtitle = stringResource(R.string.settings_main_notification_desc),
-                onClick = { onAction(SettingsAction.MenuClicked(SettingsDestination.NOTIFICATION)) },
-            )
-            SettingsDivider()
-            SettingsRow(
-                icon = DesignR.drawable.ic_widgets,
-                title = stringResource(R.string.settings_main_widget),
-                onClick = { onAction(SettingsAction.MenuClicked(SettingsDestination.WIDGET)) },
-                trailing = {
-                    Text(
-                        stringResource(R.string.settings_main_widget_guide),
-                        style = typography.bodySm,
-                        color = colors.textSecondary,
-                    )
-                },
-            )
-        }
-
-        SettingsSection(title = stringResource(R.string.settings_main_section_support)) {
-            SettingsRow(
-                icon = DesignR.drawable.ic_campaign,
-                title = stringResource(R.string.settings_main_notice),
-                onClick = { onAction(SettingsAction.SupportClicked(SupportItem.NOTICE)) },
-            )
-            SettingsDivider()
-            SettingsRow(
-                icon = DesignR.drawable.ic_help,
-                title = stringResource(R.string.settings_main_inquiry),
-                onClick = { onAction(SettingsAction.SupportClicked(SupportItem.INQUIRY)) },
-            )
-            SettingsDivider()
-            SettingsRow(
-                icon = DesignR.drawable.ic_star,
-                title = stringResource(R.string.settings_main_rate),
-                onClick = { onAction(SettingsAction.SupportClicked(SupportItem.RATE_APP)) },
-                trailing = {
-                    Text(
-                        stringResource(R.string.settings_main_rate_action),
-                        style = typography.labelMd,
-                        color = colors.primary,
-                    )
-                },
-            )
-        }
-
-        SettingsSection(title = stringResource(R.string.settings_main_section_info)) {
-            SettingsRow(
-                icon = DesignR.drawable.ic_shield,
-                title = stringResource(R.string.settings_main_policy),
-                onClick = { onAction(SettingsAction.MenuClicked(SettingsDestination.POLICY)) },
-            )
-        }
-
-        SettingsSection(title = stringResource(R.string.settings_main_section_account)) {
-            SettingsRow(
-                icon = DesignR.drawable.ic_manage_accounts,
-                title = stringResource(R.string.settings_main_account),
-                subtitle = state.accountEmail,
-                onClick = { onAction(SettingsAction.MenuClicked(SettingsDestination.ACCOUNT)) },
-            )
-        }
-
-        AppVersionFooter(version = appVersion)
     }
 
     state.themeSheet?.let { sheet -> ThemeSheet(sheet = sheet, onAction = onAction) }
@@ -314,8 +209,7 @@ private val PreviewState =
         accountEmail = "hyunwoo@example.com",
     )
 
-@Preview(name = "Light")
-@Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@ScreenPreviews
 @Composable
 private fun SettingsScreenPreview() {
     AppTheme {
@@ -323,7 +217,7 @@ private fun SettingsScreenPreview() {
     }
 }
 
-@Preview(name = "Solo")
+@Preview(name = "Solo", device = "spec:width=411dp,height=891dp")
 @Composable
 private fun SettingsScreenSoloPreview() {
     AppTheme {
@@ -331,8 +225,7 @@ private fun SettingsScreenSoloPreview() {
     }
 }
 
-@Preview(name = "Theme sheet")
-@Preview(name = "Theme sheet · Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@ComponentPreviews
 @Composable
 private fun ThemeSheetPreview() {
     AppTheme {

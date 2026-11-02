@@ -22,6 +22,11 @@ import androidx.compose.ui.unit.dp
 import jpark.bro.days.core.designsystem.AppShapes
 import jpark.bro.days.core.designsystem.AppSpacing
 import jpark.bro.days.core.designsystem.AppThemeTokens
+import jpark.bro.days.core.designsystem.component.DaysBadge
+import jpark.bro.days.core.designsystem.component.DaysBadgeTone
+import jpark.bro.days.core.designsystem.component.DaysButtonSize
+import jpark.bro.days.core.designsystem.component.DaysCard
+import jpark.bro.days.core.designsystem.component.DaysSoftButton
 import jpark.bro.days.feature.settings.impl.R
 import jpark.bro.days.feature.settings.impl.settings.ProfileSummary
 import java.time.format.DateTimeFormatter
@@ -35,14 +40,22 @@ internal fun ProfileCard(
     onEditClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    DaysCard(modifier = modifier) {
+        ProfileCardContent(profile = profile, onEditClick = onEditClick)
+    }
+}
+
+@Composable
+private fun ProfileCardContent(
+    profile: ProfileSummary?,
+    onEditClick: () -> Unit,
+) {
     val colors = AppThemeTokens.colors
     val typography = AppThemeTokens.typography
     Row(
         modifier =
-            modifier
+            Modifier
                 .fillMaxWidth()
-                .clip(AppShapes.lg)
-                .background(colors.surface)
                 .padding(AppSpacing.lg),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(AppSpacing.md),
@@ -76,15 +89,9 @@ internal fun ProfileCard(
                     modifier = Modifier.weight(1f, fill = false),
                 )
                 profile?.togetherDays?.let { days ->
-                    Text(
+                    DaysBadge(
                         text = stringResource(R.string.settings_main_profile_days, days),
-                        style = typography.labelSm,
-                        color = colors.onPrimarySoft,
-                        modifier =
-                            Modifier
-                                .clip(AppShapes.full)
-                                .background(colors.primarySoft)
-                                .padding(horizontal = AppSpacing.sm, vertical = 2.dp),
+                        tone = DaysBadgeTone.SHARED,
                     )
                 }
             }
@@ -107,16 +114,10 @@ internal fun ProfileCard(
                 }
             }
         }
-        Text(
+        DaysSoftButton(
             text = stringResource(R.string.settings_main_profile_edit),
-            style = typography.labelMd,
-            color = colors.onPrimarySoft,
-            modifier =
-                Modifier
-                    .clip(AppShapes.full)
-                    .background(colors.primarySoft)
-                    .clickable(onClick = onEditClick)
-                    .padding(horizontal = AppSpacing.md, vertical = AppSpacing.sm),
+            onClick = onEditClick,
+            size = DaysButtonSize.SMALL,
         )
     }
 }

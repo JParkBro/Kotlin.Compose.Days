@@ -1,15 +1,14 @@
 package jpark.bro.days.feature.onboarding.impl.terms
 
-import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import jpark.bro.days.core.designsystem.AppTheme
+import jpark.bro.days.core.designsystem.preview.ScreenPreviews
 import jpark.bro.days.core.ui.ObserveEvents
 import jpark.bro.days.feature.onboarding.impl.StartModeKey
 import org.koin.compose.viewmodel.koinViewModel
@@ -46,8 +45,7 @@ private fun TermsScreen(
     Box(modifier = modifier.fillMaxSize())
 }
 
-@Preview(name = "Light")
-@Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@ScreenPreviews
 @Composable
 private fun TermsScreenPreview() {
     AppTheme {

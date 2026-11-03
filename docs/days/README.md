@@ -25,7 +25,7 @@
 | 파일 | 범위 |
 |---|---|
 | `CLAUDE.md` | 프로젝트 전체: 문서 지도, 절대 규칙, Git, 비밀 정보, 언어 + Android 앱(모듈 · MVI · 데이터 · UI 규칙, Gradle 명령, 테스트 요구 사항) |
-| `functions/CLAUDE.md` | Cloud Functions 보안 · 과금 규칙, 명령 |
+| `firebase/functions/CLAUDE.md` | Cloud Functions 보안 · 과금 규칙, 명령 |
 | `firebase/CLAUDE.md` | 보안 규칙 원칙, 필수 테스트 시나리오 |
 
 > 처음 읽을 때는 위 표의 순서(product-spec → theme-guide → module-map → data-model-erd …)를 추천합니다.

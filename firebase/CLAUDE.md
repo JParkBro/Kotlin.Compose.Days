@@ -10,6 +10,7 @@
 | `firestore.indexes.json` | 복합 인덱스 |
 | `firebase.json` | 에뮬레이터 설정 |
 | `tests/rules.test.js` | 보안 규칙 테스트 (vitest + `@firebase/rules-unit-testing`) |
+| `functions/` | Cloud Functions (규칙 · 명령은 `functions/CLAUDE.md`) |
 | `package.json` · `.npmrc` | 테스트 도구 (버전 고정). `.npmrc`의 `legacy-peer-deps`는 npm 10 설치 오류 회피용 |
 
 ## 규칙
@@ -27,7 +28,7 @@
 | 목적 | 명령 |
 |---|---|
 | 설치 | `npm install` (`firebase/` 안에서) |
-| 에뮬레이터 실행 (앱 개발, dev 빌드가 기본으로 연결) | `npx firebase emulators:start --only auth,firestore --project days-61328` |
+| 에뮬레이터 실행 (앱 개발, dev 빌드가 기본으로 연결) | `npm --prefix functions run build && npx firebase emulators:start --only auth,firestore,functions --project days-61328` |
 | 에뮬레이터 실행 (규칙만 볼 때) | `npx firebase emulators:start --project demo-days` |
 | 규칙 테스트 | `npm test` (에뮬레이터를 띄워 vitest 실행, `demo-days` 가짜 프로젝트라 실제 Firebase에 닿지 않음. Java 11+ 필요) |
 | 배포 | 직접 실행하지 않는다. 사용자에게 확인 후 진행 |

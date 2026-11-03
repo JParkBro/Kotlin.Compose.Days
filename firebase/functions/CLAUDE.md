@@ -31,7 +31,7 @@ test/*.test.ts      vitest 단위 테스트 (카카오 API · Billing API는 Fak
 ```
 
 - 로직은 SDK · 네트워크를 함수 인자로 받아 단위 테스트하고, `index.ts`는 연결만 한다.
-- 설정 값은 `functions/.env.days-61328`(커밋하지 않음, `.gitignore`의 `.env*`)에 둔다. 배포와 에뮬레이터가 모두 읽는다.
+- 설정 값은 `firebase/functions/.env.days-61328`(커밋하지 않음, `.gitignore`의 `.env*`)에 둔다. 배포와 에뮬레이터가 모두 읽는다.
 
   ```
   KAKAO_APP_ID=카카오 개발자 콘솔의 앱 ID (숫자)
@@ -39,7 +39,7 @@ test/*.test.ts      vitest 단위 테스트 (카카오 API · Billing API는 Fak
 
 ## 명령어
 
-`functions/` 안에서 실행한다.
+`firebase/functions/` 안에서 실행한다. (Firebase CLI가 프로젝트 폴더 `firebase/` 밖의 소스를 배포하지 못해 이 위치에 둔다)
 
 | 목적 | 명령 |
 |---|---|
@@ -47,8 +47,8 @@ test/*.test.ts      vitest 단위 테스트 (카카오 API · Billing API는 Fak
 | 타입 검사 | `npm run typecheck` |
 | 테스트 | `npm test` (에뮬레이터 불필요) |
 | 빌드 (`lib/`) | `npm run build` |
-| 로컬 실행 | `npm run build && cd ../firebase && npx firebase emulators:start --only auth,firestore,functions --project days-61328` |
-| 배포 | 직접 실행하지 않는다. 사용자에게 확인 후 `cd ../firebase && npx firebase deploy --only functions --project days-61328` |
+| 로컬 실행 | `npm run build && cd .. && npx firebase emulators:start --only auth,firestore,functions --project days-61328` |
+| 배포 | 직접 실행하지 않는다. 사용자에게 확인 후 `cd .. && npx firebase deploy --only functions --project days-61328` |
 
 - 에뮬레이터에서도 App Check 강제가 적용된다 (토큰 없는 호출은 `UNAUTHENTICATED`).
 - `stopBilling`은 에뮬레이터에서 실행되지 않는다 (Pub/Sub 에뮬레이터를 켜지 않음). **Pub/Sub 에뮬레이터를 켜고 예산 초과 메시지를 보내면 실제 결제 API를 호출하니 하지 않는다.** 동작 확인은 배포 후 4-2의 테스트 메시지(예산 이하 금액)로 한다.

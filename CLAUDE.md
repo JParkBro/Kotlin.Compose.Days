@@ -7,8 +7,8 @@
 | 경로 | 내용 | 세부 지침 |
 |---|---|---|
 | 루트 (`app/`, `core/`, `feature/`, `widget/`, `build-logic/`) | Android 앱 (Kotlin, Compose, 멀티 모듈) | 이 파일의 "Android 앱" 섹션 |
-| `functions/` | Cloud Functions for Firebase (TypeScript): 카카오 토큰 발급, 결제 자동 해제 | `functions/CLAUDE.md` |
 | `firebase/` | Firestore · Storage 보안 규칙 · 인덱스 · 에뮬레이터 설정 | `firebase/CLAUDE.md` |
+| `firebase/functions/` | Cloud Functions for Firebase (TypeScript): 카카오 토큰 발급, 결제 자동 해제. Firebase CLI가 프로젝트 폴더 밖 소스를 배포하지 못해 `firebase/` 안에 둔다 | `firebase/functions/CLAUDE.md` |
 | `policy-site/` | Firebase Hosting: 약관 · 개인정보 처리방침 · 라이선스 | – |
 | `e2e/` | Maestro 흐름 | – |
 | `docs/common/` | 범용 규칙 (아키텍처, 컨벤션, 테스트, Git) | – |
@@ -49,7 +49,7 @@
 - 여러 모듈에 걸친 변경, DB 스키마 변경, 보안 규칙 변경은 **먼저 계획을 보여주고** 진행한다.
 - 기획이 문서에 없거나 모호하면 추측해서 구현하지 말고 질문한다.
 - 결정이 바뀌면 관련 `docs/` 문서도 같은 PR에서 고친다. 공통 규칙에서 벗어나는 결정은 `docs/days/README.md`의 "공통 문서와 다르게 가는 부분"에 기록한다.
-- 작업을 끝내기 전에 해당 영역의 "완료 전 확인"을 실행한다. Android는 이 파일의 "Android 앱" 섹션, Functions · Firebase는 `functions/CLAUDE.md` · `firebase/CLAUDE.md`.
+- 작업을 끝내기 전에 해당 영역의 "완료 전 확인"을 실행한다. Android는 이 파일의 "Android 앱" 섹션, Functions · Firebase는 `firebase/functions/CLAUDE.md` · `firebase/CLAUDE.md`.
 
 ## Git
 
@@ -93,7 +93,7 @@ Kotlin · Jetpack Compose · Navigation 3 · Koin(`koin-compose-navigation3`) ·
 | 목적 | 명령 |
 |---|---|
 | 디버그 빌드 | `./gradlew :app:assembleDevDebug` (`app/google-services.json` 필요, 커밋하지 않음) |
-| Firebase 에뮬레이터 (dev 빌드가 기본으로 연결) | `npm --prefix functions run build && cd firebase && npx firebase emulators:start --only auth,firestore,functions --project days-61328` (`functions/.env.days-61328` 필요, `functions/CLAUDE.md`) |
+| Firebase 에뮬레이터 (dev 빌드가 기본으로 연결) | `cd firebase && npm --prefix functions run build && npx firebase emulators:start --only auth,firestore,functions --project days-61328` (`firebase/functions/.env.days-61328` 필요, `firebase/functions/CLAUDE.md`) |
 | 전체 단위 테스트 | `./gradlew testDevDebugUnitTest` |
 | 특정 모듈 테스트 | `./gradlew :feature:home:impl:testDevDebugUnitTest` |
 | 포맷 자동 수정 | `./gradlew ktlintFormat` |

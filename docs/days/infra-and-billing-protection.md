@@ -37,7 +37,7 @@ Firebase(Blaze) 한 곳으로 구성한 서버, 각 흐름의 구현 포인트, 
 
 ## 2. 흐름별 구현
 
-### 2-1. 카카오 로그인 (`functions/` `kakaoAuth`)
+### 2-1. 카카오 로그인 (`firebase/functions/` `kakaoAuth`)
 
 ```
 앱: Kakao SDK 로그인 → 카카오 액세스 토큰
@@ -52,7 +52,7 @@ Function:
 앱: FirebaseAuth.signInWithCustomToken(customToken)
 ```
 
-- 카카오 앱 하나에 네이티브 앱 키 2개(dev · prod 패키지)를 두므로 **앱 ID는 하나**입니다. 앱 ID는 Functions 파라미터 `KAKAO_APP_ID`(`defineString`)로 두고, 값은 `functions/.env.days-61328`(커밋하지 않음)에 넣습니다. 배포 · 에뮬레이터가 모두 이 파일을 읽습니다.
+- 카카오 앱 하나에 네이티브 앱 키 2개(dev · prod 패키지)를 두므로 **앱 ID는 하나**입니다. 앱 ID는 Functions 파라미터 `KAKAO_APP_ID`(`defineString`)로 두고, 값은 `firebase/functions/.env.days-61328`(커밋하지 않음)에 넣습니다. 배포 · 에뮬레이터가 모두 이 파일을 읽습니다.
 - 카카오 응답은 `id` · `app_id`가 양의 정수인지만 확인합니다. 400 · 401은 토큰 거부(`unauthenticated`), 그 밖의 오류 · 시간 초과(5초)는 `unavailable`입니다.
 - `createCustomToken`은 함수의 실행 서비스 계정에 **서비스 계정 토큰 생성자** 권한이 필요합니다. 서비스 계정 비공개 키 파일은 만들지도, 저장하지도 않습니다.
 - 함수 설정: 리전 `asia-northeast3`, `maxInstances` 작게(예: 3), 타임아웃 짧게(10초). 남용되어도 동시에 늘어나는 인스턴스 수가 묶입니다.
@@ -117,7 +117,7 @@ Firebase 설정은 APK 안에 들어 있어 추출할 수 있습니다. 그러�
 | 지출 상한(spend cap) | 해당 서비스를 그달 동안 일시 중지 | 일부 서비스(AI Logic, App Hosting, Cloud Functions, Extensions)에만 적용. **Firestore · Storage 불가** |
 | 결제 자동 해제 함수 | 예산 초과 시 결제 계정 연결 해제 → 유료 사용 중단 | 알림 지연 동안 쌓인 요금은 못 막음. 해제되면 Firestore 등 **앱 전체가 멈춤** |
 
-### 4-2. 결제 자동 해제 (`functions/` `stopBilling`)
+### 4-2. 결제 자동 해제 (`firebase/functions/` `stopBilling`)
 
 ```
 Cloud Billing 예산 (월 1달러 = 결제 계정 통화 기준 1,000원, 알림 50 · 90 · 100%)
@@ -128,6 +128,8 @@ Cloud Billing 예산 (월 1달러 = 결제 계정 통화 기준 1,000원, 알림
 ```
 
 - Google Cloud 공식 방법을 따릅니다 (참고 링크). 함수는 전용 서비스 계정 `stop-billing@days-61328.iam.gserviceaccount.com`으로 실행하고, 이 계정에만 이 프로젝트의 **결제 관리 권한(Project Billing Manager)**을 줍니다. `kakaoAuth`가 쓰는 기본 계정에는 주지 않습니다.
+- 이 계정은 Eventarc 트리거가 함수를 부를 때도 쓰이므로, Cloud Run 서비스 `stopbilling`에만 `roles/run.invoker`를 준다 (프로젝트 전체에 주지 않음). 없으면 메시지가 `run.routes.invoke` 권한 오류로 계속 재시도된다.
+- 함수 배포 이미지는 Artifact Registry(`asia-northeast3`)에 쌓이므로 정리 정책(1일)을 둔다: `npx firebase functions:artifacts:setpolicy --location asia-northeast3 --days 1 --project days-61328`
 - `kakaoAuth`의 기본 실행 계정(`{프로젝트 번호}-compute@developer.gserviceaccount.com`)에는 커스텀 토큰 서명용 **서비스 계정 토큰 생성자** 권한을 주고, IAM Service Account Credentials API를 켭니다.
 - 해제되면 Firestore · Storage · Functions가 모두 멈추고, 앱은 Room 데이터로 계속 동작합니다 (동기화 실패 → 재시도 대기). 다시 쓰려면 원인을 고친 뒤 콘솔에서 결제 계정을 다시 연결합니다.
 - 예산 금액은 **월 1달러(1,000원)**, 알림은 50 · 90 · 100%. 무료 사용량 안에서만 쓰겠다는 뜻이라, 무료 사용량을 조금만 넘어도 결제가 끊기고 서버 기능이 멈출 수 있습니다. 사용자가 늘면 예산을 올립니다.
@@ -163,12 +165,12 @@ Cloud Billing 예산 (월 1달러 = 결제 계정 통화 기준 1,000원, 알림
    | 실기기 (USB) | `firebase.emulator.host=127.0.0.1` + `adb reverse tcp:9099 tcp:9099` · `adb reverse tcp:8080 tcp:8080` (에뮬레이터를 LAN에 열지 않음) |
    | 실제 프로젝트로 확인 | `firebase.useEmulator=false` (운영 예산 1,000원에 들어감) |
 
-   에뮬레이터 실행: `npm --prefix functions run build && cd firebase && npx firebase emulators:start --only auth,firestore,functions --project days-61328`. Functions 에뮬레이터는 `KAKAO_APP_ID`가 든 `functions/.env.days-61328`이 필요하고, App Check 강제도 그대로 적용된다 (토큰 없는 호출은 `UNAUTHENTICATED`). Pub/Sub 에뮬레이터를 켜지 않으므로 `stopBilling`은 에뮬레이터에서 실행되지 않는다. 앱의 프로젝트 ID와 같아야 데이터가 보인다. dev 빌드는 에뮬레이터(http) 연결을 위해 `10.0.2.2` · `localhost` · `127.0.0.1`에만 평문 통신을 허용한다 (`app/src/dev`만, prod는 허용하지 않음).
+   에뮬레이터 실행: `cd firebase && npm --prefix functions run build && npx firebase emulators:start --only auth,firestore,functions --project days-61328`. Functions 에뮬레이터는 `KAKAO_APP_ID`가 든 `firebase/functions/.env.days-61328`이 필요하고, App Check 강제도 그대로 적용된다 (토큰 없는 호출은 `UNAUTHENTICATED`). Pub/Sub 에뮬레이터를 켜지 않으므로 `stopBilling`은 에뮬레이터에서 실행되지 않는다. 앱의 프로젝트 ID와 같아야 데이터가 보인다. dev 빌드는 에뮬레이터(http) 연결을 위해 `10.0.2.2` · `localhost` · `127.0.0.1`에만 평문 통신을 허용한다 (`app/src/dev`만, prod는 허용하지 않음).
 
 ## 6. 출시 전 체크리스트
 
 - [ ] Cloud Billing 예산(월 1달러 = 1,000원) · 알림(50 · 90 · 100%) 설정, Pub/Sub 토픽 연결
-- [ ] 결제 자동 해제 함수(`stopBilling`) 배포 · 테스트 메시지로 동작 확인, 서비스 계정 권한 최소화
+- [x] 결제 자동 해제 함수(`stopBilling`) 배포 · 테스트 메시지로 동작 확인, 서비스 계정 권한 최소화 (2026-11-03, 예산 이하 메시지 → `under-budget`)
 - [ ] Firebase Authentication이 Identity Platform으로 업그레이드되지 않았는지 확인
 - [ ] App Check(Play Integrity) 등록 및 Firestore · Storage · Functions 강제 설정
 - [ ] 보안 규칙(Firestore · Storage) 배포 및 에뮬레이터 테스트 (연결 · 공유 · 해제 · 비멤버 접근 거부 · 업로드 크기 · 개수)

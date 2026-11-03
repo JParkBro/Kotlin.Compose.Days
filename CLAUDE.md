@@ -7,9 +7,9 @@
 | 경로 | 내용 | 세부 지침 |
 |---|---|---|
 | 루트 (`app/`, `core/`, `feature/`, `widget/`, `build-logic/`) | Android 앱 (Kotlin, Compose, 멀티 모듈) | 이 파일의 "Android 앱" 섹션 |
-| `workers/` | Cloudflare Worker (TypeScript): 카카오 토큰 발급, 이미지 관문 | `workers/CLAUDE.md` |
-| `firebase/` | Firestore 보안 규칙 · 인덱스 · 에뮬레이터 설정 | `firebase/CLAUDE.md` |
-| `policy-site/` | Cloudflare Pages: 약관 · 개인정보 처리방침 · 라이선스 | – |
+| `functions/` | Cloud Functions for Firebase (TypeScript): 카카오 토큰 발급, 결제 자동 해제 | `functions/CLAUDE.md` |
+| `firebase/` | Firestore · Storage 보안 규칙 · 인덱스 · 에뮬레이터 설정 | `firebase/CLAUDE.md` |
+| `policy-site/` | Firebase Hosting: 약관 · 개인정보 처리방침 · 라이선스 | – |
 | `e2e/` | Maestro 흐름 | – |
 | `docs/common/` | 범용 규칙 (아키텍처, 컨벤션, 테스트, Git) | – |
 | `docs/days/` | 이 프로젝트의 기획 · 데이터 · 인프라 결정 | – |
@@ -27,16 +27,17 @@
 | UI · 색상 | `docs/days/theme-guide.md`, 값 원본 `docs/days/assets/theme-tokens.json` |
 | DB · 데이터 모델 | `docs/days/data-model-erd.md` |
 | 동기화 · 커플 연결 | `docs/days/sync-and-pairing.md` |
-| Firebase · Cloudflare · 과금 | `docs/days/infra-and-billing-protection.md`, `docs/days/firebase-cost-strategy.md` |
+| Firebase · Functions · 과금 | `docs/days/infra-and-billing-protection.md`, `docs/days/firebase-cost-strategy.md` |
 | 광고 | `docs/days/ads-strategy.md` |
 | 브랜치 · 커밋 · PR | `docs/common/GIT_CONVENTIONS.md` |
 
 ## 절대 어기면 안 되는 결정
 
-- **Firebase는 Spark(무료) 플랜.** Cloud Functions, Firebase Storage, Firestore TTL, Identity Platform 업그레이드를 쓰는 코드나 설정을 추가하지 않는다. 필요해 보이면 Cloudflare 쪽 대안을 제안한다.
+- **Firebase는 Blaze(종량제) + 과금 방어.** 서버는 Firebase 한 곳(Auth · Firestore · Functions · Storage · Hosting)이고 Cloudflare는 쓰지 않는다. 넘으면 바로 과금되므로 예산 알림 + 결제 자동 해제 함수(`stopBilling`)를 유지하고, 사용량을 늘리는 변경(리스너 · 쓰기 · 함수 호출 · 업로드)은 이유와 최악의 경우를 설명한다. Identity Platform으로 업그레이드하지 않는다.
 - **Room이 원본.** 화면은 Room만 구독한다. Firestore는 `visibility = SHARED` 항목과 커플 정보만 오간다.
 - **"나만 보기"(PRIVATE) 데이터는 서버로 보내지 않는다.**
-- **R2는 Worker를 통해서만 접근한다.** presigned URL, 공개 버킷을 만들지 않는다.
+- **이미지는 Cloud Storage + Storage 보안 규칙으로만 접근한다.** 공개 URL · 공개 읽기 · 장기 다운로드 토큰 공유를 만들지 않는다. 크기 · 형식 · 개수 한도는 규칙(서버)에서 막는다.
+- **함수는 App Check 강제 + `maxInstances` 제한.** 서비스 계정 비공개 키 파일을 만들거나 저장하지 않는다 (함수 실행 서비스 계정 권한으로 처리).
 - **ID는 클라이언트 생성 UUID 문자열**, 날짜는 `yyyy-MM-dd`(LocalDate), 시각은 epoch millis. 자동 증가 ID 금지.
 - **자동 기념일(100일 단위 · 주년 · 생일)은 저장하지 않고 계산한다.** 숨긴 것만 저장.
 - **대표 고정 · 알림 설정은 사용자별 데이터**(`user_item_pref`, `item_reminder`)이며 공유하지 않는다.
@@ -48,7 +49,7 @@
 - 여러 모듈에 걸친 변경, DB 스키마 변경, 보안 규칙 변경은 **먼저 계획을 보여주고** 진행한다.
 - 기획이 문서에 없거나 모호하면 추측해서 구현하지 말고 질문한다.
 - 결정이 바뀌면 관련 `docs/` 문서도 같은 PR에서 고친다. 공통 규칙에서 벗어나는 결정은 `docs/days/README.md`의 "공통 문서와 다르게 가는 부분"에 기록한다.
-- 작업을 끝내기 전에 해당 영역의 "완료 전 확인"을 실행한다. Android는 이 파일의 "Android 앱" 섹션, Worker · Firebase는 `workers/CLAUDE.md` · `firebase/CLAUDE.md`.
+- 작업을 끝내기 전에 해당 영역의 "완료 전 확인"을 실행한다. Android는 이 파일의 "Android 앱" 섹션, Functions · Firebase는 `functions/CLAUDE.md` · `firebase/CLAUDE.md`.
 
 ## Git
 
@@ -62,10 +63,10 @@
 
 ## 비밀 정보
 
-다음을 커밋하거나 코드에 넣지 않는다. 필요하면 환경 변수 · `local.properties` · `keystore.properties` · GitHub Secrets · `wrangler secret`을 쓴다.
+다음을 커밋하거나 코드에 넣지 않는다. 필요하면 환경 변수 · `local.properties` · `keystore.properties` · GitHub Secrets · Functions 비밀(`firebase functions:secrets:set`)을 쓴다.
 
 - 키스토어(`*.jks`, `*.keystore`)와 비밀번호 (`keystore.properties`)
-- 서비스 계정 JSON, API 비밀 키, 토큰
+- 서비스 계정 JSON, API 비밀 키, 토큰, `google-services.json`
 - `local.properties`, `keystore.properties`, `.env`, `.dev.vars`
 
 개인정보(토큰, 이메일, 사용자 입력 원문)를 로그에 남기지 않는다.

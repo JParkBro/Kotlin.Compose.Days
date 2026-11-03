@@ -14,9 +14,9 @@
 ```
 days/
 ├─ app/ core/ feature/ widget/ build-logic/   # Android 앱 (루트가 Gradle 프로젝트)
-├─ workers/          # Cloudflare Worker (TypeScript): 카카오 토큰, 이미지 관문
+├─ functions/        # Cloud Functions (TypeScript): 카카오 토큰 발급, 결제 자동 해제
 ├─ firebase/         # firestore.rules, firestore.indexes.json, firebase.json(에뮬레이터), 규칙 테스트
-├─ policy-site/      # Cloudflare Pages: 약관, 개인정보 처리방침, 오픈소스 라이선스
+├─ policy-site/      # Firebase Hosting: 약관, 개인정보 처리방침, 오픈소스 라이선스
 ├─ e2e/              # Maestro 흐름
 └─ docs/
    ├─ common/        # 범용 문서
@@ -41,7 +41,7 @@ days/
 │  ├─ database/       Room (user, item, couple, user_item_pref, item_reminder, image, anniversary_hide, activity_log, widget_config, sync_cursor)
 │  ├─ datastore/      테마 · 모드, 광고 노출 기록, 온보딩 완료 여부
 │  ├─ firebase/       Auth, Firestore 원격 데이터 소스, Remote Config, App Check
-│  ├─ network/        Ktor: Worker API (카카오 토큰, 이미지)
+│  ├─ network/        Ktor: 외부 HTTP가 필요할 때 (카카오 토큰 발급은 Functions callable이라 core:firebase)
 │  ├─ data/           Repository: Item, Couple, User, Image, Settings
 │  ├─ sync/           SyncManager, 동기화 · 재시도 Worker
 │  ├─ notification/   기념일 · 일정 로컬 알림, 상대 활동 알림
@@ -135,7 +135,7 @@ days/
 | `appModule` | app — Navigator, 결과 핸들러, 전체 `includes` |
 | `databaseModule`, `datastoreModule` | core |
 | `firebaseModule` | core:firebase — FirebaseAuth, Firestore, RemoteConfig, 원격 데이터 소스 |
-| `networkModule` | core:network — HttpClient(토큰 · App Check 헤더), WorkerApi |
+| `networkModule` | core:network — HttpClient (외부 HTTP가 생기면) |
 | `dataModule`, `domainModule` | core |
 | `syncModule` | core:sync — SyncManager, `workerOf(::SyncWorker)` |
 | `notificationModule`, `adsModule` | core |
@@ -144,12 +144,12 @@ days/
 
 ## 8. 빌드 변형
 
-| flavor | Firebase 프로젝트 | Worker | 앱 ID |
+| flavor | Firebase 프로젝트 | 카카오 네이티브 앱 키 | 앱 ID |
 |---|---|---|---|
-| `dev` | days-dev (에뮬레이터 연결 옵션) | `wrangler dev` 또는 dev Worker | `jpark.bro.days.dev` |
-| `prod` | days-prod | prod Worker | `jpark.bro.days` |
+| `dev` | `days-61328` (에뮬레이터 연결 옵션) | `KAKAO_NATIVE_APP_KEY_DEV` (`local.properties`) | `jpark.bro.days.dev` |
+| `prod` | `days-61328` | `KAKAO_NATIVE_APP_KEY_PROD` (`local.properties`) | `jpark.bro.days` |
 
-Firebase 프로젝트는 dev · prod를 분리해 개발 중 실수가 실제 데이터 · 사용량에 닿지 않게 합니다.
+> 처음에는 dev · prod Firebase 프로젝트를 나누기로 했지만, 지금은 **한 프로젝트를 함께 씁니다** (2026-11). 개발 중 사용량 · 데이터가 운영과 섞이므로 디버그 빌드는 에뮬레이터 연결을 우선하고, 출시 전에 분리를 다시 검토합니다 (`infra-and-billing-protection.md` 출시 전 체크리스트). 카카오는 앱 하나에 네이티브 앱 키를 패키지별로 2개 둡니다 (회원번호는 같음).
 
 ## 9. 개발 순서
 
@@ -160,10 +160,18 @@ Firebase 프로젝트는 dev · prod를 분리해 개발 중 실수가 실제 �
    - `core:data` `ItemRepository` · `ItemMapper` + Repository 테스트 (#14). 사용자 id는 로그인 전까지 `LocalUserSession`(기기 UUID), 로그인을 만들면 Firebase uid로 교체
 4. `feature:home`, `feature:item`, `feature:calendar` → **솔로 모드 완성**
 5. `widget` (아래 10장 TODO)
-6. `core:firebase`, `core:network`, `core:sync`, `feature:couple`, `workers/`, `firebase/` 규칙 → **커플 모드**
-7. `feature:onboarding`, `feature:settings`, `feature:notifications`, `core:notification`
+6. 커플 모드. 커플 연결에 로그인(Firebase uid)이 필요해서 7단계의 로그인을 앞당긴다
+   - 6-1 `firebase/` 보안 규칙 · 에뮬레이터 테스트 (#23)
+   - 6-2 `core:firebase` (Auth · Firestore · App Check), flavor별 `google-services.json`
+   - 6-3 구글 로그인 → Firebase uid (`LocalUserSession` 교체)
+   - 6-4 `functions/` `kakaoAuth`(카카오 토큰 → 커스텀 토큰) + 카카오 로그인, `stopBilling`(결제 자동 해제)
+   - 6-5 `core:sync` (Room couple · user · anniversary_hide · sync_cursor, Push · Pull)
+   - 6-6 `feature:couple` (코드 발급 · 입력 · 확인 · 관리)
+   - 6-7 커플 홈 · 공개 범위 · 공유 표시
+   - 6-8 이미지 (Cloud Storage + Storage 규칙): 배경 사진 · 프로필
+7. `feature:onboarding`(소개 · 약관 · 시작 방식, 로그인은 6단계에서), `feature:settings`, `feature:notifications`, `core:notification`
 8. `core:ads`, 광고 제거 구매
-9. `policy-site/`, 출시 체크리스트 (`infra-and-billing-protection.md`)
+9. `policy-site/`(Firebase Hosting), 출시 체크리스트 (`infra-and-billing-protection.md`)
 
 ## 10. widget 모듈 (Glance)
 

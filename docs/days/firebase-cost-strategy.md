@@ -1,35 +1,36 @@
 # Firebase 비용 전략
 
-> 이 문서는 **Firebase를 Spark(무료) 플랜으로 유지**하는 구성을 기준으로 합니다. 카카오 로그인과 이미지 저장은 Cloudflare가 맡습니다. 전체 인프라 구성과 과금 방어는 [infra-and-billing-protection.md](infra-and-billing-protection.md)를 참고하세요.
+> 이 문서는 **Firebase를 Blaze(종량제)로 쓰면서 과금을 막는** 구성을 기준으로 합니다. 카카오 토큰 발급은 Cloud Functions, 이미지는 Cloud Storage, 정책 페이지는 Firebase Hosting입니다. 전체 인프라와 과금 방어(예산 알림 · 결제 자동 해제)는 [infra-and-billing-protection.md](infra-and-billing-protection.md)를 참고하세요.
+>
+> 2026-11에 Spark + Cloudflare 구성에서 바꿨습니다 (그 문서 맨 위 참고).
 
 ## 1. 구성 요약
 
-| 기능 | 담당 | 요금제 |
-|---|---|---|
-| Google 로그인 | Firebase Auth | Spark |
-| 카카오 로그인 (커스텀 토큰으로 Firebase 로그인) | 토큰 발급은 Cloudflare Worker, 로그인은 Firebase Auth | Spark |
-| 커플 데이터 동기화 | Firestore | Spark |
-| 원격 설정 · 기능 차단 스위치 | Remote Config | 무료 |
-| 앱 위변조 요청 차단 | App Check | 무료 |
-| 크래시 · 사용 통계 | Crashlytics, Analytics | 무료 |
-| 이미지 저장 | Cloudflare R2 | – |
-| 약관 · 개인정보 처리방침 페이지 | Cloudflare Pages | – |
+| 기능 | 담당 |
+|---|---|
+| Google 로그인 | Firebase Auth |
+| 카카오 로그인 (커스텀 토큰으로 Firebase 로그인) | 토큰 발급은 Cloud Functions `kakaoAuth`, 로그인은 Firebase Auth |
+| 커플 데이터 동기화 | Firestore |
+| 이미지 저장 | Cloud Storage (Storage 보안 규칙) |
+| 원격 설정 · 기능 차단 스위치 | Remote Config |
+| 앱 위변조 요청 차단 | App Check |
+| 크래시 · 사용 통계 | Crashlytics, Analytics |
+| 약관 · 개인정보 처리방침 페이지 | Firebase Hosting |
+| 과금 상한 | 예산 알림 + 결제 자동 해제 함수 `stopBilling` |
 
-**Firebase에는 결제 수단을 등록하지 않습니다.** Spark 플랜은 한도를 넘으면 기능이 멈출 뿐 청구가 발생하지 않으므로, 가장 확실한 과금 방어입니다.
+**Blaze에는 "넘으면 멈추는" 무료 한도가 없습니다.** 무료 사용량을 넘으면 바로 과금되므로, 예산 초과 시 결제 연결을 끊는 함수를 함께 둡니다.
 
-## 2. Blaze 없이 가능한 이유
+## 2. Blaze에서도 쓰지 않는 것
 
-처음 검토에서 Blaze가 필요했던 기능과, 이를 대체한 방법입니다.
+| 기능 | 이유 |
+|---|---|
+| Identity Platform 업그레이드 | 기본 Authentication(커스텀 토큰 · Google)으로 충분. 업그레이드하면 MAU 과금 · 한도가 생김 |
+| 카카오 OIDC 로그인 | Identity Platform이 필요. 커스텀 토큰으로 대신함 |
+| Firestore 백업 · PITR | 무료 사용량이 없음. 원본은 각 기기의 Room |
 
-| 기능 | Firebase만 쓸 때 | 대체 방법 |
-|---|---|---|
-| 카카오 로그인 | Cloud Functions에서 커스텀 토큰 발급 → 외부 API 호출 때문에 Blaze 필요 | Cloudflare Worker에서 커스텀 토큰 발급 |
-| 카카오 로그인 (OIDC) | Identity Platform 업그레이드 필요. Spark에서는 OIDC 사용자 하루 2명 제한 | 사용하지 않음 |
-| 이미지 저장 | 2026년 2월 3일부터 Cloud Storage는 Blaze 필수 | Cloudflare R2 |
+### Firestore TTL
 
-### 주의: Identity Platform으로 업그레이드하지 않기
-
-Firebase Authentication을 Identity Platform으로 업그레이드하면 Spark 프로젝트는 하루 활성 사용자 3,000명 제한이 생깁니다. 커스텀 토큰과 Google 로그인은 기본 Authentication으로 충분하므로 **업그레이드하지 않습니다.**
+Blaze에서는 TTL(자동 만료 삭제)을 쓸 수 있습니다. 커플 코드(`pairCodes`)의 만료 정리에 써도 되지만, 삭제도 쓰기 작업으로 집계됩니다. 지금은 보안 규칙 · 앱에서 만료를 검사하고 발급자 앱이 지우는 방식(`sync-and-pairing.md`)을 유지하고, 남은 문서가 쌓이면 TTL을 켭니다.
 
 ## 3. Firestore 무료 한도
 
@@ -44,8 +45,8 @@ Spark · Blaze 공통이며, 일일 한도는 매일 태평양 시간 자정에 
 | 외부 전송 | 10 GiB / 월 |
 
 - 무료 사용량은 프로젝트당 데이터베이스 1개에만 적용됩니다.
-- **TTL(자동 만료 삭제), 백업, PITR은 무료 사용량이 없어** Spark에서는 사용하지 않습니다. 커플 코드 만료는 보안 규칙과 앱에서 처리합니다 (`sync-and-pairing.md`).
-- 한도를 넘으면 그날 남은 시간 동안 해당 작업이 실패합니다. 앱은 실패를 조용히 재시도 대기열에 넣고, Room 데이터로 계속 동작해야 합니다.
+- Blaze에서는 넘는 만큼 과금됩니다 (읽기 10만 건당 수십 센트 수준). 결제 자동 해제가 동작하면 그때부터 Firestore가 멈추므로, 앱은 실패를 조용히 재시도 대기열에 넣고 Room 데이터로 계속 동작해야 합니다.
+- **dev · prod가 한 프로젝트를 함께 쓰므로** 개발 중 사용량도 이 한도에 들어갑니다. 디버그 빌드는 에뮬레이터 연결을 우선합니다.
 
 ## 4. 읽기 · 쓰기를 줄이는 설계
 
@@ -70,25 +71,24 @@ Firestore 비용과 한도 초과는 대부분 **읽기**에서 발생합니다.
 
 ## 5. 모니터링
 
-- Firebase 콘솔 > 프로젝트 설정 > **사용량 및 결제**에서 Firestore 일일 사용량을 주 1회 확인합니다.
-- 일일 읽기가 **한도의 50%(25,000건)**를 꾸준히 넘기 시작하면 6장의 전환 단계를 준비합니다.
-- 이상 증가가 보이면 Remote Config의 `sync_enabled`를 꺼서 즉시 멈출 수 있게 해둡니다 (`infra-and-billing-protection.md`).
+- Firebase 콘솔 > **사용량 및 결제**에서 Firestore · Storage · Functions 사용량을 주 1회 확인합니다.
+- 예산 알림(월 1달러 = 1,000원 예산의 50 · 90 · 100%)이 오면 원인을 먼저 찾고, 이상 증가면 Remote Config의 `sync_enabled` · `upload_enabled`를 꺼서 즉시 멈춥니다 (`infra-and-billing-protection.md`).
+- 일일 읽기가 무료 사용량(5만 건)을 꾸준히 넘기 시작하면 6장을 검토합니다.
 
 ## 6. 사용자가 늘었을 때
 
-Firestore 한도를 넘는 시점이 오면 두 가지 중 선택합니다.
-
 | 선택 | 내용 | 비고 |
 |---|---|---|
-| Blaze 전환 | 초과분만 과금. 이 앱 구조에서는 초과 요금이 작음 | 예산 알림 + 결제 자동 해제 함수 설정 (`infra-and-billing-protection.md`) |
+| 예산 상향 | 초과분만 과금. 이 앱 구조에서는 초과 요금이 작음 | 예산 · 알림 금액을 함께 올린다 |
 | 자체 서버 이전 | `data-model-erd.md`의 ERD 그대로 저가 VPS로 이전 | 앱은 `SyncRemoteDataSource` 구현체만 교체 |
 
-Blaze로 전환하더라도 Firestore에는 지출 상한(spend cap)을 걸 수 없습니다. 지출 상한은 AI Logic, App Hosting, Cloud Functions, Extensions에만 적용됩니다.
+Firestore · Storage에는 지출 상한(spend cap)을 걸 수 없습니다. 상한 역할은 결제 자동 해제 함수가 합니다.
 
 ## 참고 링크
 
-- Firebase 요금제: https://firebase.google.com/docs/projects/billing/firebase-pricing-plans
+- Firebase 요금제: https://firebase.google.com/pricing
 - Firestore 할당량: https://docs.cloud.google.com/firestore/quotas
 - Cloud Storage 변경 FAQ: https://firebase.google.com/docs/storage/faqs-storage-changes-announced-sept-2024
 - Authentication 한도: https://firebase.google.com/docs/auth/limits
 - 예산 알림 · 지출 상한: https://firebase.google.com/docs/projects/billing/budget-alerts
+- 결제 자동 해제: https://cloud.google.com/billing/docs/how-to/disable-billing-with-notifications

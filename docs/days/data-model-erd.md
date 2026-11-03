@@ -165,7 +165,7 @@ erDiagram
 | ITEM (나만 보기) | ✓ | ✗ (백업 기능 추가 시 `users/{uid}/items`) | `items` |
 | ITEM (우리 둘이) | ✓ | `couples/{coupleId}/items/{itemId}` | `items` |
 | USER_ITEM_PREF, ITEM_REMINDER | ✓ (내 것만) | ✗ | 기기 간 동기화가 필요해지면 추가 |
-| IMAGE | 로컬 경로 + 업로드 상태 | 메타는 항목 문서에 포함, 파일은 Cloudflare R2 | `images` + R2 (S3 호환이라 그대로 사용 가능) |
+| IMAGE | 로컬 경로 + 업로드 상태 | 메타는 항목 문서에 포함, 파일은 Cloud Storage | `images` + 오브젝트 스토리지 (S3 호환으로 옮김) |
 | ANNIVERSARY_HIDE | ✓ | `couples/{coupleId}/hiddenAnniversaries/{ruleKey}` | `anniversary_hides` |
 | TERMS_AGREEMENT | ✗ | `users/{uid}` 안의 필드 | `terms_agreements` |
 | 위젯 설정, 테마, 활동 알림 | ✓ (또는 DataStore) | ✗ | ✗ |
@@ -180,7 +180,7 @@ erDiagram
 | `activity_log` | 상대 활동 알림 목록 (id, type, item_id, actor_user_id, created_at, is_read) |
 | `widget_config` | widget_id, item_id, size, background_type, show_profile. widget_id는 시스템이 주는 appWidgetId(정수)라 UUID 원칙의 예외 (기기 밖으로 나가지 않음) |
 
-## 4. Firestore · Cloudflare 저장 구조
+## 4. Firestore · Storage 저장 구조
 
 ```
 users/{uid}
@@ -202,12 +202,12 @@ couples/{coupleId}/items/{itemId}
 couples/{coupleId}/hiddenAnniversaries/{ruleKey}
   createdAt
 
-Cloudflare R2 (Worker를 통해서만 접근, 비공개 버킷)
+couples/{coupleId}/usage/images
+  count  (커플당 이미지 수, 규칙이 +1씩 · 한도 이하로만 허용)
+
+Cloud Storage (Storage 보안 규칙: 커플 멤버만, webp · 300KB 이하, 공개 URL 없음)
   couples/{coupleId}/images/{imageId}.webp
   couples/{coupleId}/images/{imageId}_thumb.webp
-
-Cloudflare D1 (Worker 전용 집계, `infra-and-billing-protection.md`)
-  couple_usage, daily_upload, member_cache
 ```
 
 ## 5. Room Entity 예시

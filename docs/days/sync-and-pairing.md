@@ -76,79 +76,20 @@ users/A.coupleId 갱신                                              users/B.cou
 - 연결 시 기존 개인 항목은 자동 공유하지 않습니다. 사용자가 항목별로 공개 범위를 바꿉니다.
 - **만료 처리:** Firestore TTL은 유료 기능이므로, 만료 여부는 보안 규칙과 앱에서 검사하고 남은 코드 문서는 발급자 앱이 다음 실행 때 삭제합니다.
 
-## 4. 보안 규칙 초안
+## 4. 보안 규칙
 
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{db}/documents {
+원본은 `firebase/firestore.rules`, 테스트는 `firebase/tests/rules.test.js`(`cd firebase && npm test`, 에뮬레이터)입니다. 아래는 요약입니다.
 
-    function signedIn() { return request.auth != null; }
-    function me() { return request.auth.uid; }
-    function couple(id) { return get(/databases/$(db)/documents/couples/$(id)).data; }
-    function isMember(id) { return signedIn() && me() in couple(id).members; }
-    function isActive(id) { return couple(id).status == 'ACTIVE'; }
+| 경로 | 읽기 | 쓰기 |
+|---|---|---|
+| `users/{uid}` | 나, 또는 같은 커플에 연결된 상대 | 나만. `coupleId`는 null이거나 **내가 멤버인 커플**만 (초안에서 추가: 남의 커플 id를 적어 상대 프로필을 읽는 것을 막음) |
+| `pairCodes/{code}` | 코드를 아는 사람만 단건 조회, 목록 조회 불가 | 생성: 발급자 본인 · 만료 전 · `usedBy` 없이. 사용: 발급자가 아닌 사람이 만료 전 한 번만 `usedBy = 나`. 삭제: 발급자 또는 만료된 코드 |
+| `couples/{id}` | 멤버만 | 생성: 코드를 쓴 사람이 같은 트랜잭션에서 `usedBy`를 기록했을 때만(`getAfter`). 수정: 멤버, 멤버 구성은 못 바꿈. 삭제 불가 |
+| `couples/{id}/items/{itemId}` | 멤버 | 멤버 · ACTIVE · `updatedBy == 나` · `visibility == SHARED`. 삭제 불가(soft delete) |
+| `couples/{id}/hiddenAnniversaries/{ruleKey}` | 멤버 | 멤버 |
 
-    match /users/{uid} {
-      allow read: if signedIn() && (me() == uid ||
-        (get(/databases/$(db)/documents/users/$(me())).data.coupleId != null &&
-         get(/databases/$(db)/documents/users/$(me())).data.coupleId ==
-         get(/databases/$(db)/documents/users/$(uid)).data.coupleId));
-      allow write: if signedIn() && me() == uid;
-    }
 
-    match /pairCodes/{code} {
-      allow get: if signedIn();
-      allow list: if false;
-      allow create: if signedIn()
-        && request.resource.data.creatorUid == me()
-        && request.resource.data.expiresAt > request.time.toMillis()
-        && !('usedBy' in request.resource.data);
-      // B가 코드를 "사용함"으로 표시 (한 번만, 본인 uid로만, 만료 전에만)
-      allow update: if signedIn()
-        && !('usedBy' in resource.data)
-        && resource.data.creatorUid != me()
-        && resource.data.expiresAt > request.time.toMillis()
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usedBy'])
-        && request.resource.data.usedBy == me();
-      // 발급자 본인 또는 만료된 코드만 삭제
-      allow delete: if signedIn()
-        && (resource.data.creatorUid == me()
-            || resource.data.expiresAt < request.time.toMillis());
-    }
-
-    match /couples/{coupleId} {
-      allow get, list: if signedIn() && me() in resource.data.members;
-      allow create: if signedIn()
-        && request.resource.data.members.size() == 2
-        && request.resource.data.members[1] == me()
-        && request.resource.data.members[0] != me()
-        && request.resource.data.status == 'ACTIVE'
-        && getAfter(/databases/$(db)/documents/pairCodes/$(request.resource.data.pairCode)).data.creatorUid
-             == request.resource.data.members[0]
-        && getAfter(/databases/$(db)/documents/pairCodes/$(request.resource.data.pairCode)).data.usedBy
-             == me();
-      allow update: if signedIn() && me() in resource.data.members
-        && request.resource.data.members == resource.data.members;
-      allow delete: if false;
-
-      match /items/{itemId} {
-        allow read: if isMember(coupleId);
-        allow create, update: if isMember(coupleId) && isActive(coupleId)
-          && request.resource.data.updatedBy == me()
-          && request.resource.data.visibility == 'SHARED';
-        allow delete: if false; // soft delete만 허용
-      }
-
-      match /hiddenAnniversaries/{ruleKey} {
-        allow read, write: if isMember(coupleId);
-      }
-    }
-  }
-}
-```
-
-> 규칙 안의 `get()` 호출도 문서 읽기로 과금됩니다. 쿼리 리스너는 쿼리 단위로 한 번 평가되므로 부담이 크지 않지만, 단건 요청이 많아지면 연결 시 Worker가 서비스 계정으로 `coupleId`를 커스텀 클레임에 넣어 `get()`을 없애는 방식을 고려하세요. 이미지 업로드 시 Worker도 이 규칙으로 멤버 여부를 확인합니다 (`infra-and-billing-protection.md`).
+> 규칙 안의 `get()` 호출도 문서 읽기로 과금됩니다. 쿼리 리스너는 쿼리 단위로 한 번 평가되므로 부담이 크지 않지만, 단건 요청이 많아지면 연결 시 Cloud Functions가 `coupleId`를 커스텀 클레임에 넣어 `get()`을 없애는 방식을 고려하세요. 이미지는 Storage 보안 규칙이 `firestore.get()`으로 같은 커플 문서를 읽어 멤버 여부를 확인합니다 (`infra-and-billing-protection.md`).
 > 이미 다른 커플에 연결된 사용자가 또 연결하는 것은 규칙만으로 막기 어려우므로, 앱에서 `users.coupleId`를 확인해 차단합니다.
 
 ## 5. 커플 연결 해제
@@ -161,14 +102,14 @@ service cloud.firestore {
 ### 30일 안에 재연결 시 복구
 
 - 같은 두 사람이 다시 연결하면, 앱이 `members`가 같고 `disconnectedAt`이 30일 이내인 DISCONNECTED couple을 찾아 **기존 문서를 ACTIVE로 되돌립니다.** 공유 항목이 그대로 살아납니다.
-- 30일이 지난 공유 데이터 정리는 서버 예약 작업이 필요합니다. Spark에서는 앱이 다음 실행 때 정리하거나, 데이터량이 작으므로 남겨두는 것도 방법입니다.
+- 30일이 지난 공유 데이터 정리는 예약 함수(Cloud Scheduler + Functions)로 할 수 있지만, 데이터량이 작으므로 앱이 다음 실행 때 정리하거나 남겨두는 것으로 시작합니다.
 
 ## 6. 회원 탈퇴
 
 순서가 중요합니다. 인증 계정을 먼저 지우면 내 데이터를 지울 권한이 사라집니다.
 
 1. 커플이 연결되어 있으면 연결 해제 처리 (5장)
-2. 내가 올린 R2 이미지 삭제 (Worker `DELETE /images/...` 호출)
+2. 내가 올린 Storage 이미지 삭제 (Storage SDK `delete`, 규칙이 멤버만 허용)
 3. `users/{uid}` 문서 삭제
 4. Firebase Auth 계정 삭제 (최근 로그인이 필요하면 재인증)
 5. Room 데이터베이스 · DataStore 초기화

@@ -9,10 +9,10 @@
 | [product-spec.md](product-spec.md) | 기능 범위, 항목 · 계산 규칙, 화면 목록 · 동작, 설정 구조, 샘플 데이터 | 기획 · 디자인 · 개발 전반 |
 | [theme-guide.md](theme-guide.md) | 4 테마 × 라이트/다크 = 8 팔레트, 토큰 27개, 사용 규칙, Compose 적용 | 디자인 · UI 개발 |
 | [module-map.md](module-map.md) | 모듈 목록, 내비게이션 키, 기능 간 의존, 화면별 Event 유무, 개발 순서 | 개발 시작 · 기능 추가 |
-| [data-model-erd.md](data-model-erd.md) | ERD, Room · Firestore · R2 · 자체 서버 배치, Entity 예시 | 데이터 작업 |
+| [data-model-erd.md](data-model-erd.md) | ERD, Room · Firestore · Storage · 자체 서버 배치, Entity 예시 | 데이터 작업 |
 | [sync-and-pairing.md](sync-and-pairing.md) | 동기화 흐름, 커플 코드 연결, 보안 규칙, 연결 해제 · 탈퇴 | 커플 기능 개발 |
-| [infra-and-billing-protection.md](infra-and-billing-protection.md) | Firebase(Spark) + Cloudflare 구성, Worker 구현, 과금 방어, 출시 체크리스트 | 서버 작업 · 출시 전 |
-| [firebase-cost-strategy.md](firebase-cost-strategy.md) | Spark 유지 이유, Firestore 한도, 읽기 · 쓰기 절감 설계 | 동기화 설계 · 운영 |
+| [infra-and-billing-protection.md](infra-and-billing-protection.md) | Firebase(Blaze) 구성, Functions · Storage 구현, 과금 방어(예산 · 결제 자동 해제), 출시 체크리스트 | 서버 작업 · 출시 전 |
+| [firebase-cost-strategy.md](firebase-cost-strategy.md) | Blaze 비용 구성, Firestore 무료 사용량, 읽기 · 쓰기 절감 설계 | 동기화 설계 · 운영 |
 | [ads-strategy.md](ads-strategy.md) | 광고 배치 판단, 빈도 규칙, 광고 제거 구매, AdMob 정책 | 수익화 작업 |
 | `assets/theme-tokens.json` | 테마 색상 값 원본 (8 팔레트 × 27 토큰) | 디자인 시스템 코드 생성 |
 | `assets/theme-tokens.css` | 같은 값의 CSS 변수 (정책 페이지 · 웹 미리보기) | 웹 작업 |
@@ -25,7 +25,7 @@
 | 파일 | 범위 |
 |---|---|
 | `CLAUDE.md` | 프로젝트 전체: 문서 지도, 절대 규칙, Git, 비밀 정보, 언어 + Android 앱(모듈 · MVI · 데이터 · UI 규칙, Gradle 명령, 테스트 요구 사항) |
-| `workers/CLAUDE.md` | Worker 보안 · 제한 규칙, 명령 |
+| `functions/CLAUDE.md` | Cloud Functions 보안 · 과금 규칙, 명령 |
 | `firebase/CLAUDE.md` | 보안 규칙 원칙, 필수 테스트 시나리오 |
 
 > 처음 읽을 때는 위 표의 순서(product-spec → theme-guide → module-map → data-model-erd …)를 추천합니다.
@@ -39,8 +39,9 @@
 
 **기술**
 - 원본 데이터는 Room. Firestore는 "우리 둘이" 공유 데이터의 통로로만 사용.
-- **Firebase는 Spark(무료)로 유지하고 결제 수단을 등록하지 않음.** 카카오 토큰 발급과 이미지 저장은 Cloudflare Workers(무료 플랜) + R2.
-- 결제 수단이 등록되는 곳은 R2 한 곳뿐이며, Worker를 통해서만 접근해 사용량을 묶음.
+- **서버는 Firebase Blaze 한 곳.** 카카오 토큰 발급은 Cloud Functions, 이미지는 Cloud Storage, 정책 페이지는 Firebase Hosting. Cloudflare는 쓰지 않음 (2026-11 변경, 처음에는 Spark + Cloudflare).
+- Blaze는 넘으면 바로 과금되므로 **예산 알림 + 예산 초과 시 결제 자동 해제 함수**로 상한을 두고, 보안 규칙 · App Check · 함수 인스턴스 제한으로 남용을 막음.
+- dev · prod 빌드가 Firebase 프로젝트 하나(`days-61328`)를 함께 씀. 디버그 빌드는 에뮬레이터 연결을 우선함.
 - 모든 ID는 UUID, 날짜는 `yyyy-MM-dd`, 시각은 epoch millis. Room → Firestore → 자체 서버로 그대로 이전 가능.
 - 대상 플랫폼은 Android. Apple 로그인은 iOS 출시 때만 필요.
 

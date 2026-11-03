@@ -2,7 +2,9 @@ package jpark.bro.days.feature.onboarding.impl.di
 
 import jpark.bro.days.core.navigation.Navigator
 import jpark.bro.days.feature.onboarding.api.OnboardingKey
+import jpark.bro.days.feature.onboarding.api.OnboardingResult
 import jpark.bro.days.feature.onboarding.api.OnboardingResultHandler
+import jpark.bro.days.feature.onboarding.impl.IntroKey
 import jpark.bro.days.feature.onboarding.impl.LoginKey
 import jpark.bro.days.feature.onboarding.impl.StartModeKey
 import jpark.bro.days.feature.onboarding.impl.TermsKey
@@ -27,13 +29,16 @@ val onboardingModule =
         viewModelOf(::TermsViewModel)
         viewModelOf(::StartModeViewModel)
 
+        // 소개 · 약관 · 시작 방식은 7단계에서 만든다. 그때까지 온보딩은 로그인부터 시작하고, 로그인하면 혼자 시작(홈)
         navigation<OnboardingKey> {
-            val navigator = get<Navigator>()
-            IntroRoot(onNavigate = navigator::goTo)
+            LoginRoot(onLoggedIn = { get<OnboardingResultHandler>().handle(OnboardingResult.Solo) })
         }
         navigation<LoginKey> {
+            LoginRoot(onLoggedIn = { get<OnboardingResultHandler>().handle(OnboardingResult.Solo) })
+        }
+        navigation<IntroKey> {
             val navigator = get<Navigator>()
-            LoginRoot(onNavigate = navigator::goTo)
+            IntroRoot(onNavigate = navigator::goTo)
         }
         navigation<TermsKey> {
             val navigator = get<Navigator>()

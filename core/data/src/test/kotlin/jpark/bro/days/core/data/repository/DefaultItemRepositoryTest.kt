@@ -15,6 +15,8 @@ import jpark.bro.days.core.database.DaysDatabase
 import jpark.bro.days.core.model.ItemReminder
 import jpark.bro.days.core.model.TimeSlot
 import jpark.bro.days.core.model.Visibility
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -34,6 +36,7 @@ import java.time.ZoneId
 class DefaultItemRepositoryTest {
     private lateinit var db: DaysDatabase
     private val clock = MutableClock(Today)
+    private val session = SwitchableUserSession(ME)
     private var nextId = 1
 
     private val repository by lazy {
@@ -41,7 +44,7 @@ class DefaultItemRepositoryTest {
             itemDao = db.itemDao(),
             userItemPrefDao = db.userItemPrefDao(),
             itemReminderDao = db.itemReminderDao(),
-            userSession = FixedUserSession(ME),
+            userSession = session,
             clock = clock,
             idGenerator = IdGenerator { "id-${nextId++}" },
         )
@@ -210,6 +213,33 @@ class DefaultItemRepositoryTest {
 
             assertEquals(listOf(0, 1), repository.observeReminders(saved.id).first().map { it.offsetDays })
         }
+
+    @Test
+    fun `다른 계정으로 바꾸면 이전 계정의 항목이 보이지 않고 수정 삭제도 못함`() =
+        runTest {
+            val mine = repository.saveItem(id = null, content = DischargeDday).getOrThrow()
+
+            session.userId.value = "user-other"
+
+            assertEquals(emptyList<Any>(), repository.observeItems().first())
+            assertNull(repository.observeItem(mine.id).first())
+            assertTrue(repository.saveItem(id = mine.id, content = DischargeDday.copy(title = "남의 것")).isFailure)
+            assertTrue(repository.deleteItem(mine.id).isFailure)
+
+            session.userId.value = ME
+            assertEquals(listOf(mine.id), repository.observeItems().first().map { it.id })
+        }
+
+    @Test
+    fun `로그아웃 상태면 목록이 비고 저장은 실패함`() =
+        runTest {
+            repository.saveItem(id = null, content = DischargeDday).getOrThrow()
+
+            session.userId.value = null
+
+            assertEquals(emptyList<Any>(), repository.observeItems().first())
+            assertTrue(repository.saveItem(id = null, content = MomBirthday).isFailure)
+        }
 }
 
 /** 테스트 중 시각을 옮길 수 있는 시계 */
@@ -223,8 +253,13 @@ private class MutableClock(
     override fun instant(): Instant = now
 }
 
-private class FixedUserSession(
-    private val userId: String,
+/** 로그인 계정을 바꿀 수 있는 세션 (null = 로그아웃) */
+private class SwitchableUserSession(
+    initial: String?,
 ) : UserSession {
-    override suspend fun currentUserId(): String = userId
+    val userId = MutableStateFlow(initial)
+
+    override fun observeUserId(): Flow<String?> = userId
+
+    override suspend fun currentUserId(): String = checkNotNull(userId.value) { "로그인이 필요합니다." }
 }

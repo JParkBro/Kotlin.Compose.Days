@@ -1,20 +1,22 @@
 package jpark.bro.days.core.data.session
 
-import jpark.bro.days.core.common.IdGenerator
-import jpark.bro.days.core.datastore.SessionDataStore
+import jpark.bro.days.core.firebase.auth.FirebaseAuthDataSource
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
-/** 현재 사용자 id. 작성자 · 대표 고정 · 알림처럼 사용자별 데이터에 쓴다 */
+/** 현재 사용자 id(Firebase uid). 작성자 · 계정별 항목 거르기 · 대표 고정 · 알림처럼 사용자별 데이터에 쓴다 */
 internal interface UserSession {
+    /** 로그아웃 상태면 null */
+    fun observeUserId(): Flow<String?>
+
+    /** 로그인하지 않았으면 예외 (Repository가 Result 실패로 바꾼다) */
     suspend fun currentUserId(): String
 }
 
-/**
- * 로그인 전 임시 구현: 처음 쓸 때 UUID를 만들어 기기에 저장한다.
- * 로그인을 만들면 Firebase uid 구현으로 바꾼다 (그 사이 개발 데이터는 출시 전 DB v1 정책대로 지운다).
- */
-internal class LocalUserSession(
-    private val sessionDataStore: SessionDataStore,
-    private val idGenerator: IdGenerator,
+internal class FirebaseUserSession(
+    private val authDataSource: FirebaseAuthDataSource,
 ) : UserSession {
-    override suspend fun currentUserId(): String = sessionDataStore.getOrCreateLocalUserId(idGenerator::newId)
+    override fun observeUserId(): Flow<String?> = authDataSource.observeUser().map { it?.uid }
+
+    override suspend fun currentUserId(): String = checkNotNull(authDataSource.currentUser?.uid) { "로그인이 필요합니다." }
 }

@@ -18,7 +18,7 @@ import jpark.bro.days.core.model.Visibility
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import java.time.Clock
 
@@ -32,19 +32,29 @@ internal class DefaultItemRepository(
     private val clock: Clock,
     private val idGenerator: IdGenerator,
 ) : ItemRepository {
-    private val currentUserId: Flow<String> = flow { emit(userSession.currentUserId()) }
+    /** 로그인한 계정이 바뀌면 그 계정의 데이터로 다시 구독한다. 로그아웃 상태면 비어 있다 */
+    private fun <T> perUser(
+        whenSignedOut: T,
+        block: (userId: String) -> Flow<T>,
+    ): Flow<T> = userSession.observeUserId().flatMapLatest { userId -> userId?.let(block) ?: flowOf(whenSignedOut) }
 
-    override fun observeItems(): Flow<List<Item>> = itemDao.observeItems().map { items -> items.map { it.toModel() } }
+    override fun observeItems(): Flow<List<Item>> =
+        perUser(emptyList()) { userId -> itemDao.observeItems(userId).map { items -> items.map { it.toModel() } } }
 
-    override fun observeItem(id: String): Flow<Item?> = itemDao.observeItem(id).map { it?.toModel() }
+    override fun observeItem(id: String): Flow<Item?> =
+        perUser(null) { userId ->
+            itemDao.observeItem(id, userId).map {
+                it?.toModel()
+            }
+        }
 
     override fun observePinnedItemId(): Flow<String?> =
-        currentUserId.flatMapLatest { userId -> userItemPrefDao.observePinnedItemId(userId) }
+        perUser(null) { userId -> userItemPrefDao.observePinnedItemId(userId) }
 
     override fun observeReminders(itemId: String): Flow<List<ItemReminder>> =
-        currentUserId
-            .flatMapLatest { userId -> itemReminderDao.observeReminders(userId, itemId) }
-            .map { reminders -> reminders.map { it.toModel() } }
+        perUser(emptyList()) { userId ->
+            itemReminderDao.observeReminders(userId, itemId).map { reminders -> reminders.map { it.toModel() } }
+        }
 
     override suspend fun saveItem(
         id: String?,
@@ -52,10 +62,12 @@ internal class DefaultItemRepository(
     ): Result<Item> =
         suspendRunCatching {
             content.requireValid()
-            val existing = id?.let { itemDao.getItem(it) }
-            require(id == null || (existing != null && existing.deletedAt == null)) { "수정할 항목이 없습니다." }
-
             val me = userSession.currentUserId()
+            val existing = id?.let { itemDao.getItem(it) }
+            require(id == null || (existing != null && existing.deletedAt == null && existing.ownerUserId == me)) {
+                "수정할 항목이 없습니다."
+            }
+
             val now = clock.millis()
             val item =
                 Item(
@@ -77,12 +89,14 @@ internal class DefaultItemRepository(
 
     override suspend fun deleteItem(id: String): Result<Unit> =
         suspendRunCatching {
-            val existing = requireNotNull(itemDao.getItem(id)) { "삭제할 항목이 없습니다." }
+            val me = userSession.currentUserId()
+            val existing = itemDao.getItem(id)?.takeIf { it.ownerUserId == me }
+            requireNotNull(existing) { "삭제할 항목이 없습니다." }
             if (existing.deletedAt != null) return@suspendRunCatching
             itemDao.softDeleteItem(
                 id = id,
                 deletedAt = clock.millis(),
-                updatedBy = userSession.currentUserId(),
+                updatedBy = me,
                 syncState = Visibility.valueOf(existing.visibility).syncStateOnWrite().name,
             )
         }

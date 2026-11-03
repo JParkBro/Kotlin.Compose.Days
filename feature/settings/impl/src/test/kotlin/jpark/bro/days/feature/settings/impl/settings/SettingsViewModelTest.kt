@@ -3,7 +3,10 @@ package jpark.bro.days.feature.settings.impl.settings
 import app.cash.turbine.test
 import jpark.bro.days.core.model.AppThemeMode
 import jpark.bro.days.core.model.AppThemeType
+import jpark.bro.days.core.model.AuthProvider
+import jpark.bro.days.core.model.AuthUser
 import jpark.bro.days.core.model.ThemeSetting
+import jpark.bro.days.core.testing.FakeAuthRepository
 import jpark.bro.days.core.testing.FakeSettingsRepository
 import jpark.bro.days.core.testing.MainDispatcherRule
 import kotlinx.coroutines.flow.first
@@ -21,7 +24,9 @@ class SettingsViewModelTest {
     private val repository = FakeSettingsRepository(saved)
 
     // MainDispatcherRule이 적용된 뒤 만들어야 viewModelScope가 테스트 디스패처를 쓴다
-    private val viewModel by lazy { SettingsViewModel(repository) }
+    private val authRepository =
+        FakeAuthRepository(AuthUser("google-1", AuthProvider.GOOGLE, email = "hyunwoo@example.com"))
+    private val viewModel by lazy { SettingsViewModel(repository, authRepository) }
 
     @Test
     fun `저장된 테마가 State에 들어간다`() {
@@ -117,4 +122,9 @@ class SettingsViewModelTest {
                 assertEquals(SettingsEvent.Navigate(SettingsDestination.POLICY), awaitItem())
             }
         }
+
+    @Test
+    fun `로그인한 계정 이메일을 계정 메뉴에 보여줌`() {
+        assertEquals("hyunwoo@example.com", viewModel.state.value.accountEmail)
+    }
 }

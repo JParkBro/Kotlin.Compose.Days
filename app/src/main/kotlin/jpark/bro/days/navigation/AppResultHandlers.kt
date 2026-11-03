@@ -1,5 +1,6 @@
 package jpark.bro.days.navigation
 
+import androidx.navigation3.runtime.NavKey
 import jpark.bro.days.core.navigation.Navigator
 import jpark.bro.days.feature.couple.api.PairingKey
 import jpark.bro.days.feature.home.api.HomeKey
@@ -8,6 +9,9 @@ import jpark.bro.days.feature.onboarding.api.OnboardingResult
 import jpark.bro.days.feature.onboarding.api.OnboardingResultHandler
 import jpark.bro.days.feature.settings.api.SessionEnded
 import jpark.bro.days.feature.settings.api.SessionEndedHandler
+
+/** 앱을 켰을 때 첫 화면: 로그인했으면 홈, 아니면 온보딩 */
+internal fun startKeyFor(signedIn: Boolean): NavKey = if (signedIn) HomeKey else OnboardingKey
 
 /** 온보딩 완료 후 목적지 (module-map 4-3) */
 internal class AppOnboardingResultHandler(

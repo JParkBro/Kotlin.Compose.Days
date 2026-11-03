@@ -14,6 +14,10 @@ dependencies {
     implementation(projects.core.datastore)
     implementation(projects.core.network)
     implementation(projects.core.firebase)
+    // 구글 로그인 (Credential Manager)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
 
     // Repository 테스트: Robolectric + in-memory Room (TESTING.md 5-6)
     testImplementation(libs.bundles.robolectric)

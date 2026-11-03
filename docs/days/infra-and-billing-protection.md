@@ -153,7 +153,15 @@ Cloud Billing 예산 (월 1달러 = 결제 계정 통화 기준 1,000원, 알림
 3. **쓰기 디바운스:** 같은 문서를 몇 초 안에 반복해서 쓰지 않습니다.
 4. **이미지 캐시:** 한 번 받은 이미지는 기기에 저장해서 다시 요청하지 않습니다.
 5. **실패 재시도 간격:** 동기화 · 업로드 실패 시 지수 백오프(1초, 2초, 4초 … 최대 수 분)로 재시도합니다. 실패 직후 즉시 무한 재시도하는 버그가 가장 흔한 과금 원인입니다.
-6. **개발 빌드는 에뮬레이터로:** 디버그 빌드는 Firebase 에뮬레이터(Auth · Firestore · Storage · Functions)에 연결하는 옵션을 둡니다.
+6. **개발 빌드는 에뮬레이터로:** dev 빌드는 **기본으로** 로컬 Firebase 에뮬레이터(Auth 9099 · Firestore 8080)에 연결합니다 (`FirebaseSetup`, `BuildConfig.FIREBASE_EMULATOR_HOST`). Storage · Functions 에뮬레이터는 해당 단계에서 추가합니다.
+
+   | 상황 | 설정 (`local.properties`) |
+   |---|---|
+   | Android 에뮬레이터 + Mac 에뮬레이터 (기본) | 없음 (`10.0.2.2`) |
+   | 실기기 (USB) | `firebase.emulator.host=127.0.0.1` + `adb reverse tcp:9099 tcp:9099` · `adb reverse tcp:8080 tcp:8080` (에뮬레이터를 LAN에 열지 않음) |
+   | 실제 프로젝트로 확인 | `firebase.useEmulator=false` (운영 예산 1,000원에 들어감) |
+
+   에뮬레이터 실행: `cd firebase && npx firebase emulators:start --only auth,firestore --project days-61328`. 앱의 프로젝트 ID와 같아야 데이터가 보인다. dev 빌드는 에뮬레이터(http) 연결을 위해 `10.0.2.2` · `localhost` · `127.0.0.1`에만 평문 통신을 허용한다 (`app/src/dev`만, prod는 허용하지 않음).
 
 ## 6. 출시 전 체크리스트
 

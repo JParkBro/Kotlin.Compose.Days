@@ -27,7 +27,8 @@
 | 목적 | 명령 |
 |---|---|
 | 설치 | `npm install` (`firebase/` 안에서) |
-| 에뮬레이터 실행 | `npx firebase emulators:start --project demo-days` |
+| 에뮬레이터 실행 (앱 개발, dev 빌드가 기본으로 연결) | `npx firebase emulators:start --only auth,firestore --project days-61328` |
+| 에뮬레이터 실행 (규칙만 볼 때) | `npx firebase emulators:start --project demo-days` |
 | 규칙 테스트 | `npm test` (에뮬레이터를 띄워 vitest 실행, `demo-days` 가짜 프로젝트라 실제 Firebase에 닿지 않음. Java 11+ 필요) |
 | 배포 | 직접 실행하지 않는다. 사용자에게 확인 후 진행 |
 

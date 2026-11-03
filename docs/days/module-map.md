@@ -162,7 +162,7 @@ days/
 5. `widget` (아래 10장 TODO)
 6. 커플 모드. 커플 연결에 로그인(Firebase uid)이 필요해서 7단계의 로그인을 앞당긴다
    - 6-1 `firebase/` 보안 규칙 · 에뮬레이터 테스트 (#23)
-   - 6-2 `core:firebase` (Auth · Firestore · App Check), flavor별 `google-services.json`
+   - 6-2 `core:firebase` (#24): `FirebaseSetup`(App Check: prod Play Integrity · dev 디버그, Firestore 메모리 캐시, 에뮬레이터 연결), dev 빌드는 기본으로 에뮬레이터 (`local.properties` `firebase.useEmulator` · `firebase.emulator.host`). SDK 인스턴스는 Koin에 직접 등록하지 않고 6-3부터 데이터 소스로 감싼다
    - 6-3 구글 로그인 → Firebase uid (`LocalUserSession` 교체)
    - 6-4 `functions/` `kakaoAuth`(카카오 토큰 → 커스텀 토큰) + 카카오 로그인, `stopBilling`(결제 자동 해제)
    - 6-5 `core:sync` (Room couple · user · anniversary_hide · sync_cursor, Push · Pull)

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- dev 전용: 로컬 Firebase 에뮬레이터(http) 연결 허용 -->
+    <application android:networkSecurityConfig="@xml/network_security_config" />
+
+</manifest>

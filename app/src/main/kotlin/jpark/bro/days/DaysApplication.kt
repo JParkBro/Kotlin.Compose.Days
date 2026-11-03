@@ -1,6 +1,7 @@
 package jpark.bro.days
 
 import android.app.Application
+import jpark.bro.days.core.firebase.FirebaseSetup
 import jpark.bro.days.di.appModule
 import jpark.bro.days.widget.WidgetUpdater
 import org.koin.android.ext.koin.androidContext
@@ -15,6 +16,8 @@ class DaysApplication :
     KoinComponent {
     override fun onCreate() {
         super.onCreate()
+        // Firebase 인스턴스를 쓰기 전에 App Check · 캐시 · 에뮬레이터를 설정한다
+        FirebaseSetup.initialize(emulatorHost = BuildConfig.FIREBASE_EMULATOR_HOST)
         startKoin {
             androidLogger(if (BuildConfig.DEBUG) Level.DEBUG else Level.NONE)
             androidContext(this@DaysApplication)

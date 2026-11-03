@@ -127,7 +127,8 @@ Cloud Billing 예산 (월 1달러 = 결제 계정 통화 기준 1,000원, 알림
             Cloud Billing API로 프로젝트의 결제 계정 연결 해제
 ```
 
-- Google Cloud 공식 방법을 따릅니다 (참고 링크). 함수 서비스 계정에는 이 프로젝트의 **결제 관리 권한(Project Billing Manager)**만 줍니다.
+- Google Cloud 공식 방법을 따릅니다 (참고 링크). 함수는 전용 서비스 계정 `stop-billing@days-61328.iam.gserviceaccount.com`으로 실행하고, 이 계정에만 이 프로젝트의 **결제 관리 권한(Project Billing Manager)**을 줍니다. `kakaoAuth`가 쓰는 기본 계정에는 주지 않습니다.
+- `kakaoAuth`의 기본 실행 계정(`{프로젝트 번호}-compute@developer.gserviceaccount.com`)에는 커스텀 토큰 서명용 **서비스 계정 토큰 생성자** 권한을 주고, IAM Service Account Credentials API를 켭니다.
 - 해제되면 Firestore · Storage · Functions가 모두 멈추고, 앱은 Room 데이터로 계속 동작합니다 (동기화 실패 → 재시도 대기). 다시 쓰려면 원인을 고친 뒤 콘솔에서 결제 계정을 다시 연결합니다.
 - 예산 금액은 **월 1달러(1,000원)**, 알림은 50 · 90 · 100%. 무료 사용량 안에서만 쓰겠다는 뜻이라, 무료 사용량을 조금만 넘어도 결제가 끊기고 서버 기능이 멈출 수 있습니다. 사용자가 늘면 예산을 올립니다.
 - 함수 자체가 과금 대상이 되지 않도록 `maxInstances: 1`로 둡니다.

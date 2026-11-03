@@ -27,9 +27,12 @@ export const kakaoAuth = onCall({ enforceAppCheck: true, maxInstances: 3 }, (req
 
 const BILLING_ALERT_TOPIC = "billing-alerts";
 
-/** 예산 알림(Pub/Sub) → 예산 초과 시 결제 계정 연결 해제. 실행 서비스 계정에는 Project Billing Manager만 준다 */
+/**
+ * 예산 알림(Pub/Sub) → 예산 초과 시 결제 계정 연결 해제.
+ * 결제를 끊는 권한(Project Billing Manager)은 이 함수 전용 서비스 계정에만 준다 ("이름@"은 현재 프로젝트로 채워짐)
+ */
 export const stopBilling = onMessagePublished(
-  { topic: BILLING_ALERT_TOPIC, maxInstances: 1, timeoutSeconds: 60 },
+  { topic: BILLING_ALERT_TOPIC, maxInstances: 1, timeoutSeconds: 60, serviceAccount: "stop-billing@" },
   async (event) => {
     const projectId = process.env.GCLOUD_PROJECT;
     if (!projectId) throw new Error("GCLOUD_PROJECT가 없습니다.");

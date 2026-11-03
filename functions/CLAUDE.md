@@ -3,6 +3,7 @@
 설계 원문: `docs/days/infra-and-billing-protection.md` (2-1 카카오 로그인, 4-2 결제 자동 해제)
 
 > 2026-11까지는 Cloudflare Worker(`workers/`)가 맡던 역할입니다. Firebase Blaze 한 곳으로 옮기면서 이 폴더로 바꿨습니다.
+> 런타임 Node 22, TypeScript 5.9, `firebase-functions` 7 · `firebase-admin` 14, 테스트 vitest.
 
 ## 역할
 
@@ -20,17 +21,37 @@
 - 외부 API(카카오) 응답은 신뢰하지 않고 필요한 필드만 검사한다. 에러는 `HttpsError` 코드로 돌려주고 내부 정보(스택, 키 이름)를 노출하지 않는다.
 - 개인정보(토큰, 회원번호 원문)를 로그에 남기지 않는다.
 
+## 구조
+
+```
+src/index.ts        함수 정의 (옵션 · 트리거 · SDK 연결만)
+src/kakaoAuth.ts    토큰 검증 · 발급 로직 (의존성 주입, 테스트 대상)
+src/stopBilling.ts  예산 초과 판단 · 결제 해제 로직 (의존성 주입, 테스트 대상)
+test/*.test.ts      vitest 단위 테스트 (카카오 API · Billing API는 Fake)
+```
+
+- 로직은 SDK · 네트워크를 함수 인자로 받아 단위 테스트하고, `index.ts`는 연결만 한다.
+- 설정 값은 `functions/.env.days-61328`(커밋하지 않음, `.gitignore`의 `.env*`)에 둔다. 배포와 에뮬레이터가 모두 읽는다.
+
+  ```
+  KAKAO_APP_ID=카카오 개발자 콘솔의 앱 ID (숫자)
+  ```
+
 ## 명령어
 
-> 아직 함수 코드가 없다 (6-4에서 추가). 추가할 때 실제 스크립트와 맞춰 이 표를 고친다.
+`functions/` 안에서 실행한다.
 
 | 목적 | 명령 |
 |---|---|
-| 설치 | `npm install` (`functions/` 안에서) |
-| 타입 검사 | `npx tsc --noEmit` |
-| 테스트 | `npm test` (에뮬레이터 대상) |
-| 로컬 실행 | `npx firebase emulators:start --only functions,auth,firestore --project demo-days` |
-| 배포 | 직접 실행하지 않는다. 사용자에게 확인 후 진행 |
+| 설치 | `npm install` (`.npmrc`의 `legacy-peer-deps`) |
+| 타입 검사 | `npm run typecheck` |
+| 테스트 | `npm test` (에뮬레이터 불필요) |
+| 빌드 (`lib/`) | `npm run build` |
+| 로컬 실행 | `npm run build && cd ../firebase && npx firebase emulators:start --only auth,firestore,functions --project days-61328` |
+| 배포 | 직접 실행하지 않는다. 사용자에게 확인 후 `cd ../firebase && npx firebase deploy --only functions --project days-61328` |
+
+- 에뮬레이터에서도 App Check 강제가 적용된다 (토큰 없는 호출은 `UNAUTHENTICATED`).
+- `stopBilling`은 에뮬레이터에서 실행되지 않는다 (Pub/Sub 에뮬레이터를 켜지 않음). **Pub/Sub 에뮬레이터를 켜고 예산 초과 메시지를 보내면 실제 결제 API를 호출하니 하지 않는다.** 동작 확인은 배포 후 4-2의 테스트 메시지(예산 이하 금액)로 한다.
 
 ## 완료 전 확인
 

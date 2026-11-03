@@ -93,7 +93,7 @@ Kotlin · Jetpack Compose · Navigation 3 · Koin(`koin-compose-navigation3`) ·
 | 목적 | 명령 |
 |---|---|
 | 디버그 빌드 | `./gradlew :app:assembleDevDebug` (`app/google-services.json` 필요, 커밋하지 않음) |
-| Firebase 에뮬레이터 (dev 빌드가 기본으로 연결) | `cd firebase && npx firebase emulators:start --only auth,firestore --project days-61328` |
+| Firebase 에뮬레이터 (dev 빌드가 기본으로 연결) | `npm --prefix functions run build && cd firebase && npx firebase emulators:start --only auth,firestore,functions --project days-61328` (`functions/.env.days-61328` 필요, `functions/CLAUDE.md`) |
 | 전체 단위 테스트 | `./gradlew testDevDebugUnitTest` |
 | 특정 모듈 테스트 | `./gradlew :feature:home:impl:testDevDebugUnitTest` |
 | 포맷 자동 수정 | `./gradlew ktlintFormat` |

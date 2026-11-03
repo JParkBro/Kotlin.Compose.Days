@@ -52,7 +52,8 @@ Function:
 앱: FirebaseAuth.signInWithCustomToken(customToken)
 ```
 
-- 카카오 앱 하나에 네이티브 앱 키 2개(dev · prod 패키지)를 두므로 **앱 ID는 하나**입니다. 앱 ID는 Functions 환경 변수로 둡니다.
+- 카카오 앱 하나에 네이티브 앱 키 2개(dev · prod 패키지)를 두므로 **앱 ID는 하나**입니다. 앱 ID는 Functions 파라미터 `KAKAO_APP_ID`(`defineString`)로 두고, 값은 `functions/.env.days-61328`(커밋하지 않음)에 넣습니다. 배포 · 에뮬레이터가 모두 이 파일을 읽습니다.
+- 카카오 응답은 `id` · `app_id`가 양의 정수인지만 확인합니다. 400 · 401은 토큰 거부(`unauthenticated`), 그 밖의 오류 · 시간 초과(5초)는 `unavailable`입니다.
 - `createCustomToken`은 함수의 실행 서비스 계정에 **서비스 계정 토큰 생성자** 권한이 필요합니다. 서비스 계정 비공개 키 파일은 만들지도, 저장하지도 않습니다.
 - 함수 설정: 리전 `asia-northeast3`, `maxInstances` 작게(예: 3), 타임아웃 짧게(10초). 남용되어도 동시에 늘어나는 인스턴스 수가 묶입니다.
 
@@ -161,7 +162,7 @@ Cloud Billing 예산 (월 1달러 = 결제 계정 통화 기준 1,000원, 알림
    | 실기기 (USB) | `firebase.emulator.host=127.0.0.1` + `adb reverse tcp:9099 tcp:9099` · `adb reverse tcp:8080 tcp:8080` (에뮬레이터를 LAN에 열지 않음) |
    | 실제 프로젝트로 확인 | `firebase.useEmulator=false` (운영 예산 1,000원에 들어감) |
 
-   에뮬레이터 실행: `cd firebase && npx firebase emulators:start --only auth,firestore --project days-61328`. 앱의 프로젝트 ID와 같아야 데이터가 보인다. dev 빌드는 에뮬레이터(http) 연결을 위해 `10.0.2.2` · `localhost` · `127.0.0.1`에만 평문 통신을 허용한다 (`app/src/dev`만, prod는 허용하지 않음).
+   에뮬레이터 실행: `npm --prefix functions run build && cd firebase && npx firebase emulators:start --only auth,firestore,functions --project days-61328`. Functions 에뮬레이터는 `KAKAO_APP_ID`가 든 `functions/.env.days-61328`이 필요하고, App Check 강제도 그대로 적용된다 (토큰 없는 호출은 `UNAUTHENTICATED`). Pub/Sub 에뮬레이터를 켜지 않으므로 `stopBilling`은 에뮬레이터에서 실행되지 않는다. 앱의 프로젝트 ID와 같아야 데이터가 보인다. dev 빌드는 에뮬레이터(http) 연결을 위해 `10.0.2.2` · `localhost` · `127.0.0.1`에만 평문 통신을 허용한다 (`app/src/dev`만, prod는 허용하지 않음).
 
 ## 6. 출시 전 체크리스트
 

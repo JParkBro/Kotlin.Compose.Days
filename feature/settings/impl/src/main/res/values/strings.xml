@@ -66,4 +66,15 @@
     <string name="settings_widget_empty">아직 홈 화면에 놓인 위젯이 없어요</string>
     <string name="settings_widget_add">위젯 추가</string>
     <string name="settings_widget_add_failed">이 홈 화면 앱은 바로 추가를 지원하지 않아요. 홈 화면을 길게 눌러 추가해 주세요.</string>
+
+    <!-- 계정 관리 (product-spec 6장) -->
+    <string name="settings_account_title">계정 관리</string>
+    <string name="settings_account_back">뒤로</string>
+    <string name="settings_account_login_method">로그인 수단</string>
+    <string name="settings_account_provider_google">Google</string>
+    <string name="settings_account_provider_kakao">카카오</string>
+    <string name="settings_account_logout">로그아웃</string>
+    <string name="settings_account_logout_desc">이 기기에 저장한 디데이 · 일정은 지워지지 않고, 같은 계정으로 다시 로그인하면 그대로 보여요.</string>
+    <string name="settings_account_logout_failed">로그아웃하지 못했어요. 잠시 후 다시 시도해 주세요.</string>
+    <string name="settings_account_withdraw">회원 탈퇴</string>
 </resources>

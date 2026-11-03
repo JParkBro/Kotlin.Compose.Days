@@ -18,7 +18,7 @@ internal class ItemDaoTest : DatabaseTest() {
             dao.upsertItem(testItem(id = "a"))
             dao.upsertItem(testItem(id = "b", deletedAt = NOW))
 
-            assertEquals(listOf("a"), dao.observeItems().first().map { it.id })
+            assertEquals(listOf("a"), dao.observeItems(ME).first().map { it.id })
         }
 
     @Test
@@ -31,7 +31,7 @@ internal class ItemDaoTest : DatabaseTest() {
 
             assertEquals(
                 listOf("quit", "mom", "discharge", "no-date"),
-                dao.observeItems().first().map { it.id },
+                dao.observeItems(ME).first().map { it.id },
             )
         }
 
@@ -42,7 +42,7 @@ internal class ItemDaoTest : DatabaseTest() {
 
             dao.softDeleteItem(id = "a", deletedAt = NOW + 1, updatedBy = ME, syncState = "PENDING")
 
-            assertNull(dao.observeItem("a").first())
+            assertNull(dao.observeItem("a", ME).first())
             val row = db.query("SELECT deleted_at, updated_at, sync_state FROM item WHERE id = 'a'", null)
             row.use {
                 it.moveToFirst()
@@ -58,6 +58,17 @@ internal class ItemDaoTest : DatabaseTest() {
             dao.upsertItem(testItem(id = "a", title = "전역일"))
             dao.upsertItem(testItem(id = "a", title = "전역 축하"))
 
-            assertEquals("전역 축하", dao.observeItem("a").first()?.title)
+            assertEquals("전역 축하", dao.observeItem("a", ME).first()?.title)
+        }
+
+    @Test
+    fun `다른 계정의 항목은 목록과 상세에 나오지 않음`() =
+        runTest {
+            dao.upsertItem(testItem(id = "mine"))
+            dao.upsertItem(testItem(id = "other").copy(ownerUserId = "user-other"))
+
+            assertEquals(listOf("mine"), dao.observeItems(ME).first().map { it.id })
+            assertNull(dao.observeItem("other", ME).first())
+            assertEquals(listOf("other"), dao.observeItems("user-other").first().map { it.id })
         }
 }

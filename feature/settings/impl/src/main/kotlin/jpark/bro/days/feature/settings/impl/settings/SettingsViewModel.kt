@@ -1,6 +1,7 @@
 package jpark.bro.days.feature.settings.impl.settings
 
 import androidx.lifecycle.viewModelScope
+import jpark.bro.days.core.data.repository.AuthRepository
 import jpark.bro.days.core.data.repository.SettingsRepository
 import jpark.bro.days.core.model.ThemeSetting
 import jpark.bro.days.core.ui.MviViewModel
@@ -10,8 +11,13 @@ import kotlinx.coroutines.launch
 
 internal class SettingsViewModel(
     private val settingsRepository: SettingsRepository,
+    authRepository: AuthRepository,
 ) : MviViewModel<SettingsState, SettingsAction, SettingsEvent>(SettingsState()) {
     init {
+        authRepository
+            .observeUser()
+            .onEach { user -> setState { copy(accountEmail = user?.email) } }
+            .launchIn(viewModelScope)
         settingsRepository
             .observeThemeSetting()
             .onEach { setting -> setState { copy(themeSetting = setting) } }

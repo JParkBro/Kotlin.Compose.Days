@@ -1,0 +1,80 @@
+rules_version = '2';
+
+// 설계 원문: docs/days/sync-and-pairing.md 4장. Blaze라 규칙이 곧 과금 방어다 (firebase/CLAUDE.md).
+// get() · getAfter()도 문서 읽기로 과금되므로 호출 수를 늘릴 때는 이유를 주석으로 남긴다.
+service cloud.firestore {
+  match /databases/{db}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function me() { return request.auth.uid; }
+    function coupleDoc(id) { return /databases/$(db)/documents/couples/$(id); }
+    function couple(id) { return get(coupleDoc(id)).data; }
+    function isMember(id) { return signedIn() && me() in couple(id).members; }
+    function isActive(id) { return couple(id).status == 'ACTIVE'; }
+    function userDoc(uid) { return get(/databases/$(db)/documents/users/$(uid)).data; }
+
+    match /users/{uid} {
+      // 나, 또는 같은 커플에 연결된 상대만 읽는다
+      allow read: if signedIn() && (me() == uid ||
+        (userDoc(me()).coupleId != null && userDoc(me()).coupleId == userDoc(uid).coupleId));
+      // coupleId는 null이거나 내가 멤버인 커플만. 남의 커플 id를 적어 상대 프로필을 읽는 것을 막는다
+      // (문서 초안에 없던 검사: coupleId를 바꿀 때만 get 1회 추가)
+      allow write: if signedIn() && me() == uid && (
+        request.resource.data.get('coupleId', null) == null ||
+        request.resource.data.get('coupleId', null) == resource.data.get('coupleId', null) ||
+        me() in couple(request.resource.data.coupleId).members);
+    }
+
+    match /pairCodes/{code} {
+      // 코드를 아는 사람만 조회. 목록 조회는 막는다
+      allow get: if signedIn();
+      allow list: if false;
+      allow create: if signedIn()
+        && request.resource.data.creatorUid == me()
+        && request.resource.data.expiresAt > request.time.toMillis()
+        && !('usedBy' in request.resource.data);
+      // 상대가 코드를 "사용함"으로 표시: 한 번만, 본인 uid로만, 만료 전에만, 발급자는 불가
+      allow update: if signedIn()
+        && !('usedBy' in resource.data)
+        && resource.data.creatorUid != me()
+        && resource.data.expiresAt > request.time.toMillis()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usedBy'])
+        && request.resource.data.usedBy == me();
+      // 발급자 본인 또는 만료된 코드만 삭제 (TTL이 유료라 앱이 지운다)
+      allow delete: if signedIn()
+        && (resource.data.creatorUid == me()
+            || resource.data.expiresAt < request.time.toMillis());
+    }
+
+    match /couples/{coupleId} {
+      allow get, list: if signedIn() && me() in resource.data.members;
+      // 코드를 쓴 사람(members[1])이 같은 트랜잭션에서 pairCodes.usedBy를 기록한 경우에만 만든다
+      allow create: if signedIn()
+        && request.resource.data.members.size() == 2
+        && request.resource.data.members[1] == me()
+        && request.resource.data.members[0] != me()
+        && request.resource.data.status == 'ACTIVE'
+        && getAfter(/databases/$(db)/documents/pairCodes/$(request.resource.data.pairCode)).data.creatorUid
+             == request.resource.data.members[0]
+        && getAfter(/databases/$(db)/documents/pairCodes/$(request.resource.data.pairCode)).data.usedBy
+             == me();
+      // 멤버는 사귄 날 · 상태(해제 · 30일 안 재연결)를 바꿀 수 있지만 멤버 구성은 못 바꾼다
+      allow update: if signedIn() && me() in resource.data.members
+        && request.resource.data.members == resource.data.members;
+      allow delete: if false;
+
+      match /items/{itemId} {
+        allow read: if isMember(coupleId);
+        allow create, update: if isMember(coupleId) && isActive(coupleId)
+          && request.resource.data.updatedBy == me()
+          && request.resource.data.visibility == 'SHARED';
+        // soft delete(deletedAt)만 허용
+        allow delete: if false;
+      }
+
+      match /hiddenAnniversaries/{ruleKey} {
+        allow read, write: if isMember(coupleId);
+      }
+    }
+  }
+}

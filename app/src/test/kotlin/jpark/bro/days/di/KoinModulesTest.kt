@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.navigation3.runtime.NavKey
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.functions.FirebaseFunctions
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import jpark.bro.days.core.model.WidgetSize
 import jpark.bro.days.feature.item.api.ItemDetailKey
 import jpark.bro.days.feature.item.api.ItemEditKey
@@ -29,8 +30,8 @@ class KoinModulesTest {
         val navigatorArgs = listOf(NavKey::class, Set::class)
         // 위젯 설정 ViewModel은 위젯 id · 크기를 parametersOf로 받는다
         val widgetConfigArgs = listOf(Int::class, WidgetSize::class)
-        // Firebase SDK 인스턴스는 Koin이 아니라 Firebase.auth · Firebase.functions가 만들어 데이터 소스에 넘긴다
-        val firebaseTypes = listOf(FirebaseAuth::class, FirebaseFunctions::class)
+        // Firebase SDK 인스턴스는 Koin이 아니라 Firebase.auth · functions · remoteConfig가 만들어 데이터 소스에 넘긴다
+        val firebaseTypes = listOf(FirebaseAuth::class, FirebaseFunctions::class, FirebaseRemoteConfig::class)
         appModule.verify(
             extraTypes =
                 listOf(Context::class, SavedStateHandle::class) + navigatorArgs + navKeyTypes + widgetConfigArgs +

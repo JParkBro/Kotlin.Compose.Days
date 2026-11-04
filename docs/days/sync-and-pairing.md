@@ -38,6 +38,9 @@ interface SyncRemoteDataSource {
 
 ### 구현 (6-5)
 
+- 실행 시점(`core:sync` `SyncManager`): 리스너는 로그인 + 앱이 화면에 떠 있음(`ProcessLifecycleOwner`) + Remote Config `sync_enabled`일 때만 붙이고, 하나라도 바뀌면 바로 해제합니다. 리스너는 내 커플 문서 · 연결된 커플의 공유 항목 · 숨긴 기념일 3개입니다. 올릴 것이 생기면 `SyncPushWorker`(5초 디바운스 · 네트워크 · 지수 백오프 30초, 5회까지), 연결된 커플이 있으면 `SyncPullWorker`(6시간 주기 1회성 조회 + Push)를 예약합니다. 위젯은 Room을 구독하므로 받은 변경이 그대로 반영됩니다.
+- Push 대상은 현재 계정이 마지막으로 고친(`updated_by`) 연결된 커플의 항목뿐입니다. 규칙이 `updatedBy == 나` · ACTIVE 커플만 허용하므로, 같은 기기의 다른 계정 변경은 그 계정이 로그인했을 때 올립니다.
+
 - 원격: `core:firebase` `SyncRemoteDataSource`(Firestore 구현 `FirestoreSyncDataSource`). 리스너는 바뀐 문서(`documentChanges`)만, 이 기기에서 쓰고 서버에 아직 반영되지 않은 문서(`hasPendingWrites`)는 건너뜁니다. 상대가 쓴 문서는 필수 필드 · 타입을 확인하고 맞지 않으면 건너뜁니다.
 - 커서: `sync_cursor.last_pulled_at_micros`. Firestore 서버 시각은 마이크로초라, 밀리초로 자르면 `>` 조건에 같은 문서가 매번 다시 걸려 읽기가 과금됩니다.
 - `serverUpdatedAt`은 보안 규칙이 `request.time`만 허용합니다. 기기가 시각을 조작해 커서를 건너뛰는 것을 막습니다.

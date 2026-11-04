@@ -6,6 +6,7 @@ import jpark.bro.days.core.database.dao.AnniversaryHideDao
 import jpark.bro.days.core.database.dao.CoupleDao
 import jpark.bro.days.core.database.dao.ItemDao
 import jpark.bro.days.core.database.dao.ItemReminderDao
+import jpark.bro.days.core.database.dao.ItemSyncDao
 import jpark.bro.days.core.database.dao.SyncCursorDao
 import jpark.bro.days.core.database.dao.UserItemPrefDao
 import jpark.bro.days.core.database.dao.WidgetConfigDao
@@ -48,4 +49,6 @@ abstract class DaysDatabase : RoomDatabase() {
     abstract fun anniversaryHideDao(): AnniversaryHideDao
 
     abstract fun syncCursorDao(): SyncCursorDao
+
+    abstract fun itemSyncDao(): ItemSyncDao
 }

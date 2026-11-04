@@ -17,4 +17,5 @@ val databaseModule =
         single { get<DaysDatabase>().coupleDao() }
         single { get<DaysDatabase>().anniversaryHideDao() }
         single { get<DaysDatabase>().syncCursorDao() }
+        single { get<DaysDatabase>().itemSyncDao() }
     }

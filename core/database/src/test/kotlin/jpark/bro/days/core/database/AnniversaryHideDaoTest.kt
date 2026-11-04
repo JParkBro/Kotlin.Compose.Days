@@ -21,13 +21,16 @@ internal class AnniversaryHideDaoTest : DatabaseTest() {
         }
 
     @Test
-    fun `올릴 것은 PENDING과 FAILED만`() =
+    fun `올릴 것은 연결된 커플의 PENDING과 FAILED만`() =
         runTest {
+            db.coupleDao().upsertCouple(testCouple())
             dao.upsertHide(testHide("DAY_600", syncState = "PENDING"))
             dao.upsertHide(testHide("YEAR_2", syncState = "FAILED"))
             dao.upsertHide(testHide("DAY_700"))
 
-            assertEquals(setOf("DAY_600", "YEAR_2"), dao.getUnsyncedHides().map { it.ruleKey }.toSet())
+            assertEquals(setOf("DAY_600", "YEAR_2"), dao.getUnsyncedHides(ME).map { it.ruleKey }.toSet())
+            assertEquals(2, dao.observeUnsyncedCount(ME).first())
+            assertEquals(emptyList<String>(), dao.getUnsyncedHides("user-other").map { it.ruleKey })
         }
 
     @Test

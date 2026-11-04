@@ -40,6 +40,7 @@ import jpark.bro.days.core.model.ItemIcon
 import jpark.bro.days.core.model.ItemType
 import jpark.bro.days.core.model.RepeatRule
 import jpark.bro.days.core.model.TimeSlot
+import jpark.bro.days.core.ui.DaysDatePickerDialog
 import jpark.bro.days.core.ui.ObserveEvents
 import jpark.bro.days.core.ui.label
 import jpark.bro.days.core.ui.toDisplayText
@@ -50,7 +51,6 @@ import jpark.bro.days.feature.item.impl.itemedit.components.DateRow
 import jpark.bro.days.feature.item.impl.itemedit.components.DeleteConfirmDialog
 import jpark.bro.days.feature.item.impl.itemedit.components.EditSection
 import jpark.bro.days.feature.item.impl.itemedit.components.IconColorPicker
-import jpark.bro.days.feature.item.impl.itemedit.components.ItemDatePickerDialog
 import jpark.bro.days.feature.item.impl.itemedit.components.ItemPreviewCard
 import jpark.bro.days.feature.item.impl.itemedit.components.ItemTimePickerDialog
 import jpark.bro.days.feature.item.impl.itemedit.components.SwitchRow
@@ -330,7 +330,7 @@ private fun ItemEditDialogs(
     val dismiss = { onAction(ItemEditAction.DialogDismissed) }
     when (state.dialog) {
         ItemEditDialog.DATE -> {
-            ItemDatePickerDialog(
+            DaysDatePickerDialog(
                 initial = state.date ?: state.today,
                 onConfirm = { onAction(ItemEditAction.DateSelected(it)) },
                 onDismiss = dismiss,

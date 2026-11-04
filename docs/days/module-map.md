@@ -168,7 +168,9 @@ days/
    - 6-4b 앱 카카오 로그인 (#27): Kakao SDK(`core:data` `KakaoSignInClient`, 카카오톡 → 카카오 계정 순) → `kakaoAuth`(`core:firebase` `FirebaseFunctionsDataSource`) → `signInWithCustomToken`. 로그인 화면 `DaysKakaoButton`, 로그아웃 시 카카오 토큰도 끊음. 함수 실행 계정 `kakao-auth@`
    - 6-5a 동기화 스키마 (#28): Room `couple` · `anniversary_hide` · `sync_cursor`(+ 보이는 항목 = 내 나만 보기 + 내 ACTIVE 커플 공유 항목), `core:firebase` `SyncRemoteDataSource`(Firestore), 규칙: `serverUpdatedAt == request.time`, 숨긴 기념일 soft delete. `user`(프로필 캐시) 테이블은 채우는 단계(6-6 · 6-7)에서 추가
    - 6-5b `core:sync` (#29): `SyncEngine`(Push · Pull 한 단위) · `SyncManager`(로그인 + 포그라운드 + `sync_enabled`일 때만 리스너, 올릴 것이 생기면 `SyncPushWorker` 5초 디바운스, 연결된 커플이 있을 때만 `SyncPullWorker` 6시간). `core:firebase` `RemoteFlags`(Remote Config `sync_enabled`). `core:sync`는 `core:database` · `core:firebase`를 직접 참조한다 (feature가 아니라 허용). Push는 현재 계정이 고친, 연결된 커플 항목만 (`ItemSyncDao`)
-   - 6-6 `feature:couple` (코드 발급 · 입력 · 확인 · 관리)
+   - 6-6a 프로필 (#31): Room `user`(내 프로필 + 상대 캐시), `ProfileRepository`(이름 1~10자 · 생일 선택), `core:firebase` `ProfileRemoteDataSource`(`users/{uid}` 이름 · 생일 merge), `core:sync` `ProfileSync`(내 프로필 Push, 이 기기에 없을 때만 1회 조회, 상대 프로필은 커플 연결 시 리스너). 프로필 수정 화면 · 설정 카드, 공통 `DaysDatePickerDialog`(core:ui)
+   - 6-6b `feature:couple` 연결 · 확인 · 관리 · 해제 · 30일 재연결 (코드 문서에 발급자 이름)
+   - 6-6c 카카오톡 공유 · QR · 딥링크
    - 6-7 커플 홈 · 공개 범위 · 공유 표시
    - 6-8 이미지 (Cloud Storage + Storage 규칙): 배경 사진 · 프로필
 7. `feature:onboarding`(소개 · 약관 · 시작 방식, 로그인은 6단계에서), `feature:settings`, `feature:notifications`, `core:notification`

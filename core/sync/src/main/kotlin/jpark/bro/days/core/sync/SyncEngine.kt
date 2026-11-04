@@ -35,12 +35,15 @@ class SyncEngine internal constructor(
     private val hideDao: AnniversaryHideDao,
     private val coupleDao: CoupleDao,
     private val cursorDao: SyncCursorDao,
+    private val profileSync: ProfileSync,
 ) {
     /** 올릴 것이 있으면 0보다 크다 */
     fun observeUnsyncedCount(userId: String): Flow<Int> =
-        combine(itemDao.observeUnsyncedCount(userId), hideDao.observeUnsyncedCount(userId)) { items, hides ->
-            items + hides
-        }
+        combine(
+            itemDao.observeUnsyncedCount(userId),
+            hideDao.observeUnsyncedCount(userId),
+            profileSync.observeUnsyncedCount(userId),
+        ) { items, hides, profile -> items + hides + profile }
 
     fun observeActiveCoupleId(userId: String): Flow<String?> =
         coupleDao.observeActiveCouple(userId).map { it?.id }.distinctUntilChanged()
@@ -50,7 +53,7 @@ class SyncEngine internal constructor(
      * 한 번이라도 실패하면 그 행을 FAILED로 두고 false (Worker가 백오프로 다시 시도)
      */
     suspend fun push(userId: String): Boolean {
-        var succeeded = true
+        var succeeded = profileSync.push(userId)
         var round = 0
         while (succeeded && round < MAX_PUSH_ROUNDS) {
             val items = itemDao.getUnsyncedSharedItems(userId)
@@ -74,8 +77,11 @@ class SyncEngine internal constructor(
     /** 백그라운드 1회성 조회. 로컬에 연결된 커플이 있을 때만 부른다 (Worker) */
     suspend fun pullOnce(userId: String): Boolean =
         attempt {
+            profileSync.pullMineIfMissing(userId)
             applyCouples(remote.getCouples(userId))
-            val coupleId = coupleDao.getActiveCouple(userId)?.id ?: return@attempt
+            val couple = coupleDao.getActiveCouple(userId) ?: return@attempt
+            val coupleId = couple.id
+            profileSync.pullPartner(couple.partnerOf(userId))
             applyItems(coupleId, remote.getItems(coupleId, cursorDao.getCursor(itemsKey(coupleId))))
             applyHides(
                 coupleId,
@@ -84,34 +90,40 @@ class SyncEngine internal constructor(
         }
 
     /**
-     * 포그라운드 리스너. 취소될 때까지 돌아간다: 내 커플 문서 + 연결된 커플의 공유 항목 · 숨긴 기념일 변경분.
+     * 포그라운드 리스너. 취소될 때까지 돌아간다: 내 커플 문서 + 연결된 커플의 공유 항목 · 숨긴 기념일 변경분 + 상대 프로필.
      * 리스너 하나가 오류(권한 거부 등)로 끝나도 나머지는 계속 돈다. 다음 포그라운드 진입 때 다시 붙는다.
      */
     suspend fun listen(userId: String): Unit =
         coroutineScope {
+            launch { profileSync.pullMineIfMissing(userId) }
             launch {
                 remote
                     .observeCouples(userId)
                     .catch { /* 다음 포그라운드 진입 때 다시 붙는다 */ }
                     .collect { applyCouples(it) }
             }
-            observeActiveCoupleId(userId).collectLatest { coupleId ->
-                if (coupleId == null) return@collectLatest
-                coroutineScope {
-                    launch {
-                        remote
-                            .observeItems(coupleId, cursorDao.getCursor(itemsKey(coupleId)))
-                            .catch { /* 다음 포그라운드 진입 때 다시 붙는다 */ }
-                            .collect { applyItems(coupleId, it) }
-                    }
-                    launch {
-                        remote
-                            .observeHiddenAnniversaries(coupleId, cursorDao.getCursor(hidesKey(coupleId)))
-                            .catch { /* 다음 포그라운드 진입 때 다시 붙는다 */ }
-                            .collect { applyHides(coupleId, it) }
+            coupleDao
+                .observeActiveCouple(userId)
+                .map { it?.let { couple -> couple.id to couple.partnerOf(userId) } }
+                .distinctUntilChanged()
+                .collectLatest { active ->
+                    val (coupleId, partnerId) = active ?: return@collectLatest
+                    coroutineScope {
+                        launch { profileSync.listenPartner(partnerId) }
+                        launch {
+                            remote
+                                .observeItems(coupleId, cursorDao.getCursor(itemsKey(coupleId)))
+                                .catch { /* 다음 포그라운드 진입 때 다시 붙는다 */ }
+                                .collect { applyItems(coupleId, it) }
+                        }
+                        launch {
+                            remote
+                                .observeHiddenAnniversaries(coupleId, cursorDao.getCursor(hidesKey(coupleId)))
+                                .catch { /* 다음 포그라운드 진입 때 다시 붙는다 */ }
+                                .collect { applyHides(coupleId, it) }
+                        }
                     }
                 }
-            }
         }
 
     internal suspend fun applyCouples(couples: List<CoupleDto>) {

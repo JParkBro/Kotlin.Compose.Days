@@ -4,6 +4,8 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import jpark.bro.days.core.database.DaysDatabase
+import jpark.bro.days.core.database.entity.UserEntity
+import jpark.bro.days.core.firebase.sync.ProfileDto
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -23,8 +25,16 @@ import org.junit.runner.RunWith
 class SyncEngineTest {
     private lateinit var db: DaysDatabase
     private val remote = FakeSyncRemoteDataSource()
+    private val profileRemote = FakeProfileRemoteDataSource()
     private val engine by lazy {
-        SyncEngine(remote, db.itemSyncDao(), db.anniversaryHideDao(), db.coupleDao(), db.syncCursorDao())
+        SyncEngine(
+            remote,
+            db.itemSyncDao(),
+            db.anniversaryHideDao(),
+            db.coupleDao(),
+            db.syncCursorDao(),
+            ProfileSync(profileRemote, db.userDao()),
+        )
     }
 
     @Before
@@ -186,5 +196,56 @@ class SyncEngineTest {
             val items = db.itemDao().observeItems(ME).first { it.isNotEmpty() }
             assertEquals(listOf("a"), items.map { it.id })
             assertEquals(COUPLE, engine.observeActiveCoupleId(ME).first())
+        }
+
+    @Test
+    fun `내 프로필을 저장했으면 올리고 SYNCED가 됨, 실패하면 FAILED`() =
+        runTest {
+            db.userDao().upsertUser(UserEntity(ME, "현우", "1998-04-12", NOW, null, "PENDING"))
+            profileRemote.failPush = true
+
+            assertFalse(engine.push(ME))
+            assertEquals("FAILED", db.userDao().getUser(ME)?.syncState)
+
+            profileRemote.failPush = false
+            assertTrue(engine.push(ME))
+            assertEquals(listOf("현우"), profileRemote.pushed.map { it.nickname })
+            assertEquals("SYNCED", db.userDao().getUser(ME)?.syncState)
+        }
+
+    @Test
+    fun `내 프로필은 이 기기에 없을 때만 받아 오고 상대 프로필은 커플이 있을 때 받음`() =
+        runTest {
+            profileRemote.profiles[ME] = ProfileDto(ME, "현우", null, NOW, serverUpdatedAtMicros = 1)
+            profileRemote.profiles[PARTNER] = ProfileDto(PARTNER, "지민", "1999-09-28", NOW)
+            remote.remoteCouples = listOf(coupleDto())
+
+            assertTrue(engine.pullOnce(ME))
+            assertTrue(engine.pullOnce(ME))
+
+            assertEquals(listOf(ME, PARTNER, PARTNER), profileRemote.fetched)
+            assertEquals("현우", db.userDao().getUser(ME)?.nickname)
+            assertEquals("지민", db.userDao().getUser(PARTNER)?.nickname)
+        }
+
+    @Test
+    fun `상대 프로필 리스너는 커플이 연결되면 붙음`() =
+        runTest {
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { engine.listen(ME) }
+            assertEquals(emptyList<String>(), profileRemote.observed)
+
+            remote.coupleChanges.emit(listOf(coupleDto()))
+            profileRemote.changes.subscriptionCount.first { it > 0 }
+            profileRemote.changes.emit(ProfileDto(PARTNER, "지민", null, NOW))
+
+            assertEquals(listOf(PARTNER), profileRemote.observed)
+            assertEquals(
+                "지민",
+                db
+                    .userDao()
+                    .observeUser(PARTNER)
+                    .first { it != null }
+                    ?.nickname,
+            )
         }
 }

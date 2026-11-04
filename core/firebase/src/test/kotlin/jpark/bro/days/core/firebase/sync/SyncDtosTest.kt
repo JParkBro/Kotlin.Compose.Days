@@ -85,4 +85,12 @@ class SyncDtosTest {
     fun `서버 시각은 마이크로초까지 남김`() {
         assertEquals(1_793_836_800_000_123L, microsOf(seconds = 1_793_836_800L, nanoseconds = 123_456))
     }
+
+    @Test
+    fun `프로필은 이름이 있어야 하고 생일은 없어도 됨`() {
+        val data = mapOf("nickname" to "지민", "updatedAt" to 1L)
+
+        assertEquals(ProfileDto("user-partner", "지민", null, 1, 9), profileDtoOf("user-partner", data, 9))
+        assertNull(profileDtoOf("user-partner", mapOf("coupleId" to "couple-1"), 0))
+    }
 }

@@ -2,6 +2,7 @@ package jpark.bro.days.feature.settings.impl.settings
 
 import androidx.lifecycle.viewModelScope
 import jpark.bro.days.core.data.repository.AuthRepository
+import jpark.bro.days.core.data.repository.ProfileRepository
 import jpark.bro.days.core.data.repository.SettingsRepository
 import jpark.bro.days.core.model.ThemeSetting
 import jpark.bro.days.core.ui.MviViewModel
@@ -12,12 +13,23 @@ import kotlinx.coroutines.launch
 internal class SettingsViewModel(
     private val settingsRepository: SettingsRepository,
     authRepository: AuthRepository,
+    profileRepository: ProfileRepository,
 ) : MviViewModel<SettingsState, SettingsAction, SettingsEvent>(SettingsState()) {
     init {
         authRepository
             .observeUser()
             .onEach { user -> setState { copy(accountEmail = user?.email) } }
             .launchIn(viewModelScope)
+        // 함께한 날(togetherDays)은 커플 연결(6-6b)에서 채운다
+        profileRepository
+            .observeMyProfile()
+            .onEach { profile ->
+                setState {
+                    copy(
+                        profile = profile?.let { ProfileSummary(it.nickname, it.birthDate, togetherDays = null) },
+                    )
+                }
+            }.launchIn(viewModelScope)
         settingsRepository
             .observeThemeSetting()
             .onEach { setting -> setState { copy(themeSetting = setting) } }

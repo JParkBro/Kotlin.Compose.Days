@@ -8,6 +8,7 @@ import jpark.bro.days.core.database.dao.ItemDao
 import jpark.bro.days.core.database.dao.ItemReminderDao
 import jpark.bro.days.core.database.dao.ItemSyncDao
 import jpark.bro.days.core.database.dao.SyncCursorDao
+import jpark.bro.days.core.database.dao.UserDao
 import jpark.bro.days.core.database.dao.UserItemPrefDao
 import jpark.bro.days.core.database.dao.WidgetConfigDao
 import jpark.bro.days.core.database.entity.AnniversaryHideEntity
@@ -15,6 +16,7 @@ import jpark.bro.days.core.database.entity.CoupleEntity
 import jpark.bro.days.core.database.entity.ItemEntity
 import jpark.bro.days.core.database.entity.ItemReminderEntity
 import jpark.bro.days.core.database.entity.SyncCursorEntity
+import jpark.bro.days.core.database.entity.UserEntity
 import jpark.bro.days.core.database.entity.UserItemPrefEntity
 import jpark.bro.days.core.database.entity.WidgetConfigEntity
 
@@ -31,6 +33,7 @@ import jpark.bro.days.core.database.entity.WidgetConfigEntity
         CoupleEntity::class,
         AnniversaryHideEntity::class,
         SyncCursorEntity::class,
+        UserEntity::class,
     ],
     version = 1,
     exportSchema = true,
@@ -51,4 +54,6 @@ abstract class DaysDatabase : RoomDatabase() {
     abstract fun syncCursorDao(): SyncCursorDao
 
     abstract fun itemSyncDao(): ItemSyncDao
+
+    abstract fun userDao(): UserDao
 }

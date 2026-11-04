@@ -6,7 +6,9 @@ import jpark.bro.days.core.model.AppThemeType
 import jpark.bro.days.core.model.AuthProvider
 import jpark.bro.days.core.model.AuthUser
 import jpark.bro.days.core.model.ThemeSetting
+import jpark.bro.days.core.model.UserProfile
 import jpark.bro.days.core.testing.FakeAuthRepository
+import jpark.bro.days.core.testing.FakeProfileRepository
 import jpark.bro.days.core.testing.FakeSettingsRepository
 import jpark.bro.days.core.testing.MainDispatcherRule
 import kotlinx.coroutines.flow.first
@@ -15,6 +17,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
+import java.time.LocalDate
 
 class SettingsViewModelTest {
     @get:Rule
@@ -26,7 +29,8 @@ class SettingsViewModelTest {
     // MainDispatcherRule이 적용된 뒤 만들어야 viewModelScope가 테스트 디스패처를 쓴다
     private val authRepository =
         FakeAuthRepository(AuthUser("google-1", AuthProvider.GOOGLE, email = "hyunwoo@example.com"))
-    private val viewModel by lazy { SettingsViewModel(repository, authRepository) }
+    private val profileRepository = FakeProfileRepository()
+    private val viewModel by lazy { SettingsViewModel(repository, authRepository, profileRepository) }
 
     @Test
     fun `저장된 테마가 State에 들어간다`() {
@@ -126,5 +130,17 @@ class SettingsViewModelTest {
     @Test
     fun `로그인한 계정 이메일을 계정 메뉴에 보여줌`() {
         assertEquals("hyunwoo@example.com", viewModel.state.value.accountEmail)
+    }
+
+    @Test
+    fun `프로필이 없으면 비어 있고 저장하면 카드에 이름 · 생일이 나옴`() {
+        assertNull(viewModel.state.value.profile)
+
+        profileRepository.myProfile.value = UserProfile("user-me", "현우", LocalDate.of(1998, 4, 12))
+
+        assertEquals(
+            ProfileSummary("현우", LocalDate.of(1998, 4, 12), togetherDays = null),
+            viewModel.state.value.profile,
+        )
     }
 }

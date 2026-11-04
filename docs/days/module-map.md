@@ -137,7 +137,7 @@ days/
 | `firebaseModule` | core:firebase — FirebaseAuth, Firestore, RemoteConfig, 원격 데이터 소스 |
 | `networkModule` | core:network — HttpClient (외부 HTTP가 생기면) |
 | `dataModule`, `domainModule` | core |
-| `syncModule` | core:sync — SyncManager, `workerOf(::SyncWorker)` |
+| `syncModule` | core:sync — `SyncEngine` · `SyncManager`. Worker(`SyncPushWorker` · `SyncPullWorker`)는 Android 진입점이라 `KoinComponent`로 꺼낸다 (`WidgetMidnightWorker`와 같은 방식) |
 | `notificationModule`, `adsModule` | core |
 | `{feature}Module` × 7 | 각 impl |
 | `widgetModule` | widget |
@@ -167,7 +167,7 @@ days/
    - 6-4a `firebase/functions/` (#26): `kakaoAuth`(카카오 토큰 → 커스텀 토큰, App Check 강제 · `maxInstances` 3), `stopBilling`(예산 알림 Pub/Sub → 결제 계정 연결 해제, `maxInstances` 1). 리전 `asia-northeast3`
    - 6-4b 앱 카카오 로그인 (#27): Kakao SDK(`core:data` `KakaoSignInClient`, 카카오톡 → 카카오 계정 순) → `kakaoAuth`(`core:firebase` `FirebaseFunctionsDataSource`) → `signInWithCustomToken`. 로그인 화면 `DaysKakaoButton`, 로그아웃 시 카카오 토큰도 끊음. 함수 실행 계정 `kakao-auth@`
    - 6-5a 동기화 스키마 (#28): Room `couple` · `anniversary_hide` · `sync_cursor`(+ 보이는 항목 = 내 나만 보기 + 내 ACTIVE 커플 공유 항목), `core:firebase` `SyncRemoteDataSource`(Firestore), 규칙: `serverUpdatedAt == request.time`, 숨긴 기념일 soft delete. `user`(프로필 캐시) 테이블은 채우는 단계(6-6 · 6-7)에서 추가
-   - 6-5b `core:sync` SyncManager: Push(WorkManager) · Pull(포그라운드 리스너, 백그라운드 6시간 1회성 조회), Remote Config `sync_enabled`
+   - 6-5b `core:sync` (#29): `SyncEngine`(Push · Pull 한 단위) · `SyncManager`(로그인 + 포그라운드 + `sync_enabled`일 때만 리스너, 올릴 것이 생기면 `SyncPushWorker` 5초 디바운스, 연결된 커플이 있을 때만 `SyncPullWorker` 6시간). `core:firebase` `RemoteFlags`(Remote Config `sync_enabled`). `core:sync`는 `core:database` · `core:firebase`를 직접 참조한다 (feature가 아니라 허용). Push는 현재 계정이 고친, 연결된 커플 항목만 (`ItemSyncDao`)
    - 6-6 `feature:couple` (코드 발급 · 입력 · 확인 · 관리)
    - 6-7 커플 홈 · 공개 범위 · 공유 표시
    - 6-8 이미지 (Cloud Storage + Storage 규칙): 배경 사진 · 프로필

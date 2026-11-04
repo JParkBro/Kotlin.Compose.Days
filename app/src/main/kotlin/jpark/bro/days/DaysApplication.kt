@@ -3,6 +3,7 @@ package jpark.bro.days
 import android.app.Application
 import jpark.bro.days.core.data.auth.KakaoSetup
 import jpark.bro.days.core.firebase.FirebaseSetup
+import jpark.bro.days.core.sync.SyncManager
 import jpark.bro.days.di.appModule
 import jpark.bro.days.widget.WidgetUpdater
 import org.koin.android.ext.koin.androidContext
@@ -27,5 +28,7 @@ class DaysApplication :
         }
         // 항목 · 테마가 바뀌면 홈 화면 위젯을 다시 그린다 (module-map 10장)
         get<WidgetUpdater>().start()
+        // 공유 항목 · 커플 동기화 (로그인 + 포그라운드일 때 리스너, 변경이 생기면 Push 예약)
+        get<SyncManager>().start()
     }
 }

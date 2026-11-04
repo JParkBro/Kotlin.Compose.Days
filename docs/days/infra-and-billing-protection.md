@@ -150,7 +150,7 @@ Cloud Billing 예산 (월 1달러 = 결제 계정 통화 기준 1,000원, 알림
 
    | 키 | 기본값 | 용도 |
    |---|---|---|
-   | `sync_enabled` | true | 동기화 전체 중단 |
+   | `sync_enabled` | true | 동기화 전체 중단 (6-5b 구현: `RemoteFlags`, 앱 시작 · 포그라운드 진입 때 fetch, 최소 간격 1시간) |
    | `upload_enabled` | true | 이미지 업로드 중단 |
    | `kakao_login_enabled` | true | 카카오 로그인 일시 중단 |
    | `min_supported_version` | 1 | 버그 있는 구버전 강제 업데이트 |

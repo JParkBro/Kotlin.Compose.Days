@@ -108,14 +108,41 @@ internal class ItemDaoTest : DatabaseTest() {
         }
 
     @Test
-    fun `올릴 항목은 커플이 있는 공유 항목 중 PENDING과 FAILED만`() =
+    fun `올릴 항목은 내가 고친 연결된 커플의 공유 항목 중 PENDING과 FAILED만`() =
         runTest {
+            db.coupleDao().upsertCouple(testCouple())
             dao.upsertItem(testItem(id = "private").copy(syncState = "PENDING"))
             dao.upsertItem(testSharedItem(id = "pending", syncState = "PENDING"))
             dao.upsertItem(testSharedItem(id = "failed", syncState = "FAILED"))
             dao.upsertItem(testSharedItem(id = "synced", syncState = "SYNCED"))
+            dao.upsertItem(testSharedItem(id = "partner", ownerUserId = PARTNER, syncState = "PENDING"))
 
-            assertEquals(setOf("pending", "failed"), dao.getUnsyncedSharedItems().map { it.id }.toSet())
+            assertEquals(
+                setOf("pending", "failed"),
+                db
+                    .itemSyncDao()
+                    .getUnsyncedSharedItems(ME)
+                    .map { it.id }
+                    .toSet(),
+            )
+            assertEquals(2, db.itemSyncDao().observeUnsyncedCount(ME).first())
+            assertEquals(
+                setOf("partner"),
+                db
+                    .itemSyncDao()
+                    .getUnsyncedSharedItems(PARTNER)
+                    .map { it.id }
+                    .toSet(),
+            )
+        }
+
+    @Test
+    fun `연결 해제된 커플의 항목은 올리지 않음`() =
+        runTest {
+            db.coupleDao().upsertCouple(testCouple(status = "DISCONNECTED"))
+            dao.upsertItem(testSharedItem(id = "pending", syncState = "PENDING"))
+
+            assertEquals(emptyList<String>(), db.itemSyncDao().getUnsyncedSharedItems(ME).map { it.id })
         }
 
     @Test
@@ -124,10 +151,10 @@ internal class ItemDaoTest : DatabaseTest() {
             dao.upsertItem(testSharedItem(id = "a", syncState = "PENDING"))
             dao.upsertItem(testSharedItem(id = "a", syncState = "PENDING").copy(updatedAt = NOW + 5))
 
-            dao.setSyncState(id = "a", updatedAt = NOW, syncState = "SYNCED")
+            db.itemSyncDao().setSyncState(id = "a", updatedAt = NOW, syncState = "SYNCED")
             assertEquals("PENDING", dao.getItem("a")?.syncState)
 
-            dao.setSyncState(id = "a", updatedAt = NOW + 5, syncState = "SYNCED")
+            db.itemSyncDao().setSyncState(id = "a", updatedAt = NOW + 5, syncState = "SYNCED")
             assertEquals("SYNCED", dao.getItem("a")?.syncState)
         }
 
@@ -137,7 +164,7 @@ internal class ItemDaoTest : DatabaseTest() {
             dao.upsertItem(testSharedItem(id = "synced", title = "옛 제목"))
             dao.upsertItem(testSharedItem(id = "pending", title = "내 수정", syncState = "PENDING"))
 
-            dao.upsertRemoteItems(
+            db.itemSyncDao().upsertRemoteItems(
                 listOf(
                     testSharedItem(id = "synced", title = "상대 수정", syncState = "PENDING"),
                     testSharedItem(id = "pending", title = "상대 수정"),

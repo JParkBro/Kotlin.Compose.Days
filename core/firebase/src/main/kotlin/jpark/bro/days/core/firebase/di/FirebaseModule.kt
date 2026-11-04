@@ -4,8 +4,10 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import com.google.firebase.functions.functions
+import com.google.firebase.remoteconfig.remoteConfig
 import jpark.bro.days.core.firebase.FUNCTIONS_REGION
 import jpark.bro.days.core.firebase.auth.FirebaseAuthDataSource
+import jpark.bro.days.core.firebase.config.RemoteFlags
 import jpark.bro.days.core.firebase.functions.FirebaseFunctionsDataSource
 import jpark.bro.days.core.firebase.sync.FirestoreSyncDataSource
 import jpark.bro.days.core.firebase.sync.SyncRemoteDataSource
@@ -20,5 +22,6 @@ val firebaseModule =
     module {
         single { FirebaseAuthDataSource(Firebase.auth) }
         single { FirebaseFunctionsDataSource(Firebase.functions(FUNCTIONS_REGION)) }
+        single { RemoteFlags(Firebase.remoteConfig) }
         single<SyncRemoteDataSource> { FirestoreSyncDataSource(Firebase.firestore) }
     }

@@ -23,9 +23,13 @@ interface AnniversaryHideDao {
     @Upsert
     suspend fun upsertHide(hide: AnniversaryHideEntity)
 
-    /** 올려야 할 것 (PENDING · FAILED) */
-    @Query("SELECT * FROM anniversary_hide WHERE sync_state IN ('PENDING', 'FAILED')")
-    suspend fun getUnsyncedHides(): List<AnniversaryHideEntity>
+    /** [userId]가 올려야 할 것 (PENDING · FAILED): 내 연결된 커플 것만 (규칙이 ACTIVE 커플 멤버만 허용) */
+    @Query("SELECT * FROM anniversary_hide WHERE $UNSYNCED_FOR_USER")
+    suspend fun getUnsyncedHides(userId: String): List<AnniversaryHideEntity>
+
+    /** [getUnsyncedHides] 개수. 바뀌면 Push 작업을 예약한다 */
+    @Query("SELECT COUNT(*) FROM anniversary_hide WHERE $UNSYNCED_FOR_USER")
+    fun observeUnsyncedCount(userId: String): Flow<Int>
 
     /**
      * 올린 뒤 상태 변경. 올리는 사이 다시 바뀐 행(deleted_at이 다름)은 PENDING으로 남긴다.
@@ -55,3 +59,10 @@ interface AnniversaryHideDao {
         }
     }
 }
+
+private const val UNSYNCED_FOR_USER = """
+    sync_state IN ('PENDING', 'FAILED') AND couple_id IN (
+        SELECT id FROM couple
+        WHERE status = 'ACTIVE' AND (member1_user_id = :userId OR member2_user_id = :userId)
+    )
+"""

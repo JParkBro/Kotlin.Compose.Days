@@ -322,25 +322,3 @@ class DefaultItemRepositoryTest {
             assertTrue(repository.saveItem(id = null, content = MomBirthday).isFailure)
         }
 }
-
-/** 테스트 중 시각을 옮길 수 있는 시계 */
-private class MutableClock(
-    var now: Instant,
-) : Clock() {
-    override fun getZone(): ZoneId = Seoul
-
-    override fun withZone(zone: ZoneId?): Clock = this
-
-    override fun instant(): Instant = now
-}
-
-/** 로그인 계정을 바꿀 수 있는 세션 (null = 로그아웃) */
-private class SwitchableUserSession(
-    initial: String?,
-) : UserSession {
-    val userId = MutableStateFlow(initial)
-
-    override fun observeUserId(): Flow<String?> = userId
-
-    override suspend fun currentUserId(): String = checkNotNull(userId.value) { "로그인이 필요합니다." }
-}

@@ -176,7 +176,7 @@ erDiagram
 
 | 대상 | 추가 컬럼 / 테이블 |
 |---|---|
-| 동기화 대상 테이블 (item, couple, anniversary_hide) | `sync_state` (PENDING / SYNCED / FAILED) |
+| 동기화 대상 테이블 (item, couple, anniversary_hide, user) | `sync_state` (PENDING / SYNCED / FAILED). `user`는 내 행만 올리고 상대 행은 받기만 한다 |
 | image | `local_path`, `upload_state` |
 | `sync_cursor` | `key` (예: `items:{coupleId}`, `hiddenAnniversaries:{coupleId}`), `last_pulled_at_micros` (Firestore 서버 시각이 마이크로초라 이 컬럼만 마이크로초. 밀리초로 자르면 같은 문서를 매번 다시 읽는다) |
 | `activity_log` | 상대 활동 알림 목록 (id, type, item_id, actor_user_id, created_at, is_read) |
@@ -186,7 +186,7 @@ erDiagram
 
 ```
 users/{uid}
-  nickname, birthDate, authProvider, coupleId,
+  nickname (1~10자), birthDate (yyyy-MM-dd, 없으면 null), authProvider, coupleId, serverUpdatedAt,
   termsVersion, privacyVersion, ageOver14, marketing, agreedAt,
   updatedAt
 

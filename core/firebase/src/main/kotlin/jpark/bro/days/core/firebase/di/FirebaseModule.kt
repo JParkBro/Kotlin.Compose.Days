@@ -9,7 +9,9 @@ import jpark.bro.days.core.firebase.FUNCTIONS_REGION
 import jpark.bro.days.core.firebase.auth.FirebaseAuthDataSource
 import jpark.bro.days.core.firebase.config.RemoteFlags
 import jpark.bro.days.core.firebase.functions.FirebaseFunctionsDataSource
+import jpark.bro.days.core.firebase.sync.FirestoreProfileDataSource
 import jpark.bro.days.core.firebase.sync.FirestoreSyncDataSource
+import jpark.bro.days.core.firebase.sync.ProfileRemoteDataSource
 import jpark.bro.days.core.firebase.sync.SyncRemoteDataSource
 import org.koin.dsl.module
 
@@ -24,4 +26,5 @@ val firebaseModule =
         single { FirebaseFunctionsDataSource(Firebase.functions(FUNCTIONS_REGION)) }
         single { RemoteFlags(Firebase.remoteConfig) }
         single<SyncRemoteDataSource> { FirestoreSyncDataSource(Firebase.firestore) }
+        single<ProfileRemoteDataSource> { FirestoreProfileDataSource(Firebase.firestore) }
     }

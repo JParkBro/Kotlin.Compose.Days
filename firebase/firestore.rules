@@ -19,10 +19,13 @@ service cloud.firestore {
         (userDoc(me()).coupleId != null && userDoc(me()).coupleId == userDoc(uid).coupleId));
       // coupleId는 null이거나 내가 멤버인 커플만. 남의 커플 id를 적어 상대 프로필을 읽는 것을 막는다
       // (문서 초안에 없던 검사: coupleId를 바꿀 때만 get 1회 추가)
-      allow write: if signedIn() && me() == uid && (
+      // serverUpdatedAt은 서버 시각만: 상대 기기의 프로필 반영 순서가 틀어지지 않게 한다. 실제 삭제는 탈퇴(7단계)에서 다룬다
+      allow create, update: if signedIn() && me() == uid
+        && request.resource.data.serverUpdatedAt == request.time && (
         request.resource.data.get('coupleId', null) == null ||
         request.resource.data.get('coupleId', null) == resource.data.get('coupleId', null) ||
         me() in couple(request.resource.data.coupleId).members);
+      allow delete: if signedIn() && me() == uid;
     }
 
     match /pairCodes/{code} {

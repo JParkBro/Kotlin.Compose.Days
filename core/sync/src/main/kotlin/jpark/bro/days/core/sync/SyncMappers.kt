@@ -100,3 +100,13 @@ internal fun HiddenAnniversaryDto.toEntity(coupleId: String): AnniversaryHideEnt
     )
 
 private const val SHARED = "SHARED"
+
+/** 커플의 다른 멤버 */
+internal fun CoupleEntity.partnerOf(userId: String): String =
+    if (member1UserId ==
+        userId
+    ) {
+        member2UserId
+    } else {
+        member1UserId
+    }

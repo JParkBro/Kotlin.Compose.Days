@@ -101,7 +101,7 @@ private suspend fun <T> FirebaseFirestore.setAllWithServerTime(
 private const val COUPLES = "couples"
 private const val ITEMS = "items"
 private const val HIDDEN_ANNIVERSARIES = "hiddenAnniversaries"
-private const val SERVER_UPDATED_AT = "serverUpdatedAt"
+internal const val SERVER_UPDATED_AT = "serverUpdatedAt"
 
 /** Firestore batch 한 번에 쓸 수 있는 최대 문서 수 */
 private const val BATCH_LIMIT = 500
@@ -141,7 +141,7 @@ private fun <T> Query.observeChanges(parse: (DocumentSnapshot) -> T?): Flow<List
     }
 
 /** 서버 시각이 없으면(아직 반영 전) 0 */
-private fun DocumentSnapshot.serverMicros(): Long =
+internal fun DocumentSnapshot.serverMicros(): Long =
     getTimestamp(SERVER_UPDATED_AT)?.let { microsOf(it.seconds, it.nanoseconds) } ?: 0
 
 internal fun microsOf(

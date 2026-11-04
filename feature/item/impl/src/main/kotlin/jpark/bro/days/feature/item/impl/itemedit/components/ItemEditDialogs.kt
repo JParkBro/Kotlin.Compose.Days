@@ -1,55 +1,17 @@
 package jpark.bro.days.feature.item.impl.itemedit.components
 
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import jpark.bro.days.core.designsystem.AppThemeTokens
 import jpark.bro.days.feature.item.impl.R
-import java.time.Instant
-import java.time.LocalDate
 import java.time.LocalTime
-import java.time.ZoneOffset
 import jpark.bro.days.core.designsystem.R as DesignR
-
-/** DatePicker는 UTC 자정 millis로 날짜를 주고받는다 */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-internal fun ItemDatePickerDialog(
-    initial: LocalDate?,
-    onConfirm: (LocalDate) -> Unit,
-    onDismiss: () -> Unit,
-) {
-    val state =
-        rememberDatePickerState(
-            initialSelectedDateMillis = initial?.atStartOfDay(ZoneOffset.UTC)?.toInstant()?.toEpochMilli(),
-        )
-    DatePickerDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    state.selectedDateMillis?.let {
-                        onConfirm(
-                            Instant.ofEpochMilli(it).atZone(ZoneOffset.UTC).toLocalDate(),
-                        )
-                    }
-                },
-                enabled = state.selectedDateMillis != null,
-            ) { Text(stringResource(DesignR.string.common_confirm)) }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(DesignR.string.common_cancel)) } },
-    ) {
-        DatePicker(state = state)
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

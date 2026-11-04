@@ -177,6 +177,8 @@ describe('커플 연결', () => {
 });
 
 describe('사용자 문서', () => {
+  const profile = (nickname, coupleId) => ({ nickname, coupleId, updatedAt: 1, serverUpdatedAt: serverTimestamp() });
+
   test('같은 커플의 상대 프로필만 읽을 수 있다', async () => {
     await seedCouple();
     await seed(`users/${A}`, { nickname: '현우', coupleId: 'c1' });
@@ -189,14 +191,31 @@ describe('사용자 문서', () => {
   test('남의 커플 id를 내 문서에 적어 그 커플 프로필을 읽을 수 없다', async () => {
     await seedCouple();
     await seed(`users/${A}`, { nickname: '현우', coupleId: 'c1' });
-    await assertFails(setDoc(doc(db(C), `users/${C}`), { nickname: '남', coupleId: 'c1' }));
-    await assertSucceeds(setDoc(doc(db(C), `users/${C}`), { nickname: '남', coupleId: null }));
+    await assertFails(setDoc(doc(db(C), `users/${C}`), profile('남', 'c1')));
+    await assertSucceeds(setDoc(doc(db(C), `users/${C}`), profile('남', null)));
     await assertFails(getDoc(doc(db(C), `users/${A}`)));
   });
 
   test('내가 멤버인 커플 id는 적을 수 있고 다른 사람 문서는 못 쓴다', async () => {
     await seedCouple();
-    await assertSucceeds(setDoc(doc(db(B), `users/${B}`), { nickname: '지민', coupleId: 'c1' }));
-    await assertFails(setDoc(doc(db(B), `users/${A}`), { nickname: '현우' }));
+    await assertSucceeds(setDoc(doc(db(B), `users/${B}`), profile('지민', 'c1')));
+    await assertFails(setDoc(doc(db(B), `users/${A}`), profile('현우', null)));
+  });
+
+  test('프로필의 serverUpdatedAt은 서버 시각만 허용한다', async () => {
+    await assertFails(setDoc(doc(db(C), `users/${C}`), { ...profile('남', null), serverUpdatedAt: 1 }));
+    await assertFails(setDoc(doc(db(C), `users/${C}`), { nickname: '남', updatedAt: 1 }));
+  });
+
+  test('이름 · 생일만 merge해도 연결된 coupleId는 그대로 유지된다', async () => {
+    await seedCouple();
+    await seed(`users/${B}`, { nickname: '지민', coupleId: 'c1', serverUpdatedAt: 1 });
+    await assertSucceeds(
+      setDoc(
+        doc(db(B), `users/${B}`),
+        { nickname: '지민 🌷', birthDate: '1999-09-28', updatedAt: 2, serverUpdatedAt: serverTimestamp() },
+        { merge: true },
+      ),
+    );
   });
 });

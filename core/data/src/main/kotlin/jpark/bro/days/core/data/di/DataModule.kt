@@ -11,9 +11,11 @@ import jpark.bro.days.core.data.auth.KakaoSignInClient
 import jpark.bro.days.core.data.repository.AuthRepository
 import jpark.bro.days.core.data.repository.DefaultAuthRepository
 import jpark.bro.days.core.data.repository.DefaultItemRepository
+import jpark.bro.days.core.data.repository.DefaultProfileRepository
 import jpark.bro.days.core.data.repository.DefaultSettingsRepository
 import jpark.bro.days.core.data.repository.DefaultWidgetConfigRepository
 import jpark.bro.days.core.data.repository.ItemRepository
+import jpark.bro.days.core.data.repository.ProfileRepository
 import jpark.bro.days.core.data.repository.SettingsRepository
 import jpark.bro.days.core.data.repository.WidgetConfigRepository
 import jpark.bro.days.core.data.session.FirebaseUserSession
@@ -38,6 +40,7 @@ val dataModule =
         singleOf(::KakaoSdkSignIn) bind KakaoSignInClient::class
         singleOf(::DefaultSettingsRepository) bind SettingsRepository::class
         singleOf(::DefaultItemRepository) bind ItemRepository::class
+        singleOf(::DefaultProfileRepository) bind ProfileRepository::class
         singleOf(::DefaultWidgetConfigRepository) bind WidgetConfigRepository::class
     }
 

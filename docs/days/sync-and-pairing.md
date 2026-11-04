@@ -39,6 +39,7 @@ interface SyncRemoteDataSource {
 ### 구현 (6-5)
 
 - 실행 시점(`core:sync` `SyncManager`): 리스너는 로그인 + 앱이 화면에 떠 있음(`ProcessLifecycleOwner`) + Remote Config `sync_enabled`일 때만 붙이고, 하나라도 바뀌면 바로 해제합니다. 리스너는 내 커플 문서 · 연결된 커플의 공유 항목 · 숨긴 기념일 3개입니다. 올릴 것이 생기면 `SyncPushWorker`(5초 디바운스 · 네트워크 · 지수 백오프 30초, 5회까지), 연결된 커플이 있으면 `SyncPullWorker`(6시간 주기 1회성 조회 + Push)를 예약합니다. 위젯은 Room을 구독하므로 받은 변경이 그대로 반영됩니다.
+- 프로필(6-6a, `ProfileSync`): 내 프로필은 저장하면 PENDING → Push가 `users/{uid}`에 이름 · 생일만 merge로 씁니다(`coupleId`는 커플 연결이 씀). 이 기기에 내 프로필이 없을 때만 1회 조회합니다(새 기기 로그인). 상대 프로필은 커플이 연결됐을 때만 리스너(포그라운드) · 1회성 조회(백그라운드)로 받습니다. 규칙상 연결 전에는 상대 문서를 읽을 수 없어, 커플 연결 확인 화면의 발급자 이름은 코드 문서에 함께 넣습니다(6-6b).
 - Push 대상은 현재 계정이 마지막으로 고친(`updated_by`) 연결된 커플의 항목뿐입니다. 규칙이 `updatedBy == 나` · ACTIVE 커플만 허용하므로, 같은 기기의 다른 계정 변경은 그 계정이 로그인했을 때 올립니다.
 
 - 원격: `core:firebase` `SyncRemoteDataSource`(Firestore 구현 `FirestoreSyncDataSource`). 리스너는 바뀐 문서(`documentChanges`)만, 이 기기에서 쓰고 서버에 아직 반영되지 않은 문서(`hasPendingWrites`)는 건너뜁니다. 상대가 쓴 문서는 필수 필드 · 타입을 확인하고 맞지 않으면 건너뜁니다.
@@ -93,7 +94,7 @@ users/A.coupleId 갱신                                              users/B.cou
 
 | 경로 | 읽기 | 쓰기 |
 |---|---|---|
-| `users/{uid}` | 나, 또는 같은 커플에 연결된 상대 | 나만. `coupleId`는 null이거나 **내가 멤버인 커플**만 (초안에서 추가: 남의 커플 id를 적어 상대 프로필을 읽는 것을 막음) |
+| `users/{uid}` | 나, 또는 같은 커플에 연결된 상대 | 나만. `serverUpdatedAt == 서버 시각`. `coupleId`는 null이거나 **내가 멤버인 커플**만 (초안에서 추가: 남의 커플 id를 적어 상대 프로필을 읽는 것을 막음) |
 | `pairCodes/{code}` | 코드를 아는 사람만 단건 조회, 목록 조회 불가 | 생성: 발급자 본인 · 만료 전 · `usedBy` 없이. 사용: 발급자가 아닌 사람이 만료 전 한 번만 `usedBy = 나`. 삭제: 발급자 또는 만료된 코드 |
 | `couples/{id}` | 멤버만 | 생성: 코드를 쓴 사람이 같은 트랜잭션에서 `usedBy`를 기록했을 때만(`getAfter`). 수정: 멤버, 멤버 구성은 못 바꿈. 삭제 불가 |
 | `couples/{id}/items/{itemId}` | 멤버 | 멤버 · ACTIVE · `updatedBy == 나` · `visibility == SHARED` · `serverUpdatedAt == 서버 시각`. 삭제 불가(soft delete) |

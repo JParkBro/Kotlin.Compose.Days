@@ -129,6 +129,12 @@ internal fun SettingsMenu(
             title = stringResource(R.string.settings_main_policy),
             onClick = { onAction(SettingsAction.MenuClicked(SettingsDestination.POLICY)) },
         )
+        DaysDivider(inset = AppSpacing.marginMobile)
+        SettingsMenuRow(
+            icon = DesignR.drawable.ic_apps,
+            title = stringResource(R.string.settings_main_more_apps),
+            onClick = { onAction(SettingsAction.MenuClicked(SettingsDestination.MORE_APPS)) },
+        )
     }
 
     DaysSection(title = stringResource(R.string.settings_main_section_account)) {

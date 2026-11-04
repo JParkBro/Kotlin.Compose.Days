@@ -26,3 +26,7 @@ internal data object PolicyListKey : NavKey
 internal data class PolicyDocKey(
     val type: PolicyType,
 ) : NavKey
+
+/** 다른 앱 둘러보기 (크로스 프로모션 웹 페이지) */
+@Serializable
+internal data object MoreAppsKey : NavKey

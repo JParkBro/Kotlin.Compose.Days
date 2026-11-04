@@ -6,6 +6,8 @@ plugins {
     alias(libs.plugins.days.koin)
     // app/google-services.json (커밋하지 않음)에 dev · prod 패키지가 모두 들어 있다
     alias(libs.plugins.google.services)
+    // 오픈소스 라이선스 목록: 빌드할 때 Gradle 의존성의 라이선스를 모은다 (화면은 feature:settings)
+    alias(libs.plugins.oss.licenses)
 }
 
 /** local.properties (커밋하지 않음). 없으면 기본값을 쓴다 */

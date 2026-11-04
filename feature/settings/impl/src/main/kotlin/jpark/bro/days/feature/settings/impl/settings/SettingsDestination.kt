@@ -12,6 +12,9 @@ internal enum class SettingsDestination {
     NOTIFICATION,
     WIDGET,
     POLICY,
+
+    /** 다른 앱 둘러보기 */
+    MORE_APPS,
     ACCOUNT,
 }
 

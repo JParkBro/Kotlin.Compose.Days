@@ -21,6 +21,7 @@
     <string name="settings_main_rate_action">별점 남기기</string>
     <string name="settings_main_section_info">정보</string>
     <string name="settings_main_policy">약관 및 정책</string>
+    <string name="settings_main_more_apps">다른 앱 둘러보기</string>
     <string name="settings_main_section_account">계정</string>
     <string name="settings_main_account">계정 관리</string>
     <string name="settings_main_version">버전 %1$s</string>
@@ -77,4 +78,19 @@
     <string name="settings_account_logout_desc">이 기기에 저장한 디데이 · 일정은 지워지지 않고, 같은 계정으로 다시 로그인하면 그대로 보여요.</string>
     <string name="settings_account_logout_failed">로그아웃하지 못했어요. 잠시 후 다시 시도해 주세요.</string>
     <string name="settings_account_withdraw">회원 탈퇴</string>
+
+    <!-- 약관 및 정책 (product-spec 6장) -->
+    <string name="settings_policy_title">약관 및 정책</string>
+    <string name="settings_policy_back">뒤로</string>
+    <string name="settings_policy_privacy">개인정보 처리방침</string>
+    <string name="settings_policy_terms">서비스 이용약관</string>
+    <string name="settings_policy_oss">오픈소스 라이선스</string>
+    <string name="settings_policy_font">Pretendard 글꼴 라이선스</string>
+    <string name="settings_policy_font_subtitle">SIL Open Font License 1.1</string>
+
+    <!-- 다른 앱 둘러보기 -->
+    <string name="settings_more_apps_title">다른 앱 둘러보기</string>
+    <string name="settings_more_apps_back">뒤로</string>
+    <string name="settings_more_apps_failed">페이지를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.</string>
+    <string name="settings_more_apps_retry">다시 시도</string>
 </resources>

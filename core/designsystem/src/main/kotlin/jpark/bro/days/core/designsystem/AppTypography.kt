@@ -9,7 +9,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 
-/** Pretendard (SIL OFL 1.1, core/designsystem/licenses/Pretendard-OFL.txt) */
+/** Pretendard (SIL OFL 1.1, res/raw/pretendard_ofl.txt) */
 val Pretendard =
     FontFamily(
         Font(R.font.pretendard_regular, FontWeight.Normal),

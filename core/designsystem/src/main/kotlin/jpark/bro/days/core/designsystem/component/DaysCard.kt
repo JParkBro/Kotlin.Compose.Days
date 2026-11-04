@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -119,7 +120,7 @@ fun DaysIconBadge(
 
 /**
  * 카드 · 리스트 안의 한 행: [leading] · 제목 · 설명 · [trailing] · 화살표.
- * [onClick]이 있으면 기본으로 오른쪽 화살표를 보여준다.
+ * [onClick]이 있으면 기본으로 오른쪽 화살표를 보여준다. [emphasized]면 제목을 굵게 (예: 개인정보 처리방침).
  */
 @Composable
 fun DaysListItem(
@@ -130,6 +131,7 @@ fun DaysListItem(
     showChevron: Boolean = onClick != null,
     leading: (@Composable () -> Unit)? = null,
     trailing: (@Composable RowScope.() -> Unit)? = null,
+    emphasized: Boolean = false,
 ) {
     val colors = AppThemeTokens.colors
     Row(
@@ -145,7 +147,10 @@ fun DaysListItem(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
-                style = AppThemeTokens.typography.labelLg,
+                style =
+                    AppThemeTokens.typography.labelLg.let {
+                        if (emphasized) it.copy(fontWeight = FontWeight.Bold) else it
+                    },
                 color = colors.textPrimary,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,

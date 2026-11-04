@@ -7,6 +7,9 @@ internal class PolicyListViewModel :
     override fun onAction(action: PolicyListAction) {
         when (action) {
             is PolicyListAction.PolicyClicked -> sendEvent(PolicyListEvent.OpenPolicy(action.type))
+            PolicyListAction.OssLicensesClicked -> sendEvent(PolicyListEvent.OpenOssLicenses)
+            PolicyListAction.FontLicenseClicked -> setState { copy(isFontLicenseOpen = true) }
+            PolicyListAction.FontLicenseDismissed -> setState { copy(isFontLicenseOpen = false) }
             PolicyListAction.BackClicked -> sendEvent(PolicyListEvent.NavigateBack)
         }
     }

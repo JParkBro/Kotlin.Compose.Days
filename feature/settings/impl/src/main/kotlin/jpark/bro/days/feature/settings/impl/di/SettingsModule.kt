@@ -5,6 +5,7 @@ import jpark.bro.days.feature.settings.api.SessionEnded
 import jpark.bro.days.feature.settings.api.SessionEndedHandler
 import jpark.bro.days.feature.settings.api.SettingsKey
 import jpark.bro.days.feature.settings.impl.AccountKey
+import jpark.bro.days.feature.settings.impl.MoreAppsKey
 import jpark.bro.days.feature.settings.impl.NotificationSettingsKey
 import jpark.bro.days.feature.settings.impl.PolicyDocKey
 import jpark.bro.days.feature.settings.impl.PolicyListKey
@@ -13,6 +14,8 @@ import jpark.bro.days.feature.settings.impl.WidgetSettingsKey
 import jpark.bro.days.feature.settings.impl.WithdrawKey
 import jpark.bro.days.feature.settings.impl.account.AccountRoot
 import jpark.bro.days.feature.settings.impl.account.AccountViewModel
+import jpark.bro.days.feature.settings.impl.moreapps.MoreAppsRoot
+import jpark.bro.days.feature.settings.impl.moreapps.MoreAppsViewModel
 import jpark.bro.days.feature.settings.impl.notificationsettings.NotificationSettingsRoot
 import jpark.bro.days.feature.settings.impl.notificationsettings.NotificationSettingsViewModel
 import jpark.bro.days.feature.settings.impl.policydoc.PolicyDocRoot
@@ -43,6 +46,7 @@ val settingsModule =
         viewModelOf(::AccountViewModel)
         viewModelOf(::WithdrawViewModel)
         viewModelOf(::PolicyListViewModel)
+        viewModelOf(::MoreAppsViewModel)
         viewModel { params -> PolicyDocViewModel(key = params.get()) }
 
         navigation<SettingsKey> {
@@ -80,5 +84,9 @@ val settingsModule =
         navigation<PolicyDocKey> { key ->
             val navigator = get<Navigator>()
             PolicyDocRoot(key = key, onBack = navigator::goBack)
+        }
+        navigation<MoreAppsKey> {
+            val navigator = get<Navigator>()
+            MoreAppsRoot(onBack = navigator::goBack)
         }
     }

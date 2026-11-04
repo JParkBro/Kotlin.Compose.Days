@@ -398,7 +398,7 @@ WCAG 기준: 일반 텍스트 4.5:1 이상, 큰 텍스트(24px 이상 또는 18.
 
 - 포함한 굵기: Regular(400) · Medium(500) · SemiBold(600) · Bold(700) · ExtraBold(800). 시안에서 쓰지 않는 Thin · Light · Black은 넣지 않습니다.
 - 디데이 숫자는 `tnum`(tabular-nums) 스타일을 씁니다 (5.5).
-- 라이선스 원문은 `core/designsystem/licenses/Pretendard-OFL.txt`. oss-licenses 플러그인 목록에는 자동으로 들어가지 않으므로 따로 고지합니다 (product-spec 6장).
+- 라이선스 원문은 `core/designsystem/src/main/res/raw/pretendard_ofl.txt` (설정 > 약관 및 정책 > Pretendard 글꼴 라이선스에서 표시). oss-licenses 플러그인 목록에는 자동으로 들어가지 않으므로 따로 고지합니다 (product-spec 6장).
 
 ## 10. 모서리 · 간격
 
@@ -428,7 +428,7 @@ WCAG 기준: 일반 텍스트 4.5:1 이상, 큰 텍스트(24px 이상 또는 18.
 | `DaysChip.kt` | `DaysFilterChip`(여러 개 고르는 묶음은 `role = Role.Checkbox`) · `DaysSegmentedControl` | 필터 칩 · 세그먼트 컨트롤 |
 | `DaysBadge.kt` | `DaysBadge(tone = SHARED · PRIVATE · CATEGORY · SOON · SUCCESS, showDot)` | 뱃지 5종 |
 | `DdayText.kt` · `DdayTone.kt` | `DdayText(count, tone = HIGHLIGHT · DEFAULT · SOON · PASSED)` | 5.5 디데이 숫자 색, tnum |
-| `DaysCard.kt` | `DaysCard` · `DaysSection` · `DaysListItem` · `DaysIconBadge(tone)` · `DaysDivider` | 카드 · 리스트 · 아이콘 배경 · 구분선 |
+| `DaysCard.kt` | `DaysCard` · `DaysSection` · `DaysListItem(emphasized)` · `DaysIconBadge(tone)` · `DaysDivider` | 카드 · 리스트(`emphasized`: 굵은 제목) · 아이콘 배경 · 구분선 |
 | `DaysTextField.kt` | `DaysTextField` (포커스 링) | 입력창 |
 | `DaysSelectionControls.kt` | `DaysSwitch` · `DaysCheckbox` | 토글 · 체크박스 |
 | `DaysProgressBar.kt` | `DaysProgressBar` | 진행바 (5.6) |
@@ -438,6 +438,8 @@ WCAG 기준: 일반 텍스트 4.5:1 이상, 큰 텍스트(24px 이상 또는 18.
 | `DaysFeedback.kt` · `DaysInfoBoxTone.kt` | `DaysInfoBox(TIP · WARNING)` · `DaysToast` · `DaysToastHost` | 안내 박스 · 토스트 |
 
 화면 전용 모양(히어로 카드, 캘린더 날짜 셀)은 각 feature에 둡니다.
+
+외부 웹 페이지는 `core:ui`의 `DaysWebView`(배경 `bg`, https 한 사이트만 · Play 스토어 링크는 스토어로 · 그 밖은 막음, 파일 접근 · JS 인터페이스 없음)로 엽니다 (다른 앱 둘러보기, 이후 정책 문서).
 
 **Preview** (`core/designsystem/.../preview/DaysPreviews.kt`)
 - `@ComponentPreviews`: 라이트 · 다크 · 글꼴 2배. 컴포넌트 견본은 `DaysPreviewSurface { }` 안에 둡니다.

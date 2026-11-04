@@ -122,6 +122,8 @@ erDiagram
         string couple_id PK,FK
         string rule_key PK "DAY_600, YEAR_2, BDAY_uid_2027"
         long created_at
+        long deleted_at "숨김 해제 (soft delete)"
+        long server_updated_at
     }
     TERMS_AGREEMENT {
         string id PK
@@ -160,7 +162,7 @@ erDiagram
 | 엔티티 | Room | Firestore | 자체 서버 |
 |---|---|---|---|
 | USER | 내 프로필 + 상대 프로필 캐시 | `users/{uid}` | `users` |
-| COUPLE + MEMBER | 내 커플 1건 | `couples/{coupleId}` (`members` 배열로 합침) | `couples` + `couple_members` |
+| COUPLE + MEMBER | 계정별 내 커플 (`members` 2명을 `member1_user_id` 발급자 · `member2_user_id` 입력자 컬럼으로) | `couples/{coupleId}` (`members` 배열로 합침) | `couples` + `couple_members` |
 | PAIR_CODE | ✗ | `pairCodes/{code}` | `pair_codes` |
 | ITEM (나만 보기) | ✓ | ✗ (백업 기능 추가 시 `users/{uid}/items`) | `items` |
 | ITEM (우리 둘이) | ✓ | `couples/{coupleId}/items/{itemId}` | `items` |
@@ -176,7 +178,7 @@ erDiagram
 |---|---|
 | 동기화 대상 테이블 (item, couple, anniversary_hide) | `sync_state` (PENDING / SYNCED / FAILED) |
 | image | `local_path`, `upload_state` |
-| `sync_cursor` | `key` (예: `items:{coupleId}`), `last_pulled_at` |
+| `sync_cursor` | `key` (예: `items:{coupleId}`, `hiddenAnniversaries:{coupleId}`), `last_pulled_at_micros` (Firestore 서버 시각이 마이크로초라 이 컬럼만 마이크로초. 밀리초로 자르면 같은 문서를 매번 다시 읽는다) |
 | `activity_log` | 상대 활동 알림 목록 (id, type, item_id, actor_user_id, created_at, is_read) |
 | `widget_config` | widget_id, item_id, size, background_type, show_profile. widget_id는 시스템이 주는 appWidgetId(정수)라 UUID 원칙의 예외 (기기 밖으로 나가지 않음) |
 
@@ -200,7 +202,7 @@ couples/{coupleId}/items/{itemId}
   backgroundImage: { id, path, thumbPath, width, height }
 
 couples/{coupleId}/hiddenAnniversaries/{ruleKey}
-  createdAt
+  createdAt, deletedAt (숨김 해제), serverUpdatedAt
 
 couples/{coupleId}/usage/images
   count  (커플당 이미지 수, 규칙이 +1씩 · 한도 이하로만 허용)

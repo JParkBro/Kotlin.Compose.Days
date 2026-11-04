@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
 import { assertFails, assertSucceeds, initializeTestEnvironment } from '@firebase/rules-unit-testing';
-import { doc, getDoc, setDoc, updateDoc, deleteDoc, runTransaction } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, deleteDoc, runTransaction, serverTimestamp } from 'firebase/firestore';
 
 const A = 'user-a'; // 코드 발급자
 const B = 'user-b'; // 코드 입력자
@@ -39,14 +39,26 @@ async function seedCouple({ status = 'ACTIVE' } = {}) {
   await seed('couples/c1', { members: [A, B], status, pairCode: 'K7Q2MX', startDate: '2025-06-14' });
 }
 
-const sharedItem = (uid) => ({ title: '지민 생일', visibility: 'SHARED', updatedBy: uid, updatedAt: 1 });
+const sharedItem = (uid) => ({
+  title: '지민 생일',
+  visibility: 'SHARED',
+  updatedBy: uid,
+  updatedAt: 1,
+  serverUpdatedAt: serverTimestamp(),
+});
 
 describe('공유 항목', () => {
   test('멤버는 공유 항목을 읽고 쓸 수 있다', async () => {
     await seedCouple();
     await assertSucceeds(setDoc(doc(db(A), 'couples/c1/items/i1'), sharedItem(A)));
     await assertSucceeds(getDoc(doc(db(B), 'couples/c1/items/i1')));
-    await assertSucceeds(updateDoc(doc(db(B), 'couples/c1/items/i1'), { title: '지민 생일 🎂', updatedBy: B }));
+    await assertSucceeds(
+      updateDoc(doc(db(B), 'couples/c1/items/i1'), {
+        title: '지민 생일 🎂',
+        updatedBy: B,
+        serverUpdatedAt: serverTimestamp(),
+      }),
+    );
   });
 
   test('비멤버 · 비로그인 사용자는 거부된다', async () => {
@@ -69,10 +81,44 @@ describe('공유 항목', () => {
     await assertFails(setDoc(doc(db(A), 'couples/c1/items/i1'), sharedItem(A)));
   });
 
+  test('serverUpdatedAt은 서버 시각만 허용한다', async () => {
+    await seedCouple();
+    await assertFails(setDoc(doc(db(A), 'couples/c1/items/i1'), { ...sharedItem(A), serverUpdatedAt: 1 }));
+    const { serverUpdatedAt, ...withoutServerTime } = sharedItem(A);
+    await assertFails(setDoc(doc(db(A), 'couples/c1/items/i1'), withoutServerTime));
+  });
+
   test('공유 항목 삭제(delete)는 거부된다', async () => {
     await seedCouple();
     await seed('couples/c1/items/i1', sharedItem(A));
     await assertFails(deleteDoc(doc(db(A), 'couples/c1/items/i1')));
+  });
+});
+
+describe('숨긴 자동 기념일', () => {
+  const hide = (deletedAt = null) => ({ createdAt: 1, deletedAt, serverUpdatedAt: serverTimestamp() });
+
+  test('멤버는 숨기고 숨김 해제(deletedAt)할 수 있다', async () => {
+    await seedCouple();
+    await assertSucceeds(setDoc(doc(db(A), 'couples/c1/hiddenAnniversaries/DAY_600'), hide()));
+    await assertSucceeds(getDoc(doc(db(B), 'couples/c1/hiddenAnniversaries/DAY_600')));
+    await assertSucceeds(setDoc(doc(db(B), 'couples/c1/hiddenAnniversaries/DAY_600'), hide(2)));
+  });
+
+  test('비멤버는 읽거나 쓸 수 없다', async () => {
+    await seedCouple();
+    await seed('couples/c1/hiddenAnniversaries/DAY_600', { createdAt: 1, deletedAt: null, serverUpdatedAt: 1 });
+    await assertFails(getDoc(doc(db(C), 'couples/c1/hiddenAnniversaries/DAY_600')));
+    await assertFails(setDoc(doc(db(C), 'couples/c1/hiddenAnniversaries/YEAR_2'), hide()));
+  });
+
+  test('실제 삭제 · 서버 시각이 아닌 serverUpdatedAt · 해제된 커플 쓰기는 거부된다', async () => {
+    await seedCouple();
+    await seed('couples/c1/hiddenAnniversaries/DAY_600', { createdAt: 1, deletedAt: null, serverUpdatedAt: 1 });
+    await assertFails(deleteDoc(doc(db(A), 'couples/c1/hiddenAnniversaries/DAY_600')));
+    await assertFails(setDoc(doc(db(A), 'couples/c1/hiddenAnniversaries/YEAR_2'), { ...hide(), serverUpdatedAt: 5 }));
+    await seedCouple({ status: 'DISCONNECTED' });
+    await assertFails(setDoc(doc(db(A), 'couples/c1/hiddenAnniversaries/YEAR_2'), hide()));
   });
 });
 

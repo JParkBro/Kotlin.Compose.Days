@@ -2,10 +2,13 @@ package jpark.bro.days.core.firebase.di
 
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.firestore
 import com.google.firebase.functions.functions
 import jpark.bro.days.core.firebase.FUNCTIONS_REGION
 import jpark.bro.days.core.firebase.auth.FirebaseAuthDataSource
 import jpark.bro.days.core.firebase.functions.FirebaseFunctionsDataSource
+import jpark.bro.days.core.firebase.sync.FirestoreSyncDataSource
+import jpark.bro.days.core.firebase.sync.SyncRemoteDataSource
 import org.koin.dsl.module
 
 /**
@@ -17,4 +20,5 @@ val firebaseModule =
     module {
         single { FirebaseAuthDataSource(Firebase.auth) }
         single { FirebaseFunctionsDataSource(Firebase.functions(FUNCTIONS_REGION)) }
+        single<SyncRemoteDataSource> { FirestoreSyncDataSource(Firebase.firestore) }
     }

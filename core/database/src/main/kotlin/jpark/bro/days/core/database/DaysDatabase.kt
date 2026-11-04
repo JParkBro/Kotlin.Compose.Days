@@ -2,12 +2,18 @@ package jpark.bro.days.core.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import jpark.bro.days.core.database.dao.AnniversaryHideDao
+import jpark.bro.days.core.database.dao.CoupleDao
 import jpark.bro.days.core.database.dao.ItemDao
 import jpark.bro.days.core.database.dao.ItemReminderDao
+import jpark.bro.days.core.database.dao.SyncCursorDao
 import jpark.bro.days.core.database.dao.UserItemPrefDao
 import jpark.bro.days.core.database.dao.WidgetConfigDao
+import jpark.bro.days.core.database.entity.AnniversaryHideEntity
+import jpark.bro.days.core.database.entity.CoupleEntity
 import jpark.bro.days.core.database.entity.ItemEntity
 import jpark.bro.days.core.database.entity.ItemReminderEntity
+import jpark.bro.days.core.database.entity.SyncCursorEntity
 import jpark.bro.days.core.database.entity.UserItemPrefEntity
 import jpark.bro.days.core.database.entity.WidgetConfigEntity
 
@@ -21,6 +27,9 @@ import jpark.bro.days.core.database.entity.WidgetConfigEntity
         UserItemPrefEntity::class,
         ItemReminderEntity::class,
         WidgetConfigEntity::class,
+        CoupleEntity::class,
+        AnniversaryHideEntity::class,
+        SyncCursorEntity::class,
     ],
     version = 1,
     exportSchema = true,
@@ -33,4 +42,10 @@ abstract class DaysDatabase : RoomDatabase() {
     abstract fun itemReminderDao(): ItemReminderDao
 
     abstract fun widgetConfigDao(): WidgetConfigDao
+
+    abstract fun coupleDao(): CoupleDao
+
+    abstract fun anniversaryHideDao(): AnniversaryHideDao
+
+    abstract fun syncCursorDao(): SyncCursorDao
 }

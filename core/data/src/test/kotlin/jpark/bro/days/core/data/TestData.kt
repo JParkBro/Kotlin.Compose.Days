@@ -16,6 +16,10 @@ internal val Seoul: ZoneId = ZoneId.of("Asia/Seoul")
 internal val Today: Instant = LocalDate.of(2026, 11, 5).atStartOfDay(Seoul).toInstant()
 internal const val ME = "user-me"
 
+/** 커플 시나리오의 상대(지민)와 커플 */
+internal const val PARTNER = "user-partner"
+internal const val COUPLE = "couple-1"
+
 /** 솔로: 전역일 (대표) 2027.03.19 */
 internal val DischargeDday =
     ItemContent(

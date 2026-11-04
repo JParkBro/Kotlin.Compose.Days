@@ -21,7 +21,7 @@
 - 공유 항목은 `delete`를 허용하지 않는다 (soft delete만). `updatedBy == request.auth.uid`를 검사한다.
 - 커플 생성은 `pairCodes`의 `usedBy`를 같은 트랜잭션에서 기록한 경우에만 허용한다 (`getAfter`).
 - 규칙 안의 `get()` · `getAfter()`도 읽기로 과금되므로 호출 수를 늘리는 변경은 이유를 설명한다.
-- 쿼리 리스너는 `serverUpdatedAt > cursor` 조건을 전제로 한다. 인덱스가 필요하면 `firestore.indexes.json`에 추가한다.
+- 쿼리 리스너는 `serverUpdatedAt > cursor` 조건을 전제로 한다. 그래서 동기화 문서(공유 항목 · 숨긴 기념일)는 `serverUpdatedAt == request.time`만 허용하고 실제 삭제 대신 `deletedAt`을 쓴다. 인덱스가 필요하면 `firestore.indexes.json`에 추가한다.
 
 ## 명령어
 

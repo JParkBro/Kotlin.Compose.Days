@@ -4,14 +4,17 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import jpark.bro.days.core.common.IdGenerator
+import jpark.bro.days.core.data.COUPLE
 import jpark.bro.days.core.data.DinnerPlan
 import jpark.bro.days.core.data.DischargeDday
 import jpark.bro.days.core.data.ME
 import jpark.bro.days.core.data.MomBirthday
+import jpark.bro.days.core.data.PARTNER
 import jpark.bro.days.core.data.Seoul
 import jpark.bro.days.core.data.Today
 import jpark.bro.days.core.data.session.UserSession
 import jpark.bro.days.core.database.DaysDatabase
+import jpark.bro.days.core.database.entity.CoupleEntity
 import jpark.bro.days.core.model.ItemReminder
 import jpark.bro.days.core.model.TimeSlot
 import jpark.bro.days.core.model.Visibility
@@ -62,6 +65,36 @@ class DefaultItemRepositoryTest {
     @After
     fun tearDown() = db.close()
 
+    /** 현우(나)와 지민의 커플 (product-spec 9장) */
+    private suspend fun seedCouple(status: String = "ACTIVE") =
+        db.coupleDao().upsertCouple(
+            CoupleEntity(
+                id = COUPLE,
+                member1UserId = PARTNER,
+                member2UserId = ME,
+                startDate = "2025-06-14",
+                countFirstDayAsOne = true,
+                status = status,
+                pairCode = "K7Q2MX",
+                disconnectedAt = null,
+                createdAt = 0,
+                updatedAt = 0,
+                serverUpdatedAt = 0,
+            ),
+        )
+
+    /** 상대가 만들어 동기화로 받은 공유 항목 */
+    private suspend fun seedPartnerItem(): String {
+        val saved =
+            repository
+                .saveItem(id = null, content = MomBirthday.copy(visibility = Visibility.SHARED, coupleId = COUPLE))
+                .getOrThrow()
+        db.openHelper.writableDatabase.execSQL(
+            "UPDATE item SET owner_user_id = '$PARTNER', updated_by = '$PARTNER', sync_state = 'SYNCED'",
+        )
+        return saved.id
+    }
+
     private fun syncStateOf(id: String): String =
         db.query("SELECT sync_state FROM item WHERE id = '$id'", null).use {
             it.moveToFirst()
@@ -109,12 +142,13 @@ class DefaultItemRepositoryTest {
     @Test
     fun `나만 보기 항목은 동기화 대상이 아니고 공유 항목은 PENDING`() =
         runTest {
+            seedCouple()
             val private = repository.saveItem(id = null, content = DischargeDday).getOrThrow()
             val shared =
                 repository
                     .saveItem(
                         id = null,
-                        content = MomBirthday.copy(visibility = Visibility.SHARED, coupleId = "couple-1"),
+                        content = MomBirthday.copy(visibility = Visibility.SHARED, coupleId = COUPLE),
                     ).getOrThrow()
 
             assertEquals("SYNCED", syncStateOf(private.id))
@@ -145,6 +179,52 @@ class DefaultItemRepositoryTest {
         }
 
     @Test
+    fun `연결된 커플이 아닌 곳에는 공유할 수 없음`() =
+        runTest {
+            val shared = MomBirthday.copy(visibility = Visibility.SHARED, coupleId = COUPLE)
+            assertTrue(repository.saveItem(id = null, content = shared).isFailure)
+
+            seedCouple()
+            assertTrue(repository.saveItem(id = null, content = shared.copy(coupleId = "couple-other")).isFailure)
+        }
+
+    @Test
+    fun `상대가 만든 공유 항목도 수정 삭제할 수 있고 작성자는 그대로`() =
+        runTest {
+            seedCouple()
+            val id = seedPartnerItem()
+
+            val edited =
+                repository
+                    .saveItem(
+                        id = id,
+                        content =
+                            MomBirthday.copy(
+                                title = "지민 생일 🎂",
+                                visibility = Visibility.SHARED,
+                                coupleId = COUPLE,
+                            ),
+                    ).getOrThrow()
+
+            assertEquals(PARTNER, edited.ownerUserId)
+            assertEquals(ME, edited.updatedBy)
+            assertEquals("PENDING", syncStateOf(id))
+            assertTrue(repository.deleteItem(id).isSuccess)
+        }
+
+    @Test
+    fun `연결이 해제되면 상대가 만든 공유 항목은 보이지 않고 수정할 수 없음`() =
+        runTest {
+            seedCouple()
+            val id = seedPartnerItem()
+
+            seedCouple(status = "DISCONNECTED")
+
+            assertNull(repository.observeItem(id).first())
+            assertTrue(repository.deleteItem(id).isFailure)
+        }
+
+    @Test
     fun `시간 지정이 아닌데 시각이 있으면 저장 실패`() =
         runTest {
             assertTrue(repository.saveItem(id = null, content = DinnerPlan.copy(timeSlot = TimeSlot.EVENING)).isFailure)
@@ -172,11 +252,12 @@ class DefaultItemRepositoryTest {
     @Test
     fun `공유 항목을 삭제하면 상대에게 전달하도록 PENDING`() =
         runTest {
+            seedCouple()
             val shared =
                 repository
                     .saveItem(
                         id = null,
-                        content = MomBirthday.copy(visibility = Visibility.SHARED, coupleId = "couple-1"),
+                        content = MomBirthday.copy(visibility = Visibility.SHARED, coupleId = COUPLE),
                     ).getOrThrow()
             db.openHelper.writableDatabase.execSQL("UPDATE item SET sync_state = 'SYNCED'")
             assertEquals("SYNCED", syncStateOf(shared.id))

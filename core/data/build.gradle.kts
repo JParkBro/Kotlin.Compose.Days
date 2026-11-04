@@ -18,6 +18,8 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
+    // 카카오 로그인 (Kakao SDK)
+    implementation(libs.kakao.user)
 
     // Repository 테스트: Robolectric + in-memory Room (TESTING.md 5-6)
     testImplementation(libs.bundles.robolectric)

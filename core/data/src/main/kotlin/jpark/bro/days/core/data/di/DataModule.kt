@@ -6,6 +6,8 @@ import jpark.bro.days.core.common.IdGenerator
 import jpark.bro.days.core.common.UuidIdGenerator
 import jpark.bro.days.core.data.auth.CredentialManagerGoogleSignIn
 import jpark.bro.days.core.data.auth.GoogleSignInClient
+import jpark.bro.days.core.data.auth.KakaoSdkSignIn
+import jpark.bro.days.core.data.auth.KakaoSignInClient
 import jpark.bro.days.core.data.repository.AuthRepository
 import jpark.bro.days.core.data.repository.DefaultAuthRepository
 import jpark.bro.days.core.data.repository.DefaultItemRepository
@@ -33,6 +35,7 @@ val dataModule =
                 webClientId = androidContext().defaultWebClientId(),
             )
         }
+        singleOf(::KakaoSdkSignIn) bind KakaoSignInClient::class
         singleOf(::DefaultSettingsRepository) bind SettingsRepository::class
         singleOf(::DefaultItemRepository) bind ItemRepository::class
         singleOf(::DefaultWidgetConfigRepository) bind WidgetConfigRepository::class

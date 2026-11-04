@@ -423,7 +423,7 @@ WCAG 기준: 일반 텍스트 4.5:1 이상, 큰 텍스트(24px 이상 또는 18.
 
 | 파일 | 컴포넌트 | 6장 항목 |
 |---|---|---|
-| `DaysButton.kt` · `DaysButtonSize.kt` | `DaysPrimaryButton` · `DaysSecondaryButton` · `DaysSoftButton` · `DaysOutlineButton` · `DaysDangerButton(filled)`, 크기 `LARGE`(56dp) · `SMALL`(36dp) | 주 · 보조 · 아웃라인 · 위험 버튼 (Soft는 Stitch DESIGN.md "Soft Accent Action") |
+| `DaysButton.kt` · `DaysButtonSize.kt` | `DaysPrimaryButton` · `DaysSecondaryButton` · `DaysSoftButton` · `DaysOutlineButton` · `DaysKakaoButton` · `DaysDangerButton(filled)`, 크기 `LARGE`(56dp) · `SMALL`(36dp) | 주 · 보조 · 아웃라인 · 카카오(고정 색 `kakao` · `onKakao`) · 위험 버튼 (Soft는 Stitch DESIGN.md "Soft Accent Action") |
 | `DaysIconButton.kt` | `DaysIconButton`(fill 원형) · `DaysFab` | FAB |
 | `DaysChip.kt` | `DaysFilterChip`(여러 개 고르는 묶음은 `role = Role.Checkbox`) · `DaysSegmentedControl` | 필터 칩 · 세그먼트 컨트롤 |
 | `DaysBadge.kt` | `DaysBadge(tone = SHARED · PRIVATE · CATEGORY · SOON · SUCCESS, showDot)` | 뱃지 5종 |

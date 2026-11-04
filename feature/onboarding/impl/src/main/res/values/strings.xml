@@ -3,6 +3,7 @@
     <!-- 로그인 (product-spec 3-2, 시안 design/onboarding-login) -->
     <string name="onboarding_login_app_name">데이즈</string>
     <string name="onboarding_login_subtitle">로그인하면 커플 연결과 함께 보는 디데이를 쓸 수 있어요</string>
+    <string name="onboarding_login_kakao">카카오로 계속하기</string>
     <string name="onboarding_login_google">Google로 계속하기</string>
     <string name="onboarding_login_signing_in">로그인하는 중…</string>
     <string name="onboarding_login_failed">로그인하지 못했어요. 잠시 후 다시 시도해 주세요.</string>

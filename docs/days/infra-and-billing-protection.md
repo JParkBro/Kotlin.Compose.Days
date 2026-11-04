@@ -54,7 +54,9 @@ Function:
 
 - 카카오 앱 하나에 네이티브 앱 키 2개(dev · prod 패키지)를 두므로 **앱 ID는 하나**입니다. 앱 ID는 Functions 파라미터 `KAKAO_APP_ID`(`defineString`)로 두고, 값은 `firebase/functions/.env.days-61328`(커밋하지 않음)에 넣습니다. 배포 · 에뮬레이터가 모두 이 파일을 읽습니다.
 - 카카오 응답은 `id` · `app_id`가 양의 정수인지만 확인합니다. 400 · 401은 토큰 거부(`unauthenticated`), 그 밖의 오류 · 시간 초과(5초)는 `unavailable`입니다.
-- `createCustomToken`은 함수의 실행 서비스 계정에 **서비스 계정 토큰 생성자** 권한이 필요합니다. 서비스 계정 비공개 키 파일은 만들지도, 저장하지도 않습니다.
+- `createCustomToken`은 함수의 실행 서비스 계정에 **서비스 계정 토큰 생성자** 권한이 필요합니다. 함수는 전용 서비스 계정 `kakao-auth@days-61328.iam.gserviceaccount.com`으로 실행하고, 이 계정에는 **자기 자신에 대한** 토큰 생성자 권한(`roles/iam.serviceAccountTokenCreator`)만 줍니다. 기본 compute 계정은 Editor 권한이 있어 쓰지 않습니다. 서비스 계정 비공개 키 파일은 만들지도, 저장하지도 않습니다.
+- 앱(6-4b): Kakao SDK가 카카오톡 앱 로그인을 먼저 시도하고, 카카오톡이 없거나 연결된 계정이 없으면 카카오 계정(웹) 로그인으로 넘어갑니다. 사용자가 창을 닫으면 알리지 않습니다. 로그아웃할 때 카카오 쪽 토큰도 끊습니다(`UserApiClient.logout`). 네이티브 앱 키는 `local.properties`의 `KAKAO_NATIVE_APP_KEY_DEV` · `KAKAO_NATIVE_APP_KEY_PROD`이고, 없으면 빌드는 되지만 카카오 로그인이 실패합니다.
+- 사용량: 로그인할 때 한 번만 호출합니다. 남용되어도 App Check 강제와 `maxInstances` 3이 막고, 마지막은 예산 알림 + `stopBilling`입니다.
 - 함수 설정: 리전 `asia-northeast3`, `maxInstances` 작게(예: 3), 타임아웃 짧게(10초). 남용되어도 동시에 늘어나는 인스턴스 수가 묶입니다.
 
 ### 2-2. 이미지 업로드 · 다운로드 · 삭제 (Cloud Storage)
@@ -127,10 +129,10 @@ Cloud Billing 예산 (월 1달러 = 결제 계정 통화 기준 1,000원, 알림
             Cloud Billing API로 프로젝트의 결제 계정 연결 해제
 ```
 
-- Google Cloud 공식 방법을 따릅니다 (참고 링크). 함수는 전용 서비스 계정 `stop-billing@days-61328.iam.gserviceaccount.com`으로 실행하고, 이 계정에만 이 프로젝트의 **결제 관리 권한(Project Billing Manager)**을 줍니다. `kakaoAuth`가 쓰는 기본 계정에는 주지 않습니다.
+- Google Cloud 공식 방법을 따릅니다 (참고 링크). 함수는 전용 서비스 계정 `stop-billing@days-61328.iam.gserviceaccount.com`으로 실행하고, 이 계정에만 이 프로젝트의 **결제 관리 권한(Project Billing Manager)**을 줍니다. `kakaoAuth`의 실행 계정(`kakao-auth@`)에는 주지 않습니다.
 - 이 계정은 Eventarc 트리거가 함수를 부를 때도 쓰이므로, Cloud Run 서비스 `stopbilling`에만 `roles/run.invoker`를 준다 (프로젝트 전체에 주지 않음). 없으면 메시지가 `run.routes.invoke` 권한 오류로 계속 재시도된다.
 - 함수 배포 이미지는 Artifact Registry(`asia-northeast3`)에 쌓이므로 정리 정책(1일)을 둔다: `npx firebase functions:artifacts:setpolicy --location asia-northeast3 --days 1 --project days-61328`
-- `kakaoAuth`의 기본 실행 계정(`{프로젝트 번호}-compute@developer.gserviceaccount.com`)에는 커스텀 토큰 서명용 **서비스 계정 토큰 생성자** 권한을 주고, IAM Service Account Credentials API를 켭니다.
+- `kakaoAuth`는 전용 계정 `kakao-auth@`로 실행하고, 이 계정 자신에 대한 **서비스 계정 토큰 생성자** 권한만 줍니다 (2-1). IAM Service Account Credentials API를 켭니다.
 - 해제되면 Firestore · Storage · Functions가 모두 멈추고, 앱은 Room 데이터로 계속 동작합니다 (동기화 실패 → 재시도 대기). 다시 쓰려면 원인을 고친 뒤 콘솔에서 결제 계정을 다시 연결합니다.
 - 예산 금액은 **월 1달러(1,000원)**, 알림은 50 · 90 · 100%. 무료 사용량 안에서만 쓰겠다는 뜻이라, 무료 사용량을 조금만 넘어도 결제가 끊기고 서버 기능이 멈출 수 있습니다. 사용자가 늘면 예산을 올립니다.
 - 함수 자체가 과금 대상이 되지 않도록 `maxInstances: 1`로 둡니다.
@@ -174,7 +176,7 @@ Cloud Billing 예산 (월 1달러 = 결제 계정 통화 기준 1,000원, 알림
 - [ ] Firebase Authentication이 Identity Platform으로 업그레이드되지 않았는지 확인
 - [ ] App Check(Play Integrity) 등록 및 Firestore · Storage · Functions 강제 설정
 - [ ] 보안 규칙(Firestore · Storage) 배포 및 에뮬레이터 테스트 (연결 · 공유 · 해제 · 비멤버 접근 거부 · 업로드 크기 · 개수)
-- [ ] `kakaoAuth` 함수: 카카오 앱 ID 환경 변수, `maxInstances`, App Check 강제 확인
+- [x] `kakaoAuth` 함수: 카카오 앱 ID 환경 변수, `maxInstances`, App Check 강제 확인 (2026-11 배포 · 실기기 카카오 로그인으로 확인, 실행 계정 `kakao-auth@`)
 - [ ] Storage 버킷 리전 확인, 공개 URL · 공개 읽기 없음 확인
 - [ ] Remote Config 차단 스위치 4종 등록 및 앱 동작 확인
 - [ ] Firebase(Google) 계정 2단계 인증 설정

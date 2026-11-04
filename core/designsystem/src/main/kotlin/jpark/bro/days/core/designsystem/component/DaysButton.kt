@@ -24,6 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import jpark.bro.days.core.designsystem.AppFixedColors
 import jpark.bro.days.core.designsystem.AppShapes
 import jpark.bro.days.core.designsystem.AppSpacing
 import jpark.bro.days.core.designsystem.AppThemeTokens
@@ -107,6 +108,19 @@ fun DaysOutlineButton(
         icon = icon,
         border = BorderStroke(1.dp, colors.borderStrong),
     )
+}
+
+/** 카카오 로그인 · 공유 버튼: 테마와 무관하게 카카오 노랑 (theme-guide 4장 고정 색) */
+@Composable
+fun DaysKakaoButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    size: DaysButtonSize = DaysButtonSize.LARGE,
+    @DrawableRes icon: Int? = null,
+) {
+    DaysButton(text, onClick, AppFixedColors.kakao, AppFixedColors.onKakao, modifier, enabled, size, icon)
 }
 
 /**
@@ -196,6 +210,7 @@ private fun DaysButtonPreview() {
         DaysSecondaryButton(text = "취소", onClick = {}, modifier = full)
         DaysSoftButton(text = "커플 코드로 연결하기", onClick = {}, modifier = full)
         DaysOutlineButton(text = "다른 방법으로 시작", onClick = {}, modifier = full)
+        DaysKakaoButton(text = "카카오로 계속하기", onClick = {}, modifier = full)
         DaysDangerButton(text = "연결 해제", onClick = {}, modifier = full)
         DaysDangerButton(text = "탈퇴하기", onClick = {}, modifier = full, filled = true)
         Row {

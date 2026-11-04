@@ -26,6 +26,23 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- 카카오 계정(웹) 로그인 후 돌아오는 화면. 스킴 kakao{네이티브 앱 키}는 flavor별 (app/build.gradle.kts).
+             Kakao SDK는 core:data의 implementation이라 app 컴파일 경로에 없어 lint MissingClass만 무시한다
+             (라이브러리 매니페스트에 두면 모든 모듈의 테스트 매니페스트가 kakaoScheme 값을 요구한다) -->
+        <activity
+            android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
+            android:exported="true"
+            tools:ignore="MissingClass">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:host="oauth"
+                    android:scheme="${kakaoScheme}" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

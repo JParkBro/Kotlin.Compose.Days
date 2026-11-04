@@ -47,6 +47,11 @@ data class ItemEntity(
     @ColumnInfo(name = "updated_at") val updatedAt: Long,
     @ColumnInfo(name = "server_updated_at") val serverUpdatedAt: Long?,
     @ColumnInfo(name = "deleted_at") val deletedAt: Long?,
+    /**
+     * 커플 연결 해제 때 공유 항목을 복사한 나만 보기 사본이면 원본 항목 id (sync-and-pairing.md 5장).
+     * 30일 안 재연결로 원본이 다시 보이면, 해제 뒤 고치지 않은 사본은 지운다. Room 전용
+     */
+    @ColumnInfo(name = "copied_from_item_id") val copiedFromItemId: String? = null,
     /** Room 전용. [SyncState.name] */
     @ColumnInfo(name = "sync_state") val syncState: String = SyncState.PENDING.name,
 )

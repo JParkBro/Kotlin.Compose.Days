@@ -8,7 +8,9 @@ import java.time.LocalDate
 internal data class SettingsState(
     /** null이면 프로필 미설정 */
     val profile: ProfileSummary? = null,
-    /** null이면 솔로 (커플 미연결) */
+    /** 커플이 연결됨 */
+    val isCoupled: Boolean = false,
+    /** 상대 이름. 연결됐어도 상대 프로필을 아직 받지 못했으면 null */
     val partnerName: String? = null,
     val accountEmail: String? = null,
     val themeSetting: ThemeSetting = ThemeSetting(),

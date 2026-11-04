@@ -2,34 +2,45 @@ package jpark.bro.days.feature.settings.impl.settings
 
 import androidx.lifecycle.viewModelScope
 import jpark.bro.days.core.data.repository.AuthRepository
+import jpark.bro.days.core.data.repository.CoupleRepository
 import jpark.bro.days.core.data.repository.ProfileRepository
 import jpark.bro.days.core.data.repository.SettingsRepository
+import jpark.bro.days.core.domain.dday.daysSince
 import jpark.bro.days.core.model.ThemeSetting
 import jpark.bro.days.core.ui.MviViewModel
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import java.time.Clock
+import java.time.LocalDate
 
 internal class SettingsViewModel(
     private val settingsRepository: SettingsRepository,
     authRepository: AuthRepository,
     profileRepository: ProfileRepository,
+    coupleRepository: CoupleRepository,
+    clock: Clock,
 ) : MviViewModel<SettingsState, SettingsAction, SettingsEvent>(SettingsState()) {
     init {
         authRepository
             .observeUser()
             .onEach { user -> setState { copy(accountEmail = user?.email) } }
             .launchIn(viewModelScope)
-        // 함께한 날(togetherDays)은 커플 연결(6-6b)에서 채운다
-        profileRepository
-            .observeMyProfile()
-            .onEach { profile ->
-                setState {
-                    copy(
-                        profile = profile?.let { ProfileSummary(it.nickname, it.birthDate, togetherDays = null) },
-                    )
-                }
-            }.launchIn(viewModelScope)
+        combine(
+            profileRepository.observeMyProfile(),
+            profileRepository.observePartnerProfile(),
+            coupleRepository.observeCouple(),
+        ) { me, partner, couple ->
+            val togetherDays = couple?.let { daysSince(it.startDate, LocalDate.now(clock), it.countFirstDayAsOne) }
+            setState {
+                copy(
+                    profile = me?.let { ProfileSummary(it.nickname, it.birthDate, togetherDays) },
+                    isCoupled = couple != null,
+                    partnerName = partner?.nickname?.takeIf { couple != null },
+                )
+            }
+        }.launchIn(viewModelScope)
         settingsRepository
             .observeThemeSetting()
             .onEach { setting -> setState { copy(themeSetting = setting) } }
@@ -50,7 +61,7 @@ internal class SettingsViewModel(
 
     /** 솔로일 때 커플 메뉴는 커플 코드 연결로 보낸다 (product-spec 6장) */
     private fun resolve(destination: SettingsDestination): SettingsDestination =
-        if (destination == SettingsDestination.COUPLE && currentState.partnerName == null) {
+        if (destination == SettingsDestination.COUPLE && !currentState.isCoupled) {
             SettingsDestination.PAIRING
         } else {
             destination

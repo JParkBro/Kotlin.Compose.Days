@@ -178,6 +178,7 @@ erDiagram
 |---|---|
 | 동기화 대상 테이블 (item, couple, anniversary_hide, user) | `sync_state` (PENDING / SYNCED / FAILED). `user`는 내 행만 올리고 상대 행은 받기만 한다 |
 | image | `local_path`, `upload_state` |
+| item | `copied_from_item_id` (커플 해제 때 만든 나만 보기 사본의 원본 id. 30일 안 재연결 때 고치지 않은 사본 정리) |
 | `sync_cursor` | `key` (예: `items:{coupleId}`, `hiddenAnniversaries:{coupleId}`), `last_pulled_at_micros` (Firestore 서버 시각이 마이크로초라 이 컬럼만 마이크로초. 밀리초로 자르면 같은 문서를 매번 다시 읽는다) |
 | `activity_log` | 상대 활동 알림 목록 (id, type, item_id, actor_user_id, created_at, is_read) |
 | `widget_config` | widget_id, item_id, size, background_type, show_profile. widget_id는 시스템이 주는 appWidgetId(정수)라 UUID 원칙의 예외 (기기 밖으로 나가지 않음) |
@@ -191,7 +192,7 @@ users/{uid}
   updatedAt
 
 pairCodes/{code}
-  creatorUid, usedBy, expiresAt, createdAt
+  creatorUid, creatorNickname (1~10자, 확인 화면용), usedBy, expiresAt, createdAt
 
 couples/{coupleId}
   members: [uidA, uidB], pairCode, startDate, countFirstDayAsOne,

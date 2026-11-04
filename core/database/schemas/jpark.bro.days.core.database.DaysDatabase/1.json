@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "942572345880c901f1197b0bd7970d29",
+    "identityHash": "fbcbdeaf6a8954457da9ac674557d363",
     "entities": [
       {
         "tableName": "item",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `type` TEXT NOT NULL, `owner_user_id` TEXT NOT NULL, `couple_id` TEXT, `visibility` TEXT NOT NULL, `title` TEXT NOT NULL, `category` TEXT NOT NULL, `date` TEXT, `count_mode` TEXT, `count_first_day_as_one` INTEGER NOT NULL, `repeat_rule` TEXT NOT NULL, `time_slot` TEXT, `time` TEXT, `place` TEXT, `memo` TEXT, `is_done` INTEGER NOT NULL, `show_as_dday` INTEGER NOT NULL, `color_key` TEXT NOT NULL, `icon_key` TEXT NOT NULL, `background_image_id` TEXT, `updated_by` TEXT NOT NULL, `created_at` INTEGER NOT NULL, `updated_at` INTEGER NOT NULL, `server_updated_at` INTEGER, `deleted_at` INTEGER, `sync_state` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `type` TEXT NOT NULL, `owner_user_id` TEXT NOT NULL, `couple_id` TEXT, `visibility` TEXT NOT NULL, `title` TEXT NOT NULL, `category` TEXT NOT NULL, `date` TEXT, `count_mode` TEXT, `count_first_day_as_one` INTEGER NOT NULL, `repeat_rule` TEXT NOT NULL, `time_slot` TEXT, `time` TEXT, `place` TEXT, `memo` TEXT, `is_done` INTEGER NOT NULL, `show_as_dday` INTEGER NOT NULL, `color_key` TEXT NOT NULL, `icon_key` TEXT NOT NULL, `background_image_id` TEXT, `updated_by` TEXT NOT NULL, `created_at` INTEGER NOT NULL, `updated_at` INTEGER NOT NULL, `server_updated_at` INTEGER, `deleted_at` INTEGER, `copied_from_item_id` TEXT, `sync_state` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -147,6 +147,11 @@
             "fieldPath": "deletedAt",
             "columnName": "deleted_at",
             "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "copiedFromItemId",
+            "columnName": "copied_from_item_id",
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "syncState",
@@ -556,7 +561,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '942572345880c901f1197b0bd7970d29')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fbcbdeaf6a8954457da9ac674557d363')"
     ]
   }
 }

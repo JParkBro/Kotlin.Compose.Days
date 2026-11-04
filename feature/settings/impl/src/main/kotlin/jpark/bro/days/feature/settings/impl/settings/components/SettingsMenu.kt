@@ -41,10 +41,15 @@ internal fun SettingsMenu(
             title = stringResource(R.string.settings_main_couple_manage),
             onClick = { onAction(SettingsAction.MenuClicked(SettingsDestination.COUPLE)) },
             trailing = {
-                val partner = state.partnerName
-                if (partner != null) {
+                if (state.isCoupled) {
+                    val partner = state.partnerName
                     DaysBadge(
-                        text = stringResource(R.string.settings_main_couple_connected, partner),
+                        text =
+                            if (partner != null) {
+                                stringResource(R.string.settings_main_couple_connected, partner)
+                            } else {
+                                stringResource(R.string.settings_main_couple_connected_unnamed)
+                            },
                         tone = DaysBadgeTone.SUCCESS,
                         size = DaysBadgeSize.MEDIUM,
                         showDot = true,

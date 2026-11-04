@@ -3,9 +3,13 @@ package jpark.bro.days.core.sync
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import jpark.bro.days.core.common.IdGenerator
+import jpark.bro.days.core.data.couple.CoupleTransitions
 import jpark.bro.days.core.database.DaysDatabase
 import jpark.bro.days.core.database.entity.UserEntity
 import jpark.bro.days.core.firebase.sync.ProfileDto
+import jpark.bro.days.core.testing.FakeCoupleRemoteDataSource
+import jpark.bro.days.core.testing.testSettingsDataStore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -19,6 +23,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.Clock
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -26,12 +31,23 @@ class SyncEngineTest {
     private lateinit var db: DaysDatabase
     private val remote = FakeSyncRemoteDataSource()
     private val profileRemote = FakeProfileRemoteDataSource()
+    private val couples by lazy {
+        CoupleTransitions(
+            db.coupleDao(),
+            db.coupleItemDao(),
+            FakeCoupleRemoteDataSource(),
+            testSettingsDataStore(),
+            Clock.systemUTC(),
+            IdGenerator { "copy-${nextCopyId++}" },
+        )
+    }
+    private var nextCopyId = 1
     private val engine by lazy {
         SyncEngine(
             remote,
             db.itemSyncDao(),
             db.anniversaryHideDao(),
-            db.coupleDao(),
+            couples,
             db.syncCursorDao(),
             ProfileSync(profileRemote, db.userDao()),
         )
@@ -49,7 +65,7 @@ class SyncEngineTest {
     @After
     fun tearDown() = db.close()
 
-    private suspend fun connectCouple() = engine.applyCouples(listOf(coupleDto()))
+    private suspend fun connectCouple() = couples.apply(ME, listOf(coupleDto()))
 
     private suspend fun syncStateOf(id: String) = db.itemDao().getItem(id)?.syncState
 

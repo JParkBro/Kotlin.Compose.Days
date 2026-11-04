@@ -24,4 +24,5 @@ dependencies {
     // Repository 테스트: Robolectric + in-memory Room (TESTING.md 5-6)
     testImplementation(libs.bundles.robolectric)
     testImplementation(libs.bundles.room)
+    testImplementation(projects.core.testing)
 }

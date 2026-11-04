@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import jpark.bro.days.core.model.ThemeSetting
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 /** 기기에만 저장하는 앱 설정 (서버로 보내지 않음) */
@@ -29,6 +30,16 @@ class SettingsDataStore(
         dataStore.edit { prefs -> prefs[COUPLE_BANNER_DISMISSED] = true }
     }
 
+    /** 내가 마지막으로 발급한 커플 코드. 24시간 안에 다시 열면 같은 코드를 보여주고, 연결되거나 새로 발급하면 지운다 */
+    suspend fun issuedPairCode(): IssuedPairCode? =
+        dataStore.data.first()[ISSUED_PAIR_CODE]?.let(IssuedPairCode::decode)
+
+    suspend fun setIssuedPairCode(code: IssuedPairCode?) {
+        dataStore.edit { prefs ->
+            if (code == null) prefs.remove(ISSUED_PAIR_CODE) else prefs[ISSUED_PAIR_CODE] = code.encode()
+        }
+    }
+
     suspend fun setThemeSetting(setting: ThemeSetting) {
         dataStore.edit { prefs ->
             prefs[THEME_TYPE] = setting.type.name
@@ -40,8 +51,29 @@ class SettingsDataStore(
         val THEME_TYPE = stringPreferencesKey("theme_type")
         val THEME_MODE = stringPreferencesKey("theme_mode")
         val COUPLE_BANNER_DISMISSED = booleanPreferencesKey("couple_banner_dismissed")
+        val ISSUED_PAIR_CODE = stringPreferencesKey("issued_pair_code")
     }
 }
 
 private inline fun <reified E : Enum<E>> String?.toEnumOr(default: E): E =
     enumValues<E>().firstOrNull { it.name == this } ?: default
+
+/** 발급한 계정 · 코드 · 만료 시각 (한 기기에 여러 계정이 로그인할 수 있어 계정을 함께 둔다) */
+data class IssuedPairCode(
+    val userId: String,
+    val code: String,
+    val expiresAt: Long,
+) {
+    internal fun encode(): String = "$userId$SEPARATOR$code$SEPARATOR$expiresAt"
+
+    internal companion object {
+        private const val SEPARATOR = "|"
+        private const val PARTS = 3
+
+        fun decode(value: String): IssuedPairCode? {
+            val parts = value.split(SEPARATOR)
+            val expiresAt = parts.getOrNull(2)?.toLongOrNull()
+            return if (parts.size == PARTS && expiresAt != null) IssuedPairCode(parts[0], parts[1], expiresAt) else null
+        }
+    }
+}

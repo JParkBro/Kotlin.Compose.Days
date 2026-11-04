@@ -5,9 +5,11 @@ import jpark.bro.days.core.model.AppThemeMode
 import jpark.bro.days.core.model.AppThemeType
 import jpark.bro.days.core.model.AuthProvider
 import jpark.bro.days.core.model.AuthUser
+import jpark.bro.days.core.model.Couple
 import jpark.bro.days.core.model.ThemeSetting
 import jpark.bro.days.core.model.UserProfile
 import jpark.bro.days.core.testing.FakeAuthRepository
+import jpark.bro.days.core.testing.FakeCoupleRepository
 import jpark.bro.days.core.testing.FakeProfileRepository
 import jpark.bro.days.core.testing.FakeSettingsRepository
 import jpark.bro.days.core.testing.MainDispatcherRule
@@ -17,7 +19,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
+import java.time.Clock
 import java.time.LocalDate
+import java.time.ZoneOffset
 
 class SettingsViewModelTest {
     @get:Rule
@@ -30,7 +34,11 @@ class SettingsViewModelTest {
     private val authRepository =
         FakeAuthRepository(AuthUser("google-1", AuthProvider.GOOGLE, email = "hyunwoo@example.com"))
     private val profileRepository = FakeProfileRepository()
-    private val viewModel by lazy { SettingsViewModel(repository, authRepository, profileRepository) }
+    private val coupleRepository = FakeCoupleRepository()
+    private val clock = Clock.fixed(LocalDate.of(2026, 11, 5).atStartOfDay(ZoneOffset.UTC).toInstant(), ZoneOffset.UTC)
+    private val viewModel by lazy {
+        SettingsViewModel(repository, authRepository, profileRepository, coupleRepository, clock)
+    }
 
     @Test
     fun `저장된 테마가 State에 들어간다`() {
@@ -143,4 +151,21 @@ class SettingsViewModelTest {
             viewModel.state.value.profile,
         )
     }
+
+    @Test
+    fun `커플이 연결되면 상대 이름과 함께한 날을 보여주고 커플 메뉴는 관리로 감`() =
+        runTest {
+            profileRepository.myProfile.value = UserProfile("user-me", "현우", null)
+            profileRepository.partnerProfile.value = UserProfile("user-partner", "지민", null)
+            coupleRepository.couple.value = Couple("couple-1", "user-partner", LocalDate.of(2025, 6, 14), true)
+
+            val state = viewModel.state.value
+            assertEquals(true, state.isCoupled)
+            assertEquals("지민", state.partnerName)
+            assertEquals(510, state.profile?.togetherDays)
+            viewModel.event.test {
+                viewModel.onAction(SettingsAction.MenuClicked(SettingsDestination.COUPLE))
+                assertEquals(SettingsEvent.Navigate(SettingsDestination.COUPLE), awaitItem())
+            }
+        }
 }

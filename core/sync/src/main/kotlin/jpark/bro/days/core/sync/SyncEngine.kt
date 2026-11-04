@@ -1,13 +1,12 @@
 package jpark.bro.days.core.sync
 
 import jpark.bro.days.core.common.suspendRunCatching
+import jpark.bro.days.core.data.couple.CoupleTransitions
 import jpark.bro.days.core.database.dao.AnniversaryHideDao
-import jpark.bro.days.core.database.dao.CoupleDao
 import jpark.bro.days.core.database.dao.ItemSyncDao
 import jpark.bro.days.core.database.dao.SyncCursorDao
 import jpark.bro.days.core.database.entity.SyncCursorEntity
 import jpark.bro.days.core.database.entity.SyncState
-import jpark.bro.days.core.firebase.sync.CoupleDto
 import jpark.bro.days.core.firebase.sync.HiddenAnniversaryDto
 import jpark.bro.days.core.firebase.sync.ItemDto
 import jpark.bro.days.core.firebase.sync.SyncRemoteDataSource
@@ -33,7 +32,7 @@ class SyncEngine internal constructor(
     private val remote: SyncRemoteDataSource,
     private val itemDao: ItemSyncDao,
     private val hideDao: AnniversaryHideDao,
-    private val coupleDao: CoupleDao,
+    private val couples: CoupleTransitions,
     private val cursorDao: SyncCursorDao,
     private val profileSync: ProfileSync,
 ) {
@@ -46,7 +45,7 @@ class SyncEngine internal constructor(
         ) { items, hides, profile -> items + hides + profile }
 
     fun observeActiveCoupleId(userId: String): Flow<String?> =
-        coupleDao.observeActiveCouple(userId).map { it?.id }.distinctUntilChanged()
+        couples.observeActiveCouple(userId).map { it?.id }.distinctUntilChanged()
 
     /**
      * 내 변경을 올린다. 올리는 사이 새로 저장된 것까지 [MAX_PUSH_ROUNDS]번까지 반복한다.
@@ -78,8 +77,8 @@ class SyncEngine internal constructor(
     suspend fun pullOnce(userId: String): Boolean =
         attempt {
             profileSync.pullMineIfMissing(userId)
-            applyCouples(remote.getCouples(userId))
-            val couple = coupleDao.getActiveCouple(userId) ?: return@attempt
+            couples.apply(userId, remote.getCouples(userId))
+            val couple = couples.getActiveCouple(userId) ?: return@attempt
             val coupleId = couple.id
             profileSync.pullPartner(couple.partnerOf(userId))
             applyItems(coupleId, remote.getItems(coupleId, cursorDao.getCursor(itemsKey(coupleId))))
@@ -100,9 +99,9 @@ class SyncEngine internal constructor(
                 remote
                     .observeCouples(userId)
                     .catch { /* 다음 포그라운드 진입 때 다시 붙는다 */ }
-                    .collect { applyCouples(it) }
+                    .collect { couples.apply(userId, it) }
             }
-            coupleDao
+            couples
                 .observeActiveCouple(userId)
                 .map { it?.let { couple -> couple.id to couple.partnerOf(userId) } }
                 .distinctUntilChanged()
@@ -125,10 +124,6 @@ class SyncEngine internal constructor(
                     }
                 }
         }
-
-    internal suspend fun applyCouples(couples: List<CoupleDto>) {
-        couples.forEach { coupleDao.upsertCouple(it.toEntity()) }
-    }
 
     /** 다른 커플 경로에 섞여 들어온 문서는 버린다 */
     internal suspend fun applyItems(

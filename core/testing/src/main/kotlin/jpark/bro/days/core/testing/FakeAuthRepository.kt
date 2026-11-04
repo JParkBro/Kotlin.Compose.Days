@@ -14,6 +14,9 @@ class FakeAuthRepository(
     /** signInWithGoogle로 받은 ID 토큰 */
     val googleIdTokens = mutableListOf<String>()
 
+    /** signInWithKakao로 받은 액세스 토큰 */
+    val kakaoAccessTokens = mutableListOf<String>()
+
     /** true면 다음 로그인 · 로그아웃이 실패한다 */
     var failNext: Boolean = false
 
@@ -25,6 +28,14 @@ class FakeAuthRepository(
         googleIdTokens += idToken
         if (consumeFailure()) return Result.failure(IllegalStateException("로그인 실패 (테스트)"))
         val signedIn = AuthUser(uid = "google-$idToken", provider = AuthProvider.GOOGLE, email = "hyunwoo@example.com")
+        user.value = signedIn
+        return Result.success(signedIn)
+    }
+
+    override suspend fun signInWithKakao(accessToken: String): Result<AuthUser> {
+        kakaoAccessTokens += accessToken
+        if (consumeFailure()) return Result.failure(IllegalStateException("로그인 실패 (테스트)"))
+        val signedIn = AuthUser(uid = "kakao:4012345678", provider = AuthProvider.KAKAO, email = null)
         user.value = signedIn
         return Result.success(signedIn)
     }

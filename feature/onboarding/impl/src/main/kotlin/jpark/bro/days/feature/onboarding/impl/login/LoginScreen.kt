@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,42 +32,65 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import jpark.bro.days.core.data.auth.GoogleSignInCancelledException
 import jpark.bro.days.core.data.auth.GoogleSignInClient
+import jpark.bro.days.core.data.auth.KakaoSignInCancelledException
+import jpark.bro.days.core.data.auth.KakaoSignInClient
 import jpark.bro.days.core.designsystem.AppShapes
 import jpark.bro.days.core.designsystem.AppSpacing
 import jpark.bro.days.core.designsystem.AppTheme
 import jpark.bro.days.core.designsystem.AppThemeTokens
+import jpark.bro.days.core.designsystem.component.DaysKakaoButton
 import jpark.bro.days.core.designsystem.component.DaysOutlineButton
 import jpark.bro.days.core.designsystem.component.DaysToastHost
 import jpark.bro.days.core.designsystem.preview.ScreenPreviews
 import jpark.bro.days.core.ui.ObserveEvents
 import jpark.bro.days.feature.onboarding.impl.R
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import jpark.bro.days.core.designsystem.R as DesignR
 
-/** 로그인 (product-spec 3-2: 카카오 · Google, 비로그인 사용 없음). 카카오는 6-4에서 붙인다 */
+/** 로그인 (product-spec 3-2: 카카오 · Google, 비로그인 사용 없음) */
 @Composable
 internal fun LoginRoot(
     onLoggedIn: () -> Unit,
     viewModel: LoginViewModel = koinViewModel(),
     googleSignIn: GoogleSignInClient = koinInject(),
+    kakaoSignIn: KakaoSignInClient = koinInject(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val toastHostState = remember { SnackbarHostState() }
+    // 로그인 창(카카오 웹 로그인의 Custom Tab 등)이 떠 있는 동안 화면이 STOP되면 ObserveEvents 수집이 취소된다.
+    // 로그인 요청은 화면 수명 범위에서 따로 실행해 결과가 돌아올 때까지 기다린다
+    val signInScope = rememberCoroutineScope()
     val loginFailed = stringResource(R.string.onboarding_login_failed)
 
     ObserveEvents(viewModel.event) { event ->
         when (event) {
             LoginEvent.RequestGoogleIdToken -> {
-                googleSignIn
-                    .requestIdToken(context)
-                    .onSuccess { viewModel.onAction(LoginAction.GoogleIdTokenReceived(it)) }
-                    .onFailure {
-                        viewModel.onAction(
-                            LoginAction.GoogleIdTokenFailed(cancelled = it is GoogleSignInCancelledException),
-                        )
-                    }
+                signInScope.launch {
+                    googleSignIn
+                        .requestIdToken(context)
+                        .onSuccess { viewModel.onAction(LoginAction.GoogleIdTokenReceived(it)) }
+                        .onFailure {
+                            viewModel.onAction(
+                                LoginAction.GoogleIdTokenFailed(cancelled = it is GoogleSignInCancelledException),
+                            )
+                        }
+                }
+            }
+
+            LoginEvent.RequestKakaoAccessToken -> {
+                signInScope.launch {
+                    kakaoSignIn
+                        .requestAccessToken(context)
+                        .onSuccess { viewModel.onAction(LoginAction.KakaoAccessTokenReceived(it)) }
+                        .onFailure {
+                            viewModel.onAction(
+                                LoginAction.KakaoAccessTokenFailed(cancelled = it is KakaoSignInCancelledException),
+                            )
+                        }
+                }
             }
 
             LoginEvent.LoggedIn -> {
@@ -134,10 +158,18 @@ private fun LoginScreen(
         )
         Spacer(modifier = Modifier.weight(1f))
         Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(AppSpacing.sm)) {
-            val googleLabel =
-                if (state.isSigningIn) R.string.onboarding_login_signing_in else R.string.onboarding_login_google
+            // 로그인 중에는 두 버튼 모두 막고, 어느 쪽을 눌렀는지 구분하지 않는다
+            DaysKakaoButton(
+                text = stringResource(R.string.onboarding_login_kakao),
+                onClick = { onAction(LoginAction.KakaoLoginClicked) },
+                enabled = !state.isSigningIn,
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .testTag("login_kakao"),
+            )
             DaysOutlineButton(
-                text = stringResource(googleLabel),
+                text = stringResource(R.string.onboarding_login_google),
                 onClick = { onAction(LoginAction.GoogleLoginClicked) },
                 enabled = !state.isSigningIn,
                 modifier =
@@ -145,6 +177,15 @@ private fun LoginScreen(
                         .fillMaxWidth()
                         .testTag("login_google"),
             )
+            if (state.isSigningIn) {
+                Text(
+                    text = stringResource(R.string.onboarding_login_signing_in),
+                    style = AppThemeTokens.typography.bodySm,
+                    color = colors.textSecondary,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
         }
     }
 }

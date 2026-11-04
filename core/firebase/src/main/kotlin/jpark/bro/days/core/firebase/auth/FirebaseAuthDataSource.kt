@@ -29,6 +29,12 @@ class FirebaseAuthDataSource(
         return checkNotNull(result.user) { "로그인 결과에 사용자가 없습니다." }.toAuthUser()
     }
 
+    /** 카카오: kakaoAuth 함수가 발급한 커스텀 토큰으로 로그인 */
+    suspend fun signInWithCustomToken(customToken: String): AuthUser {
+        val result = auth.signInWithCustomToken(customToken).await()
+        return checkNotNull(result.user) { "로그인 결과에 사용자가 없습니다." }.toAuthUser()
+    }
+
     fun signOut() {
         auth.signOut()
     }

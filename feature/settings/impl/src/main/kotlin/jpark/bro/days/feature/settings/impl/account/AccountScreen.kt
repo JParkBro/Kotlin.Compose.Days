@@ -20,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import jpark.bro.days.core.data.auth.GoogleSignInClient
+import jpark.bro.days.core.data.auth.KakaoSignInClient
 import jpark.bro.days.core.designsystem.AppSpacing
 import jpark.bro.days.core.designsystem.AppTheme
 import jpark.bro.days.core.designsystem.AppThemeTokens
@@ -48,6 +49,7 @@ internal fun AccountRoot(
     onBack: () -> Unit,
     viewModel: AccountViewModel = koinViewModel(),
     googleSignIn: GoogleSignInClient = koinInject(),
+    kakaoSignIn: KakaoSignInClient = koinInject(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -57,8 +59,9 @@ internal fun AccountRoot(
     ObserveEvents(viewModel.event) { event ->
         when (event) {
             AccountEvent.LoggedOut -> {
-                // 다음 로그인에서 구글 계정을 다시 고르게 한다
+                // 다음 로그인에서 구글 계정을 다시 고르게 하고, 카카오 쪽 토큰도 끊는다
                 googleSignIn.clearCredentialState(context)
+                kakaoSignIn.logout()
                 onSessionEnded()
             }
 

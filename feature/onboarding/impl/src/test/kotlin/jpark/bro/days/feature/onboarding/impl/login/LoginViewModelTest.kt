@@ -1,6 +1,7 @@
 package jpark.bro.days.feature.onboarding.impl.login
 
 import app.cash.turbine.test
+import jpark.bro.days.core.model.AuthProvider
 import jpark.bro.days.core.testing.FakeAuthRepository
 import jpark.bro.days.core.testing.MainDispatcherRule
 import kotlinx.coroutines.test.runTest
@@ -90,5 +91,80 @@ class LoginViewModelTest {
                 viewModel.onAction(LoginAction.GoogleIdTokenFailed(cancelled = false))
                 assertEquals(LoginEvent.LoginFailed, awaitItem())
             }
+        }
+
+    @Test
+    fun `카카오 버튼을 누르면 카카오 로그인을 요청하고 버튼을 막음`() =
+        runTest {
+            viewModel.event.test {
+                viewModel.onAction(LoginAction.KakaoLoginClicked)
+                assertEquals(LoginEvent.RequestKakaoAccessToken, awaitItem())
+            }
+            assertTrue(viewModel.state.value.isSigningIn)
+        }
+
+    @Test
+    fun `구글 로그인 중에는 카카오 버튼을 눌러도 요청하지 않음`() =
+        runTest {
+            viewModel.event.test {
+                viewModel.onAction(LoginAction.GoogleLoginClicked)
+                viewModel.onAction(LoginAction.KakaoLoginClicked)
+                assertEquals(LoginEvent.RequestGoogleIdToken, awaitItem())
+                expectNoEvents()
+            }
+        }
+
+    @Test
+    fun `카카오 토큰을 받으면 Firebase에 로그인하고 다음으로 감`() =
+        runTest {
+            viewModel.onAction(LoginAction.KakaoLoginClicked)
+
+            viewModel.event.test {
+                skipItems(1)
+                viewModel.onAction(LoginAction.KakaoAccessTokenReceived("kakao-token-1"))
+                assertEquals(LoginEvent.LoggedIn, awaitItem())
+            }
+            assertEquals(listOf("kakao-token-1"), authRepository.kakaoAccessTokens)
+            assertEquals(AuthProvider.KAKAO, authRepository.currentUser()?.provider)
+        }
+
+    @Test
+    fun `카카오 토큰 교환에 실패하면 알리고 다시 누를 수 있음`() =
+        runTest {
+            authRepository.failNext = true
+            viewModel.onAction(LoginAction.KakaoLoginClicked)
+
+            viewModel.event.test {
+                skipItems(1)
+                viewModel.onAction(LoginAction.KakaoAccessTokenReceived("kakao-token-1"))
+                assertEquals(LoginEvent.LoginFailed, awaitItem())
+            }
+            assertFalse(viewModel.state.value.isSigningIn)
+        }
+
+    @Test
+    fun `카카오 로그인 창을 닫으면 알리지 않고 다시 누를 수 있음`() =
+        runTest {
+            viewModel.onAction(LoginAction.KakaoLoginClicked)
+
+            viewModel.event.test {
+                skipItems(1)
+                viewModel.onAction(LoginAction.KakaoAccessTokenFailed(cancelled = true))
+                expectNoEvents()
+            }
+            assertFalse(viewModel.state.value.isSigningIn)
+        }
+
+    @Test
+    fun `카카오 로그인이 오류로 실패하면 알림`() =
+        runTest {
+            viewModel.onAction(LoginAction.KakaoLoginClicked)
+
+            viewModel.event.test {
+                skipItems(1)
+                viewModel.onAction(LoginAction.KakaoAccessTokenFailed(cancelled = false))
+                assertEquals(LoginEvent.LoginFailed, awaitItem())
+            }
+            assertFalse(viewModel.state.value.isSigningIn)
         }
 }

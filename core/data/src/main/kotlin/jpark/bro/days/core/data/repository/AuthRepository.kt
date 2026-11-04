@@ -12,6 +12,9 @@ interface AuthRepository {
 
     suspend fun signInWithGoogle(idToken: String): Result<AuthUser>
 
+    /** 카카오 액세스 토큰을 kakaoAuth 함수로 커스텀 토큰으로 바꿔 로그인한다 */
+    suspend fun signInWithKakao(accessToken: String): Result<AuthUser>
+
     /** 기기 데이터는 지우지 않는다. 화면은 계정별로 걸러 보여준다 (product-spec 6장) */
     suspend fun signOut(): Result<Unit>
 }

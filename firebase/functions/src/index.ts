@@ -16,8 +16,11 @@ setGlobalOptions({ region: "asia-northeast3", maxInstances: 1, timeoutSeconds: 1
 /** 카카오 개발자 콘솔의 앱 ID (dev · prod 네이티브 앱 키가 한 앱에 있어 하나). 비밀 값이 아니다 */
 const kakaoAppId = defineString("KAKAO_APP_ID");
 
-/** 카카오 액세스 토큰 → 커스텀 토큰 (uid = kakao:{회원번호}). 로그인 전에 부르므로 request.auth는 없다 */
-export const kakaoAuth = onCall({ enforceAppCheck: true, maxInstances: 3 }, (request) =>
+/**
+ * 카카오 액세스 토큰 → 커스텀 토큰 (uid = kakao:{회원번호}). 로그인 전에 부르므로 request.auth는 없다.
+ * 커스텀 토큰 서명(signBlob)은 이 함수 전용 서비스 계정이 자기 자신에 대한 토큰 생성자 권한으로 한다 (기본 compute 계정은 Editor라 넓다)
+ */
+export const kakaoAuth = onCall({ enforceAppCheck: true, maxInstances: 3, serviceAccount: "kakao-auth@" }, (request) =>
   issueKakaoCustomToken(request.data, {
     expectedAppId: kakaoAppId.value(),
     fetchTokenInfo: (accessToken) => fetchKakaoTokenInfo(accessToken),

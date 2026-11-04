@@ -19,6 +19,11 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // 카카오 SDK는 카카오 저장소에만 있다. com.kakao.* 는 이 저장소에서만, 이 저장소에서는 com.kakao.* 만 받는다
+        exclusiveContent {
+            forRepository { maven("https://devrepo.kakao.com/nexus/content/groups/public/") }
+            filter { includeGroupByRegex("com\\.kakao.*") }
+        }
     }
 }
 

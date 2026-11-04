@@ -71,4 +71,83 @@ internal class ItemDaoTest : DatabaseTest() {
             assertNull(dao.observeItem("other", ME).first())
             assertEquals(listOf("other"), dao.observeItems("user-other").first().map { it.id })
         }
+
+    @Test
+    fun `연결된 커플의 공유 항목은 상대가 만든 것도 보임`() =
+        runTest {
+            db.coupleDao().upsertCouple(testCouple())
+            dao.upsertItem(testItem(id = "mine"))
+            dao.upsertItem(testSharedItem(id = "birthday", ownerUserId = PARTNER))
+
+            assertEquals(listOf("birthday", "mine"), dao.observeItems(ME).first().map { it.id })
+            assertEquals("birthday", dao.observeItem("birthday", ME).first()?.id)
+            assertEquals(listOf("birthday"), dao.observeItems(PARTNER).first().map { it.id })
+        }
+
+    @Test
+    fun `연결 해제된 커플이나 남의 커플 공유 항목은 보이지 않음`() =
+        runTest {
+            db.coupleDao().upsertCouple(testCouple(status = "DISCONNECTED"))
+            db.coupleDao().upsertCouple(testCouple(id = "couple-other", member1 = "user-x", member2 = "user-y"))
+            dao.upsertItem(testSharedItem(id = "old", ownerUserId = PARTNER))
+            dao.upsertItem(testSharedItem(id = "others", ownerUserId = "user-x").copy(coupleId = "couple-other"))
+
+            assertEquals(emptyList<String>(), dao.observeItems(ME).first().map { it.id })
+            assertNull(dao.observeItem("others", ME).first())
+        }
+
+    @Test
+    fun `커플이 연결되면 공유 항목 목록이 다시 나옴`() =
+        runTest {
+            dao.upsertItem(testSharedItem(id = "birthday", ownerUserId = PARTNER))
+            assertEquals(emptyList<String>(), dao.observeItems(ME).first().map { it.id })
+
+            db.coupleDao().upsertCouple(testCouple())
+
+            assertEquals(listOf("birthday"), dao.observeItems(ME).first().map { it.id })
+        }
+
+    @Test
+    fun `올릴 항목은 커플이 있는 공유 항목 중 PENDING과 FAILED만`() =
+        runTest {
+            dao.upsertItem(testItem(id = "private").copy(syncState = "PENDING"))
+            dao.upsertItem(testSharedItem(id = "pending", syncState = "PENDING"))
+            dao.upsertItem(testSharedItem(id = "failed", syncState = "FAILED"))
+            dao.upsertItem(testSharedItem(id = "synced", syncState = "SYNCED"))
+
+            assertEquals(setOf("pending", "failed"), dao.getUnsyncedSharedItems().map { it.id }.toSet())
+        }
+
+    @Test
+    fun `올리는 사이 다시 저장된 항목은 SYNCED로 바꾸지 않음`() =
+        runTest {
+            dao.upsertItem(testSharedItem(id = "a", syncState = "PENDING"))
+            dao.upsertItem(testSharedItem(id = "a", syncState = "PENDING").copy(updatedAt = NOW + 5))
+
+            dao.setSyncState(id = "a", updatedAt = NOW, syncState = "SYNCED")
+            assertEquals("PENDING", dao.getItem("a")?.syncState)
+
+            dao.setSyncState(id = "a", updatedAt = NOW + 5, syncState = "SYNCED")
+            assertEquals("SYNCED", dao.getItem("a")?.syncState)
+        }
+
+    @Test
+    fun `받은 변경은 덮어쓰지만 아직 올리지 않은 내 변경은 지킴`() =
+        runTest {
+            dao.upsertItem(testSharedItem(id = "synced", title = "옛 제목"))
+            dao.upsertItem(testSharedItem(id = "pending", title = "내 수정", syncState = "PENDING"))
+
+            dao.upsertRemoteItems(
+                listOf(
+                    testSharedItem(id = "synced", title = "상대 수정", syncState = "PENDING"),
+                    testSharedItem(id = "pending", title = "상대 수정"),
+                    testSharedItem(id = "new", ownerUserId = PARTNER, deletedAt = NOW),
+                ),
+            )
+
+            assertEquals("상대 수정", dao.getItem("synced")?.title)
+            assertEquals("SYNCED", dao.getItem("synced")?.syncState)
+            assertEquals("내 수정", dao.getItem("pending")?.title)
+            assertEquals(NOW, dao.getItem("new")?.deletedAt)
+        }
 }

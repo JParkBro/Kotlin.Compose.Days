@@ -65,15 +65,21 @@ service cloud.firestore {
 
       match /items/{itemId} {
         allow read: if isMember(coupleId);
+        // serverUpdatedAt은 서버 시각만: 상대 기기의 변경분 조회 커서(serverUpdatedAt > cursor)가 틀어지지 않게 한다
         allow create, update: if isMember(coupleId) && isActive(coupleId)
           && request.resource.data.updatedBy == me()
-          && request.resource.data.visibility == 'SHARED';
+          && request.resource.data.visibility == 'SHARED'
+          && request.resource.data.serverUpdatedAt == request.time;
         // soft delete(deletedAt)만 허용
         allow delete: if false;
       }
 
+      // 숨긴 자동 기념일. 숨김 해제도 deletedAt 기록(soft delete): 상대 기기가 변경분 조회로 받아야 한다
       match /hiddenAnniversaries/{ruleKey} {
-        allow read, write: if isMember(coupleId);
+        allow read: if isMember(coupleId);
+        allow create, update: if isMember(coupleId) && isActive(coupleId)
+          && request.resource.data.serverUpdatedAt == request.time;
+        allow delete: if false;
       }
     }
   }

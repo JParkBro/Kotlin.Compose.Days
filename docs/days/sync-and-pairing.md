@@ -36,6 +36,14 @@ interface SyncRemoteDataSource {
 5. 받은 항목의 `updatedBy`가 상대라면 로컬 활동 알림을 생성합니다 ("지민 님이 일정을 추가했어요").
 6. 백그라운드에서는 WorkManager가 하루 몇 회 1회성 조회(get)로 같은 작업을 하고 위젯을 갱신합니다.
 
+### 구현 (6-5)
+
+- 원격: `core:firebase` `SyncRemoteDataSource`(Firestore 구현 `FirestoreSyncDataSource`). 리스너는 바뀐 문서(`documentChanges`)만, 이 기기에서 쓰고 서버에 아직 반영되지 않은 문서(`hasPendingWrites`)는 건너뜁니다. 상대가 쓴 문서는 필수 필드 · 타입을 확인하고 맞지 않으면 건너뜁니다.
+- 커서: `sync_cursor.last_pulled_at_micros`. Firestore 서버 시각은 마이크로초라, 밀리초로 자르면 `>` 조건에 같은 문서가 매번 다시 걸려 읽기가 과금됩니다.
+- `serverUpdatedAt`은 보안 규칙이 `request.time`만 허용합니다. 기기가 시각을 조작해 커서를 건너뛰는 것을 막습니다.
+- Room: 화면에 보이는 항목 = 내 나만 보기 항목 + 내 ACTIVE 커플의 공유 항목(상대가 만든 것 포함). 수정 · 삭제도 같은 조건입니다.
+- 받은 변경 반영(`upsertRemoteItems` · `upsertRemoteHides`)은 SYNCED 행만 덮습니다. 올린 뒤 SYNCED로 바꿀 때는 `updated_at`(숨긴 기념일은 `deleted_at`)이 그대로인 행만 바꿔, 올리는 사이 다시 저장한 변경을 잃지 않습니다.
+
 ### 시각 필드 두 개를 쓰는 이유
 
 | 필드 | 누가 기록 | 용도 |
@@ -85,8 +93,8 @@ users/A.coupleId 갱신                                              users/B.cou
 | `users/{uid}` | 나, 또는 같은 커플에 연결된 상대 | 나만. `coupleId`는 null이거나 **내가 멤버인 커플**만 (초안에서 추가: 남의 커플 id를 적어 상대 프로필을 읽는 것을 막음) |
 | `pairCodes/{code}` | 코드를 아는 사람만 단건 조회, 목록 조회 불가 | 생성: 발급자 본인 · 만료 전 · `usedBy` 없이. 사용: 발급자가 아닌 사람이 만료 전 한 번만 `usedBy = 나`. 삭제: 발급자 또는 만료된 코드 |
 | `couples/{id}` | 멤버만 | 생성: 코드를 쓴 사람이 같은 트랜잭션에서 `usedBy`를 기록했을 때만(`getAfter`). 수정: 멤버, 멤버 구성은 못 바꿈. 삭제 불가 |
-| `couples/{id}/items/{itemId}` | 멤버 | 멤버 · ACTIVE · `updatedBy == 나` · `visibility == SHARED`. 삭제 불가(soft delete) |
-| `couples/{id}/hiddenAnniversaries/{ruleKey}` | 멤버 | 멤버 |
+| `couples/{id}/items/{itemId}` | 멤버 | 멤버 · ACTIVE · `updatedBy == 나` · `visibility == SHARED` · `serverUpdatedAt == 서버 시각`. 삭제 불가(soft delete) |
+| `couples/{id}/hiddenAnniversaries/{ruleKey}` | 멤버 | 멤버 · ACTIVE · `serverUpdatedAt == 서버 시각`. 숨김 해제는 `deletedAt` 기록, 삭제 불가 (변경분 조회로 상대 기기에 전달) |
 
 
 > 규칙 안의 `get()` 호출도 문서 읽기로 과금됩니다. 쿼리 리스너는 쿼리 단위로 한 번 평가되므로 부담이 크지 않지만, 단건 요청이 많아지면 연결 시 Cloud Functions가 `coupleId`를 커스텀 클레임에 넣어 `get()`을 없애는 방식을 고려하세요. 이미지는 Storage 보안 규칙이 `firestore.get()`으로 같은 커플 문서를 읽어 멤버 여부를 확인합니다 (`infra-and-billing-protection.md`).

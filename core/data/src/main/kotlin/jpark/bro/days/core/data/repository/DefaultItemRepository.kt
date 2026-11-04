@@ -63,9 +63,11 @@ internal class DefaultItemRepository(
         suspendRunCatching {
             content.requireValid()
             val me = userSession.currentUserId()
-            val existing = id?.let { itemDao.getItem(it) }
-            require(id == null || (existing != null && existing.deletedAt == null && existing.ownerUserId == me)) {
-                "수정할 항목이 없습니다."
+            // 고칠 수 있는 항목 = 보이는 항목 (내 나만 보기 항목, 내 연결된 커플의 공유 항목)
+            val existing = id?.let { itemDao.getVisibleItem(it, me) }
+            require(id == null || existing != null) { "수정할 항목이 없습니다." }
+            content.coupleId?.let { coupleId ->
+                require(itemDao.isActiveCoupleOf(coupleId, me)) { "연결된 커플에만 공유할 수 있습니다." }
             }
 
             val now = clock.millis()
@@ -90,9 +92,10 @@ internal class DefaultItemRepository(
     override suspend fun deleteItem(id: String): Result<Unit> =
         suspendRunCatching {
             val me = userSession.currentUserId()
-            val existing = itemDao.getItem(id)?.takeIf { it.ownerUserId == me }
+            val existing = itemDao.getVisibleItem(id, me)
+            // 이미 삭제된 항목을 다시 지우는 것은 성공으로 본다
+            if (existing == null && itemDao.getItem(id)?.deletedAt != null) return@suspendRunCatching
             requireNotNull(existing) { "삭제할 항목이 없습니다." }
-            if (existing.deletedAt != null) return@suspendRunCatching
             itemDao.softDeleteItem(
                 id = id,
                 deletedAt = clock.millis(),

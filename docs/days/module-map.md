@@ -166,7 +166,8 @@ days/
    - 6-3 구글 로그인 (#25): `FirebaseAuthDataSource`(core:firebase), `AuthRepository` · `GoogleSignInClient`(Credential Manager, `default_web_client_id`) · `FirebaseUserSession`(core:data). `LocalUserSession` · `SessionDataStore` 제거. 첫 화면은 로그인 여부로 결정(홈 / 온보딩). 7단계 전까지 온보딩은 로그인부터, 로그인하면 혼자 시작. 로그아웃해도 기기 데이터는 남기고 항목 · 대표 고정 · 알림을 계정(`owner_user_id`, `user_id`)별로 걸러 보여준다 (커플 공유 항목 조건은 6-5)
    - 6-4a `firebase/functions/` (#26): `kakaoAuth`(카카오 토큰 → 커스텀 토큰, App Check 강제 · `maxInstances` 3), `stopBilling`(예산 알림 Pub/Sub → 결제 계정 연결 해제, `maxInstances` 1). 리전 `asia-northeast3`
    - 6-4b 앱 카카오 로그인 (#27): Kakao SDK(`core:data` `KakaoSignInClient`, 카카오톡 → 카카오 계정 순) → `kakaoAuth`(`core:firebase` `FirebaseFunctionsDataSource`) → `signInWithCustomToken`. 로그인 화면 `DaysKakaoButton`, 로그아웃 시 카카오 토큰도 끊음. 함수 실행 계정 `kakao-auth@`
-   - 6-5 `core:sync` (Room couple · user · anniversary_hide · sync_cursor, Push · Pull)
+   - 6-5a 동기화 스키마 (#28): Room `couple` · `anniversary_hide` · `sync_cursor`(+ 보이는 항목 = 내 나만 보기 + 내 ACTIVE 커플 공유 항목), `core:firebase` `SyncRemoteDataSource`(Firestore), 규칙: `serverUpdatedAt == request.time`, 숨긴 기념일 soft delete. `user`(프로필 캐시) 테이블은 채우는 단계(6-6 · 6-7)에서 추가
+   - 6-5b `core:sync` SyncManager: Push(WorkManager) · Pull(포그라운드 리스너, 백그라운드 6시간 1회성 조회), Remote Config `sync_enabled`
    - 6-6 `feature:couple` (코드 발급 · 입력 · 확인 · 관리)
    - 6-7 커플 홈 · 공개 범위 · 공유 표시
    - 6-8 이미지 (Cloud Storage + Storage 규칙): 배경 사진 · 프로필

@@ -32,6 +32,7 @@ internal fun SettingsMenu(
     val typography = AppThemeTokens.typography
     ProfileCard(
         profile = state.profile,
+        photo = state.profilePhoto,
         onEditClick = { onAction(SettingsAction.MenuClicked(SettingsDestination.PROFILE)) },
     )
 

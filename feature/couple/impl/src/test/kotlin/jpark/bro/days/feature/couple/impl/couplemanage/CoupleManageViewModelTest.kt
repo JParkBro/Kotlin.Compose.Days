@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import jpark.bro.days.core.model.Couple
 import jpark.bro.days.core.model.UserProfile
 import jpark.bro.days.core.testing.FakeCoupleRepository
+import jpark.bro.days.core.testing.FakeImageRepository
 import jpark.bro.days.core.testing.FakeProfileRepository
 import jpark.bro.days.core.testing.MainDispatcherRule
 import jpark.bro.days.feature.couple.impl.TestClock
@@ -22,7 +23,8 @@ class CoupleManageViewModelTest {
     private val couple = Couple("couple-1", "user-partner", LocalDate.of(2025, 6, 14), countFirstDayAsOne = true)
     private val repository = FakeCoupleRepository(couple)
     private val profiles = FakeProfileRepository(partner = UserProfile("user-partner", "지민", LocalDate.of(1999, 9, 28)))
-    private val viewModel by lazy { CoupleManageViewModel(repository, profiles, TestClock) }
+    private val images = FakeImageRepository()
+    private val viewModel by lazy { CoupleManageViewModel(repository, profiles, images, TestClock) }
 
     @Test
     fun `상대 이름 · 함께한 날을 보여줌`() {
@@ -86,4 +88,12 @@ class CoupleManageViewModelTest {
                 assertEquals(CoupleManageEvent.OpenAnniversaries, awaitItem())
             }
         }
+
+    @Test
+    fun `상대 프로필 사진이 있으면 보여줌`() {
+        val face = images.add("partner-face")
+        profiles.partnerProfile.value = profiles.partnerProfile.value?.copy(profileImageId = "partner-face")
+
+        assertEquals(face, viewModel.state.value.partnerPhoto)
+    }
 }

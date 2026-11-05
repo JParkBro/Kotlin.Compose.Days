@@ -10,6 +10,7 @@ import jpark.bro.days.core.model.UserProfile
 import jpark.bro.days.core.model.Visibility
 import jpark.bro.days.core.testing.FakeAnniversaryRepository
 import jpark.bro.days.core.testing.FakeCoupleRepository
+import jpark.bro.days.core.testing.FakeImageRepository
 import jpark.bro.days.core.testing.FakeItemRepository
 import jpark.bro.days.core.testing.FakeProfileRepository
 import jpark.bro.days.core.testing.FakeSettingsRepository
@@ -40,6 +41,7 @@ class HomeViewModelTest {
             partner = UserProfile("user-jimin", "지민", LocalDate.of(1999, 9, 28)),
         )
     private val anniversaryRepository = FakeAnniversaryRepository()
+    private val images = FakeImageRepository()
     private lateinit var itemRepository: FakeItemRepository
 
     private fun viewModel(items: List<Item> = emptyList()): HomeViewModel {
@@ -47,9 +49,7 @@ class HomeViewModelTest {
         return HomeViewModel(
             itemRepository,
             settingsRepository,
-            coupleRepository,
-            profileRepository,
-            anniversaryRepository,
+            HomeCoupleSource(coupleRepository, profileRepository, anniversaryRepository, images),
             clock,
         )
     }
@@ -251,5 +251,20 @@ class HomeViewModelTest {
         )
         assertEquals(listOf(Discharge), state.visibleRows.map { it.item })
         assertTrue(state.showCoupleBanner)
+    }
+
+    @Test
+    fun `두 사람 프로필 사진이 있으면 히어로에 사진 파일을 줌`() {
+        connect()
+        val face = images.add("partner-face")
+        profileRepository.partnerProfile.value =
+            profileRepository.partnerProfile.value?.copy(profileImageId = "partner-face")
+
+        val couple =
+            viewModel(listOf(Discharge))
+                .state.value.content.couple!!
+
+        assertEquals(face, couple.partnerPhoto)
+        assertNull(couple.myPhoto)
     }
 }

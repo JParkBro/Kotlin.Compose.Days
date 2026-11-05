@@ -1,6 +1,7 @@
 package jpark.bro.days.core.data.repository
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import java.io.File
 
 /**
@@ -17,3 +18,7 @@ interface ImageRepository {
     /** 더 쓰지 않는 사진 (바꾸거나 지움). 기기 파일을 지우고, 내가 올린 서버 파일은 동기화가 지운다 */
     suspend fun discard(imageId: String): Result<Unit>
 }
+
+/** 사진이 없으면(null) 바로 null */
+fun ImageRepository.observeImageFileOrNull(imageId: String?): Flow<File?> =
+    if (imageId == null) flowOf(null) else observeImageFile(imageId)

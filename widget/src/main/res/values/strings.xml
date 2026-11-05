@@ -20,6 +20,10 @@
     <string name="widget_config_background_theme">테마색</string>
     <string name="widget_config_background_dark">다크</string>
     <string name="widget_config_background_white">화이트</string>
+    <string name="widget_config_background_photo">사진</string>
+    <string name="widget_config_background_photo_hint">디데이의 커버 사진이 배경이 돼요. 사진이 없으면 테마색으로 보여요.</string>
+    <string name="widget_config_profile">프로필 사진 표시</string>
+    <string name="widget_config_profile_desc">커플이면 두 사람, 혼자 쓸 때는 내 사진이 보여요</string>
     <string name="widget_config_save">저장하기</string>
     <string name="widget_config_save_failed">저장하지 못했어요. 잠시 후 다시 시도해 주세요.</string>
 </resources>

@@ -49,6 +49,7 @@ internal class DefaultProfileRepository(
     override suspend fun saveMyProfile(
         nickname: String,
         birthDate: LocalDate?,
+        profileImageId: String?,
     ): Result<UserProfile> =
         suspendRunCatching {
             val trimmed = nickname.trim()
@@ -65,10 +66,10 @@ internal class DefaultProfileRepository(
                     updatedAt = clock.millis(),
                     serverUpdatedAt = existing?.serverUpdatedAt,
                     syncState = SyncState.PENDING.name,
-                    profileImageId = existing?.profileImageId,
+                    profileImageId = profileImageId,
                 ),
             )
-            UserProfile(userId = me, nickname = trimmed, birthDate = birthDate)
+            UserProfile(userId = me, nickname = trimmed, birthDate = birthDate, profileImageId = profileImageId)
         }
 }
 
@@ -94,4 +95,5 @@ private fun UserEntity.toModel(): UserProfile =
                     null
                 }
             },
+        profileImageId = profileImageId,
     )

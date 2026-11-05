@@ -2,9 +2,11 @@ package jpark.bro.days.widget.config
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
@@ -27,10 +29,14 @@ import jpark.bro.days.core.designsystem.component.ddayLabel
 import jpark.bro.days.core.designsystem.component.iconRes
 import jpark.bro.days.core.model.ItemIcon
 import jpark.bro.days.core.model.WidgetSize
+import jpark.bro.days.core.ui.DaysPhoto
+import jpark.bro.days.core.ui.ProfileAvatar
 import jpark.bro.days.core.ui.toDisplayText
 import jpark.bro.days.widget.R
 import jpark.bro.days.widget.WidgetColorScheme
 import jpark.bro.days.widget.WidgetDisplay
+import jpark.bro.days.widget.WidgetProfile
+import java.io.File
 
 /** 위젯 미리보기 (Compose). 위젯(Glance)과 같은 색 · 배치 */
 @Composable
@@ -39,18 +45,37 @@ internal fun WidgetPreviewCard(
     size: WidgetSize,
     colors: WidgetColorScheme,
     modifier: Modifier = Modifier,
+    photo: File? = null,
+    profiles: List<WidgetProfile> = emptyList(),
 ) {
-    val palette = colors.pick(LocalIsDarkTheme.current)
-    val typography = AppThemeTokens.typography
-    Column(
+    Box(
         modifier =
             modifier
                 .size(width = if (size == WidgetSize.SMALL) SmallWidth else MediumWidth, height = WidgetHeight)
                 .shadow(elevation = 8.dp, shape = AppShapes.xl, ambientColor = AppThemeTokens.colors.shadow)
                 .clip(AppShapes.xl)
-                .background(palette.background)
-                .padding(AppSpacing.md)
                 .testTag("widget_config_preview"),
+    ) {
+        DaysPhoto(file = photo, contentDescription = null, modifier = Modifier.matchParentSize())
+        PreviewBody(display = display, size = size, colors = colors, profiles = profiles)
+    }
+}
+
+@Composable
+private fun PreviewBody(
+    display: WidgetDisplay,
+    size: WidgetSize,
+    colors: WidgetColorScheme,
+    profiles: List<WidgetProfile>,
+) {
+    val palette = colors.pick(LocalIsDarkTheme.current)
+    val typography = AppThemeTokens.typography
+    Column(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(palette.background)
+                .padding(AppSpacing.md),
     ) {
         when (display) {
             is WidgetDisplay.Dday -> {
@@ -71,7 +96,9 @@ internal fun WidgetPreviewCard(
                         color = palette.title,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f),
                     )
+                    profiles.forEach { ProfileAvatar(file = it.photo, name = it.name, size = 24.dp) }
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 Text(

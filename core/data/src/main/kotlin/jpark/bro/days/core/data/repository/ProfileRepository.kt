@@ -12,9 +12,13 @@ interface ProfileRepository {
     /** 연결된 상대의 프로필. 솔로이거나 아직 받지 못했으면 null */
     fun observePartnerProfile(): Flow<UserProfile?>
 
-    /** [nickname]은 앞뒤 공백을 지우고 1~[UserProfile.NICKNAME_MAX_LENGTH]자, [birthDate]는 오늘 이전 */
+    /**
+     * [nickname]은 앞뒤 공백을 지우고 1~[UserProfile.NICKNAME_MAX_LENGTH]자, [birthDate]는 오늘 이전.
+     * [profileImageId]는 [ImageRepository.importImage]로 저장한 사진 (바꾼 이전 사진은 호출한 쪽이 버린다)
+     */
     suspend fun saveMyProfile(
         nickname: String,
         birthDate: LocalDate?,
+        profileImageId: String?,
     ): Result<UserProfile>
 }

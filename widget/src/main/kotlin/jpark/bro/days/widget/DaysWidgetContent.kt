@@ -2,6 +2,7 @@ package jpark.bro.days.widget
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.glance.ColorFilter
@@ -15,8 +16,10 @@ import androidx.glance.appwidget.appWidgetBackground
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.background
 import androidx.glance.layout.Alignment
+import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.ColumnScope
+import androidx.glance.layout.ContentScale
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
@@ -46,31 +49,58 @@ import jpark.bro.days.core.ui.toDisplayText
 import java.time.LocalDate
 import jpark.bro.days.core.designsystem.R as DesignR
 
-/** 위젯 화면: 작게는 아이콘 · 제목 · D-day, 중간은 기준일까지 (product-spec 8장) */
+/**
+ * 위젯 화면: 작게는 아이콘 · 제목 · D-day, 중간은 기준일까지 (product-spec 8장).
+ * [photo]가 있으면 사진 위에 어두운 막(colors.background)을 깔고, [avatars]가 있으면 제목 줄 끝에 프로필 원
+ */
 @Composable
 internal fun DaysWidgetContent(
     display: WidgetDisplay,
     size: WidgetSize,
     colors: WidgetColors,
+    photo: Bitmap? = null,
+    avatars: List<WidgetAvatar> = emptyList(),
 ) {
     val context = LocalContext.current
-    Column(
+    Box(
         modifier =
             GlanceModifier
                 .fillMaxSize()
                 .appWidgetBackground()
                 .cornerRadius(AppRadius.xl)
-                .background(colors.background)
-                .padding(AppSpacing.md)
                 .clickable(
                     actionStartActivity(context.openAppIntent((display as? WidgetDisplay.Dday)?.entry?.item?.id)),
                 ),
-        verticalAlignment = Alignment.Vertical.Top,
     ) {
-        when (display) {
-            is WidgetDisplay.Dday -> DdayBody(entry = display.entry, size = size, colors = colors)
-            WidgetDisplay.Empty -> MessageBody(text = context.getString(R.string.widget_empty), colors = colors)
-            WidgetDisplay.Missing -> MessageBody(text = context.getString(R.string.widget_missing), colors = colors)
+        if (photo != null) {
+            Image(
+                provider = ImageProvider(photo),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = GlanceModifier.fillMaxSize(),
+            )
+        }
+        Column(
+            modifier =
+                GlanceModifier
+                    .fillMaxSize()
+                    .background(colors.background)
+                    .padding(AppSpacing.md),
+            verticalAlignment = Alignment.Vertical.Top,
+        ) {
+            when (display) {
+                is WidgetDisplay.Dday -> {
+                    DdayBody(entry = display.entry, size = size, colors = colors, avatars = avatars)
+                }
+
+                WidgetDisplay.Empty -> {
+                    MessageBody(text = context.getString(R.string.widget_empty), colors = colors)
+                }
+
+                WidgetDisplay.Missing -> {
+                    MessageBody(text = context.getString(R.string.widget_missing), colors = colors)
+                }
+            }
         }
     }
 }
@@ -80,6 +110,7 @@ private fun ColumnScope.DdayBody(
     entry: ItemDday,
     size: WidgetSize,
     colors: WidgetColors,
+    avatars: List<WidgetAvatar>,
 ) {
     val context = LocalContext.current
     val content = entry.item.content
@@ -101,7 +132,9 @@ private fun ColumnScope.DdayBody(
                     fontWeight = FontWeight.Medium,
                 ),
             maxLines = 1,
+            modifier = GlanceModifier.defaultWeight(),
         )
+        avatars.forEach { avatar -> Avatar(avatar = avatar, colors = colors) }
     }
     Spacer(GlanceModifier.defaultWeight())
     Text(
@@ -126,6 +159,36 @@ private fun ColumnScope.DdayBody(
 }
 
 @Composable
+private fun Avatar(
+    avatar: WidgetAvatar,
+    colors: WidgetColors,
+) {
+    Spacer(GlanceModifier.width(AppSpacing.xs))
+    Box(
+        modifier =
+            GlanceModifier
+                .size(AvatarSize)
+                .cornerRadius(AvatarSize / 2)
+                .background(colors.secondary),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (avatar.bitmap != null) {
+            Image(
+                provider = ImageProvider(avatar.bitmap),
+                contentDescription = avatar.initial,
+                contentScale = ContentScale.Crop,
+                modifier = GlanceModifier.fillMaxSize(),
+            )
+        } else {
+            Text(
+                text = avatar.initial.orEmpty(),
+                style = TextStyle(color = colors.background, fontSize = DefaultTypography.labelSm.fontSize),
+            )
+        }
+    }
+}
+
+@Composable
 private fun ColumnScope.MessageBody(
     text: String,
     colors: WidgetColors,
@@ -136,6 +199,7 @@ private fun ColumnScope.MessageBody(
 }
 
 private val IconSize = 20.dp
+private val AvatarSize = 24.dp
 
 private fun Context.ddayText(dday: DdayCount): String =
     when (dday) {

@@ -14,6 +14,7 @@ import jpark.bro.days.core.model.RepeatRule
 import jpark.bro.days.core.model.TimeSlot
 import jpark.bro.days.core.model.Visibility
 import jpark.bro.days.core.testing.FakeCoupleRepository
+import jpark.bro.days.core.testing.FakeImageRepository
 import jpark.bro.days.core.testing.FakeItemRepository
 import jpark.bro.days.core.testing.MainDispatcherRule
 import jpark.bro.days.feature.item.api.ItemEditKey
@@ -62,12 +63,13 @@ class ItemEditViewModelTest {
 
     private val repository = FakeItemRepository(initial = listOf(quitSmoking))
     private val coupleRepository = FakeCoupleRepository()
+    private val images = FakeImageRepository()
 
     private fun viewModel(
         itemId: String? = null,
         type: ItemType = ItemType.DDAY,
         presetDate: String? = null,
-    ) = ItemEditViewModel(ItemEditKey(itemId, type, presetDate), repository, coupleRepository, clock)
+    ) = ItemEditViewModel(ItemEditKey(itemId, type, presetDate), repository, coupleRepository, images, clock)
 
     private fun connect() {
         coupleRepository.couple.value = Couple("couple-1", "user-jimin", LocalDate.of(2025, 6, 14), true)
@@ -96,6 +98,7 @@ class ItemEditViewModelTest {
                 ItemEditKey(null, ItemType.DDAY, null, presetCategory = Category.GOAL, presetTitle = "전역일"),
                 repository,
                 coupleRepository,
+                images,
                 clock,
             ).state.value
 
@@ -370,5 +373,83 @@ class ItemEditViewModelTest {
             viewModel.onAction(ItemEditAction.VisibilitySelected(Visibility.PRIVATE))
 
             assertEquals(Visibility.SHARED, viewModel.state.value.visibility)
+        }
+
+    @Test
+    fun `커버 사진을 고르면 보여주고 저장하면 배경 사진 id가 들어감`() =
+        runTest {
+            val viewModel = viewModel()
+            viewModel.onAction(ItemEditAction.PhotoPicked("content://photo/1"))
+            assertEquals(images.files.value["image-1"], viewModel.state.value.backgroundFile)
+
+            viewModel.onAction(ItemEditAction.TitleChanged("전역일"))
+            viewModel.onAction(ItemEditAction.SaveClicked)
+
+            val saved = repository.observeItems().first().first { it.content.title == "전역일" }
+            assertEquals("image-1", saved.content.backgroundImageId)
+        }
+
+    @Test
+    fun `커버 사진을 바꿔 저장하면 이전 사진을 버리고 취소하면 새 사진만 버림`() =
+        runTest {
+            images.add("old")
+            val withPhoto = quitSmoking.content.copy(backgroundImageId = "old")
+            val id = repository.saveItem(id = null, content = withPhoto).getOrThrow().id
+
+            val cancelled = viewModel(itemId = id)
+            cancelled.onAction(ItemEditAction.PhotoPicked("content://photo/1"))
+            cancelled.onAction(ItemEditAction.CancelClicked)
+            assertEquals(listOf("image-1"), images.discarded)
+            assertEquals(
+                "old",
+                repository
+                    .observeItem(id)
+                    .first()
+                    ?.content
+                    ?.backgroundImageId,
+            )
+
+            val edited = viewModel(itemId = id)
+            edited.onAction(ItemEditAction.PhotoPicked("content://photo/2"))
+            edited.onAction(ItemEditAction.SaveClicked)
+            assertEquals(listOf("image-1", "old"), images.discarded)
+            assertEquals(
+                "image-2",
+                repository
+                    .observeItem(id)
+                    .first()
+                    ?.content
+                    ?.backgroundImageId,
+            )
+        }
+
+    @Test
+    fun `일정은 커버 사진을 저장하지 않음`() =
+        runTest {
+            val viewModel = viewModel(type = ItemType.PLAN)
+            viewModel.onAction(ItemEditAction.PhotoPicked("content://photo/1"))
+            viewModel.onAction(ItemEditAction.TitleChanged("성수 저녁"))
+            viewModel.onAction(ItemEditAction.SaveClicked)
+
+            assertNull(
+                repository
+                    .observeItems()
+                    .first()
+                    .first { it.content.title == "성수 저녁" }
+                    .content.backgroundImageId,
+            )
+        }
+
+    @Test
+    fun `사진을 읽지 못하면 알림`() =
+        runTest {
+            val viewModel = viewModel()
+            images.failNextImport = true
+
+            viewModel.event.test {
+                viewModel.onAction(ItemEditAction.PhotoPicked("content://broken"))
+                assertEquals(ItemEditEvent.PhotoFailed, awaitItem())
+            }
+            assertNull(viewModel.state.value.backgroundImageId)
         }
 }

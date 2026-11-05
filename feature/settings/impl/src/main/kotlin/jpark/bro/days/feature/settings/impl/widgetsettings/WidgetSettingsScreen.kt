@@ -170,6 +170,7 @@ private val WidgetBackground.label: Int
             WidgetBackground.THEME -> R.string.settings_widget_background_theme
             WidgetBackground.DARK -> R.string.settings_widget_background_dark
             WidgetBackground.WHITE -> R.string.settings_widget_background_white
+            WidgetBackground.PHOTO -> R.string.settings_widget_background_photo
         }
 
 @ScreenPreviews

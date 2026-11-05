@@ -131,7 +131,7 @@ private fun ItemDetailScreen(
                     .padding(top = AppSpacing.sm, bottom = AppSpacing.xxl),
             verticalArrangement = Arrangement.spacedBy(AppSpacing.lg),
         ) {
-            DetailHeroCard(item = item, dday = state.dday)
+            DetailHeroCard(item = item, dday = state.dday, photo = state.backgroundFile)
             item.content.memo?.let { memo ->
                 MemoCard(memo = memo, onEditClick = { onAction(ItemDetailAction.EditClicked) })
             }

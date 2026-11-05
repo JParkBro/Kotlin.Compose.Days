@@ -1,7 +1,6 @@
 package jpark.bro.days.feature.home.impl.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,6 +34,7 @@ import jpark.bro.days.core.designsystem.component.DdayText
 import jpark.bro.days.core.designsystem.component.DdayTone
 import jpark.bro.days.core.domain.anniversary.NextAnniversary
 import jpark.bro.days.core.model.Item
+import jpark.bro.days.core.ui.ProfileAvatar
 import jpark.bro.days.core.ui.scheduleText
 import jpark.bro.days.core.ui.title
 import jpark.bro.days.core.ui.toDisplayText
@@ -62,7 +62,7 @@ internal fun CoupleHeroCard(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(AppSpacing.xs),
     ) {
-        CoupleAvatars(partnerName = couple.partnerName, myName = couple.myName)
+        CoupleAvatars(couple = couple)
         Text(
             text =
                 stringResource(
@@ -88,17 +88,14 @@ internal fun CoupleHeroCard(
     }
 }
 
-/** 이름 첫 글자 원 두 개 + 가운데 하트 */
+/** 두 사람 사진(없으면 이름 첫 글자) + 가운데 하트 */
 @Composable
-private fun CoupleAvatars(
-    partnerName: String?,
-    myName: String?,
-) {
+private fun CoupleAvatars(couple: CoupleSummary) {
     val colors = AppThemeTokens.colors
     Box(contentAlignment = Alignment.Center) {
         Row(horizontalArrangement = Arrangement.spacedBy((-AvatarOverlap))) {
-            InitialAvatar(name = partnerName)
-            InitialAvatar(name = myName)
+            ProfileAvatar(file = couple.partnerPhoto, name = couple.partnerName, size = AvatarSize)
+            ProfileAvatar(file = couple.myPhoto, name = couple.myName, size = AvatarSize)
         }
         Box(
             modifier =
@@ -113,31 +110,6 @@ private fun CoupleAvatars(
                 contentDescription = null,
                 tint = colors.primary,
                 modifier = Modifier.size(16.dp),
-            )
-        }
-    }
-}
-
-@Composable
-private fun InitialAvatar(name: String?) {
-    val colors = AppThemeTokens.colors
-    Box(
-        modifier =
-            Modifier
-                .size(AvatarSize)
-                .clip(AppShapes.full)
-                .background(colors.surface)
-                .border(2.dp, colors.primarySoft, AppShapes.full),
-        contentAlignment = Alignment.Center,
-    ) {
-        val initial = name?.firstOrNull()?.toString()
-        if (initial != null) {
-            Text(text = initial, style = AppThemeTokens.typography.headlineSm, color = colors.primary)
-        } else {
-            Icon(
-                painter = painterResource(DesignR.drawable.ic_person),
-                contentDescription = null,
-                tint = colors.primary,
             )
         }
     }

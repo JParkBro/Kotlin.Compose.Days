@@ -36,7 +36,7 @@ class WidgetConfigActivity : ComponentActivity() {
         // 닫아도 위젯은 기본 설정(홈 히어로 규칙)으로 놓이게 한다 (product-spec 8장 "바로 놓기")
         setResult(RESULT_OK, Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId))
 
-        val viewModel: WidgetConfigViewModel by viewModel { parametersOf(widgetId, size) }
+        val viewModel: WidgetConfigViewModel by viewModel { parametersOf(WidgetTarget(widgetId, size)) }
         enableEdgeToEdge()
         setContent {
             val theme by settingsRepository.observeThemeSetting().collectAsStateWithLifecycle(ThemeSetting())

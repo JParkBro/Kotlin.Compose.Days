@@ -1,6 +1,7 @@
 package jpark.bro.days.feature.settings.impl.profileedit
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import jpark.bro.days.core.designsystem.AppSpacing
 import jpark.bro.days.core.designsystem.AppTheme
@@ -42,6 +45,8 @@ import jpark.bro.days.core.designsystem.preview.ScreenPreviews
 import jpark.bro.days.core.model.UserProfile
 import jpark.bro.days.core.ui.DaysDatePickerDialog
 import jpark.bro.days.core.ui.ObserveEvents
+import jpark.bro.days.core.ui.ProfileAvatar
+import jpark.bro.days.core.ui.rememberPhotoPicker
 import jpark.bro.days.core.ui.toDisplayText
 import jpark.bro.days.feature.settings.impl.R
 import org.koin.compose.viewmodel.koinViewModel
@@ -56,12 +61,16 @@ internal fun ProfileEditRoot(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val toastHostState = remember { SnackbarHostState() }
     val saveFailed = stringResource(R.string.settings_profile_save_failed)
+    val photoFailed = stringResource(R.string.settings_profile_photo_failed)
+    val openPhotoPicker = rememberPhotoPicker { viewModel.onAction(ProfileEditAction.PhotoPicked(it)) }
 
     ObserveEvents(viewModel.event) { event ->
         when (event) {
             ProfileEditEvent.Saved -> onBack()
             ProfileEditEvent.SaveFailed -> toastHostState.showSnackbar(saveFailed)
             ProfileEditEvent.NavigateBack -> onBack()
+            ProfileEditEvent.OpenPhotoPicker -> openPhotoPicker()
+            ProfileEditEvent.PhotoFailed -> toastHostState.showSnackbar(photoFailed)
         }
     }
 
@@ -71,7 +80,7 @@ internal fun ProfileEditRoot(
     }
 }
 
-/** 프로필 수정 (product-spec 6장: 이름 · 생일. 사진은 이미지 저장소 단계에서). 시안 없음 */
+/** 프로필 수정 (product-spec 6장: 이름 · 사진 · 생일). 시안 없음 */
 @Composable
 private fun ProfileEditScreen(
     state: ProfileEditState,
@@ -107,6 +116,7 @@ private fun ProfileEditScreen(
                     .padding(horizontal = AppSpacing.marginMobile, vertical = AppSpacing.md),
             verticalArrangement = Arrangement.spacedBy(AppSpacing.lg),
         ) {
+            PhotoSection(state = state, onAction = onAction)
             Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.sm)) {
                 FieldLabel(text = stringResource(R.string.settings_profile_nickname))
                 DaysTextField(
@@ -160,6 +170,54 @@ private fun ProfileEditScreen(
             maxDate = state.today,
             onConfirm = { onAction(ProfileEditAction.BirthDateSelected(it)) },
             onDismiss = { onAction(ProfileEditAction.BirthDateDismissed) },
+        )
+    }
+}
+
+/** 프로필 사진: 원 + 변경 · 삭제. 솔로일 때는 이 기기에만 저장된다 */
+@Composable
+private fun PhotoSection(
+    state: ProfileEditState,
+    onAction: (ProfileEditAction) -> Unit,
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
+    ) {
+        ProfileAvatar(
+            file = state.photoFile,
+            name = state.nickname.trim().ifEmpty { null },
+            size = 96.dp,
+            modifier =
+                Modifier
+                    .clickable(enabled = !state.isLoading && !state.isPhotoWorking) {
+                        onAction(ProfileEditAction.PhotoClicked)
+                    }.testTag("profile_photo"),
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm)) {
+            DaysSoftButton(
+                text = stringResource(R.string.settings_profile_photo_change),
+                onClick = { onAction(ProfileEditAction.PhotoClicked) },
+                enabled = !state.isLoading && !state.isPhotoWorking,
+                size = DaysButtonSize.SMALL,
+                modifier = Modifier.testTag("profile_photo_change"),
+            )
+            if (state.photoId != null) {
+                DaysSecondaryButton(
+                    text = stringResource(R.string.settings_profile_photo_remove),
+                    onClick = { onAction(ProfileEditAction.PhotoRemoved) },
+                    enabled = !state.isPhotoWorking,
+                    size = DaysButtonSize.SMALL,
+                    modifier = Modifier.testTag("profile_photo_remove"),
+                )
+            }
+        }
+        Text(
+            text = stringResource(R.string.settings_profile_photo_hint),
+            style = AppThemeTokens.typography.bodySm,
+            color = AppThemeTokens.colors.textTertiary,
+            textAlign = TextAlign.Center,
         )
     }
 }

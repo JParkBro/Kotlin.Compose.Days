@@ -2,7 +2,9 @@ package jpark.bro.days.feature.item.impl.itemdetail
 
 import androidx.lifecycle.viewModelScope
 import jpark.bro.days.core.data.repository.HomeWidgets
+import jpark.bro.days.core.data.repository.ImageRepository
 import jpark.bro.days.core.data.repository.ItemRepository
+import jpark.bro.days.core.data.repository.observeImageFileOrNull
 import jpark.bro.days.core.domain.anniversary.itemMilestones
 import jpark.bro.days.core.domain.dday.calculateDday
 import jpark.bro.days.core.domain.dday.ddayOn
@@ -11,14 +13,20 @@ import jpark.bro.days.core.model.Item
 import jpark.bro.days.core.model.RepeatRule
 import jpark.bro.days.core.ui.MviViewModel
 import jpark.bro.days.feature.item.api.ItemDetailKey
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import java.time.Clock
 import java.time.LocalDate
 
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class ItemDetailViewModel(
     key: ItemDetailKey,
     itemRepository: ItemRepository,
+    imageRepository: ImageRepository,
     private val homeWidgets: HomeWidgets,
     private val clock: Clock,
 ) : MviViewModel<ItemDetailState, ItemDetailAction, ItemDetailEvent>(ItemDetailState(id = key.id)) {
@@ -34,10 +42,18 @@ internal class ItemDetailViewModel(
                         item.toDetailState(today = LocalDate.now(clock)).copy(
                             canAddWidget = homeWidgets.isPinSupported(),
                             isWidgetSheetOpen = isWidgetSheetOpen,
+                            backgroundFile = backgroundFile,
                         )
                     }
                 }
             }.launchIn(viewModelScope)
+        itemRepository
+            .observeItem(key.id)
+            .map { it?.content?.backgroundImageId }
+            .distinctUntilChanged()
+            .flatMapLatest(imageRepository::observeImageFileOrNull)
+            .onEach { file -> setState { copy(backgroundFile = file) } }
+            .launchIn(viewModelScope)
     }
 
     override fun onAction(action: ItemDetailAction) {

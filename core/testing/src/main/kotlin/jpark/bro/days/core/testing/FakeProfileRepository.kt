@@ -23,12 +23,19 @@ class FakeProfileRepository(
     override suspend fun saveMyProfile(
         nickname: String,
         birthDate: LocalDate?,
+        profileImageId: String?,
     ): Result<UserProfile> {
         if (failNext) {
             failNext = false
             return Result.failure(IllegalStateException("저장 실패 (테스트)"))
         }
-        val saved = UserProfile(userId = "user-me", nickname = nickname.trim(), birthDate = birthDate)
+        val saved =
+            UserProfile(
+                userId = "user-me",
+                nickname = nickname.trim(),
+                birthDate = birthDate,
+                profileImageId = profileImageId,
+            )
         myProfile.value = saved
         return Result.success(saved)
     }

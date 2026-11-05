@@ -7,4 +7,9 @@ internal sealed interface ItemEditEvent {
     data object SaveFailed : ItemEditEvent
 
     data object DeleteFailed : ItemEditEvent
+
+    data object OpenPhotoPicker : ItemEditEvent
+
+    /** 고른 사진을 읽거나 줄이지 못함 */
+    data object PhotoFailed : ItemEditEvent
 }

@@ -2,6 +2,7 @@ package jpark.bro.days.feature.settings.impl.profileedit
 
 import app.cash.turbine.test
 import jpark.bro.days.core.model.UserProfile
+import jpark.bro.days.core.testing.FakeImageRepository
 import jpark.bro.days.core.testing.FakeProfileRepository
 import jpark.bro.days.core.testing.MainDispatcherRule
 import kotlinx.coroutines.test.runTest
@@ -24,7 +25,8 @@ class ProfileEditViewModelTest {
     private val clock = Clock.fixed(LocalDate.of(2026, 11, 5).atStartOfDay(seoul).toInstant(), seoul)
     private val saved = UserProfile("user-me", "현우", LocalDate.of(1998, 4, 12))
     private val repository = FakeProfileRepository(me = saved)
-    private val viewModel by lazy { ProfileEditViewModel(repository, clock) }
+    private val images = FakeImageRepository()
+    private val viewModel by lazy { ProfileEditViewModel(repository, images, clock) }
 
     @Test
     fun `저장된 프로필로 채우고 바뀐 것이 없으면 저장할 수 없음`() {
@@ -86,9 +88,86 @@ class ProfileEditViewModelTest {
 
     @Test
     fun `처음 설정할 때는 비어 있음`() {
-        val empty = ProfileEditViewModel(FakeProfileRepository(), clock)
+        val empty = ProfileEditViewModel(FakeProfileRepository(), images, clock)
 
         assertEquals("", empty.state.value.nickname)
         assertFalse(empty.state.value.canSave)
     }
+
+    @Test
+    fun `사진을 누르면 사진 선택기를 엶`() =
+        runTest {
+            viewModel.event.test {
+                viewModel.onAction(ProfileEditAction.PhotoClicked)
+                assertEquals(ProfileEditEvent.OpenPhotoPicker, awaitItem())
+            }
+        }
+
+    @Test
+    fun `사진을 고르면 보여주고 저장하면 프로필에 사진 id가 들어감`() =
+        runTest {
+            viewModel.onAction(ProfileEditAction.PhotoPicked("content://photo/1"))
+
+            val state = viewModel.state.value
+            assertEquals("image-1", state.photoId)
+            assertEquals(images.files.value["image-1"], state.photoFile)
+            assertTrue(state.canSave)
+
+            viewModel.onAction(ProfileEditAction.SaveClicked)
+            assertEquals("image-1", repository.myProfile.value?.profileImageId)
+        }
+
+    @Test
+    fun `사진을 바꿔 저장하면 이전 사진을 버림`() =
+        runTest {
+            images.add("old")
+            repository.myProfile.value = saved.copy(profileImageId = "old")
+
+            viewModel.onAction(ProfileEditAction.PhotoPicked("content://photo/1"))
+            assertEquals(emptyList<String>(), images.discarded)
+            viewModel.onAction(ProfileEditAction.SaveClicked)
+
+            assertEquals(listOf("old"), images.discarded)
+        }
+
+    @Test
+    fun `저장하지 않고 뒤로 가면 새로 고른 사진을 버리고 프로필은 그대로`() =
+        runTest {
+            viewModel.onAction(ProfileEditAction.PhotoPicked("content://photo/1"))
+
+            viewModel.event.test {
+                viewModel.onAction(ProfileEditAction.BackClicked)
+                assertEquals(ProfileEditEvent.NavigateBack, awaitItem())
+            }
+            assertEquals(listOf("image-1"), images.discarded)
+            assertNull(repository.myProfile.value?.profileImageId)
+        }
+
+    @Test
+    fun `사진을 읽지 못하면 알리고 사진은 그대로`() =
+        runTest {
+            images.failNextImport = true
+
+            viewModel.event.test {
+                viewModel.onAction(ProfileEditAction.PhotoPicked("content://broken"))
+                assertEquals(ProfileEditEvent.PhotoFailed, awaitItem())
+            }
+            assertNull(viewModel.state.value.photoId)
+            assertFalse(viewModel.state.value.isPhotoWorking)
+        }
+
+    @Test
+    fun `저장된 사진을 지우면 저장할 수 있고 저장하면 사진이 빠짐`() =
+        runTest {
+            images.add("old")
+            repository.myProfile.value = saved.copy(profileImageId = "old")
+            assertEquals(images.files.value["old"], viewModel.state.value.photoFile)
+
+            viewModel.onAction(ProfileEditAction.PhotoRemoved)
+            assertNull(viewModel.state.value.photoFile)
+            viewModel.onAction(ProfileEditAction.SaveClicked)
+
+            assertNull(repository.myProfile.value?.profileImageId)
+            assertEquals(listOf("old"), images.discarded)
+        }
 }

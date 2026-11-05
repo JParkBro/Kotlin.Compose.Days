@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.glance.color.ColorProvider
 import androidx.glance.unit.ColorProvider
 import jpark.bro.days.core.designsystem.AppColors
+import jpark.bro.days.core.designsystem.AppFixedColors
 import jpark.bro.days.core.designsystem.themePalette
 import jpark.bro.days.core.model.AppThemeType
 import jpark.bro.days.core.model.WidgetBackground
@@ -28,6 +29,7 @@ internal data class WidgetColorScheme(
  * 앱과 같은 팔레트를 쓴다.
  * - THEME: 히어로 카드와 같은 primary-soft 배경. 기기 다크 모드를 따른다
  * - DARK · WHITE: 기기 모드와 상관없이 고정
+ * - PHOTO: 사진 위 글자는 on-image(흰색), 배경은 사진 위에 까는 어두운 막(image-scrim)
  */
 internal fun widgetColorScheme(
     theme: AppThemeType,
@@ -39,8 +41,21 @@ internal fun widgetColorScheme(
         WidgetBackground.THEME -> WidgetColorScheme(day = light.soft(), night = dark.soft())
         WidgetBackground.DARK -> dark.surface().let { WidgetColorScheme(it, it) }
         WidgetBackground.WHITE -> light.surface().let { WidgetColorScheme(it, it) }
+        WidgetBackground.PHOTO -> PhotoPalette.let { WidgetColorScheme(it, it) }
     }
 }
+
+private val PhotoPalette =
+    WidgetPalette(
+        background = AppFixedColors.imageScrim,
+        title = AppFixedColors.onImage,
+        number = AppFixedColors.onImage,
+        secondary = AppFixedColors.onImage,
+    )
+
+/** 사진 배경을 골랐어도 사진이 없으면 테마색으로 보인다 */
+internal fun WidgetBackground.effective(hasPhoto: Boolean): WidgetBackground =
+    if (this == WidgetBackground.PHOTO && !hasPhoto) WidgetBackground.THEME else this
 
 private fun AppColors.soft() = WidgetPalette(primarySoft, onPrimarySoft, primary, textSecondary)
 

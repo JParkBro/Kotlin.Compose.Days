@@ -2,12 +2,14 @@ package jpark.bro.days.feature.onboarding.impl.login
 
 import androidx.lifecycle.viewModelScope
 import jpark.bro.days.core.data.repository.AuthRepository
+import jpark.bro.days.core.data.repository.OnboardingRepository
 import jpark.bro.days.core.model.AuthUser
 import jpark.bro.days.core.ui.MviViewModel
 import kotlinx.coroutines.launch
 
 internal class LoginViewModel(
     private val authRepository: AuthRepository,
+    private val onboardingRepository: OnboardingRepository,
 ) : MviViewModel<LoginState, LoginAction, LoginEvent>(LoginState()) {
     override fun onAction(action: LoginAction) {
         when (action) {
@@ -52,8 +54,13 @@ internal class LoginViewModel(
     private fun signIn(signIn: suspend () -> Result<AuthUser>) {
         viewModelScope.launch {
             signIn()
-                .onSuccess { sendEvent(LoginEvent.LoggedIn) }
-                .onFailure {
+                .onSuccess {
+                    // 확인하지 못하면(오프라인 등) 약관을 다시 받는다. 다시 동의해도 기록을 덮어쓸 뿐이다
+                    val agreed = onboardingRepository.checkTermsAgreed().getOrDefault(false)
+                    // 약관에서 뒤로 오면 다시 로그인할 수 있게 푼다
+                    setState { copy(isSigningIn = false) }
+                    sendEvent(LoginEvent.LoggedIn(termsAgreed = agreed))
+                }.onFailure {
                     setState { copy(isSigningIn = false) }
                     sendEvent(LoginEvent.LoginFailed)
                 }

@@ -2,7 +2,7 @@ package jpark.bro.days.feature.settings.impl.policylist
 
 import app.cash.turbine.test
 import jpark.bro.days.core.testing.MainDispatcherRule
-import jpark.bro.days.feature.settings.impl.PolicyType
+import jpark.bro.days.feature.settings.api.PolicyType
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse

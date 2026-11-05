@@ -52,7 +52,8 @@ import jpark.bro.days.core.designsystem.R as DesignR
 /** 로그인 (product-spec 3-2: 카카오 · Google, 비로그인 사용 없음) */
 @Composable
 internal fun LoginRoot(
-    onLoggedIn: () -> Unit,
+    onNeedsTerms: () -> Unit,
+    onFinished: () -> Unit,
     viewModel: LoginViewModel = koinViewModel(),
     googleSignIn: GoogleSignInClient = koinInject(),
     kakaoSignIn: KakaoSignInClient = koinInject(),
@@ -93,8 +94,8 @@ internal fun LoginRoot(
                 }
             }
 
-            LoginEvent.LoggedIn -> {
-                onLoggedIn()
+            is LoginEvent.LoggedIn -> {
+                if (event.termsAgreed) onFinished() else onNeedsTerms()
             }
 
             LoginEvent.LoginFailed -> {

@@ -7,4 +7,45 @@
     <string name="onboarding_login_google">Google로 계속하기</string>
     <string name="onboarding_login_signing_in">로그인하는 중…</string>
     <string name="onboarding_login_failed">로그인하지 못했어요. 잠시 후 다시 시도해 주세요.</string>
+
+    <!-- 소개 (product-spec 3-2: 2~3장 스와이프, 시안 design/onboarding-intro) -->
+    <string name="onboarding_intro_skip">건너뛰기</string>
+    <string name="onboarding_intro_next">다음</string>
+    <string name="onboarding_intro_start">시작하기</string>
+    <string name="onboarding_intro_title_count">소중한 날을 함께 세어요</string>
+    <string name="onboarding_intro_body_count">혼자 쓰는 디데이도, 둘이 쓰는 기념일도 한 곳에서</string>
+    <string name="onboarding_intro_title_anniversary">기념일은 알아서 챙겨요</string>
+    <string name="onboarding_intro_body_anniversary">100일 · 주년 · 생일을 자동으로 계산해 미리 보여 드려요</string>
+    <string name="onboarding_intro_title_couple">둘이 함께 보는 디데이</string>
+    <string name="onboarding_intro_body_couple">커플 코드로 연결하면 \"우리 둘이\" 항목을 함께 봐요</string>
+    <string name="onboarding_intro_page">%1$d / %2$d 페이지</string>
+
+    <!-- 약관 동의 (product-spec 5장, 시안 design/onboarding-terms) -->
+    <string name="onboarding_terms_back">뒤로</string>
+    <string name="onboarding_terms_title">약관에 동의해 주세요</string>
+    <string name="onboarding_terms_subtitle">서비스를 이용하려면 필수 약관에 동의해야 해요.</string>
+    <string name="onboarding_terms_all">전체 동의</string>
+    <string name="onboarding_terms_all_desc">필수 및 선택 항목에 모두 동의합니다.</string>
+    <string name="onboarding_terms_required">[필수]</string>
+    <string name="onboarding_terms_optional">[선택]</string>
+    <string name="onboarding_terms_age">만 14세 이상입니다</string>
+    <string name="onboarding_terms_service">서비스 이용약관</string>
+    <string name="onboarding_terms_privacy">개인정보 수집 · 이용 동의</string>
+    <string name="onboarding_terms_marketing">마케팅 정보 수신</string>
+    <string name="onboarding_terms_marketing_desc">이벤트 및 혜택 알림. 알림 설정에서 바꿀 수 있어요</string>
+    <string name="onboarding_terms_view">보기</string>
+    <string name="onboarding_terms_agree">동의하고 시작하기</string>
+    <string name="onboarding_terms_hint">필수 항목에 모두 동의하면 다음으로 진행할 수 있어요.</string>
+    <string name="onboarding_terms_failed">동의를 저장하지 못했어요. 인터넷 연결을 확인해 주세요.</string>
+
+    <!-- 시작 방식 (product-spec 3-1, 시안 design/onboarding-start-mode) -->
+    <string name="onboarding_start_title">어떻게 시작할까요?</string>
+    <string name="onboarding_start_subtitle">언제든지 둘만의 공간으로 연결할 수 있어요.</string>
+    <string name="onboarding_start_solo">혼자 시작하기</string>
+    <string name="onboarding_start_solo_desc">나만의 중요한 일정과 디데이를 먼저 기록하고 관리해요.</string>
+    <string name="onboarding_start_couple">커플 코드로 연결하기</string>
+    <string name="onboarding_start_couple_desc">상대방의 6자리 코드를 입력하거나, 내 코드를 공유해 함께 시작해요.</string>
+    <string name="onboarding_start_recommended">추천</string>
+    <string name="onboarding_start_later">연결은 나중에 설정에서도 할 수 있어요</string>
+    <string name="onboarding_start_next">다음</string>
 </resources>

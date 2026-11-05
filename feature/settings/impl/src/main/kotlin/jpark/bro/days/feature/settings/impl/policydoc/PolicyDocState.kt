@@ -1,6 +1,6 @@
 package jpark.bro.days.feature.settings.impl.policydoc
 
-import jpark.bro.days.feature.settings.impl.PolicyType
+import jpark.bro.days.feature.settings.api.PolicyType
 
 internal data class PolicyDocState(
     val type: PolicyType,

@@ -8,8 +8,8 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import jpark.bro.days.core.designsystem.AppTheme
 import jpark.bro.days.core.designsystem.preview.ScreenPreviews
-import jpark.bro.days.feature.settings.impl.PolicyDocKey
-import jpark.bro.days.feature.settings.impl.PolicyType
+import jpark.bro.days.feature.settings.api.PolicyDocKey
+import jpark.bro.days.feature.settings.api.PolicyType
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 

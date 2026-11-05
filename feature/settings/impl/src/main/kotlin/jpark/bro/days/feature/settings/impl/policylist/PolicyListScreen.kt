@@ -33,8 +33,8 @@ import jpark.bro.days.core.designsystem.component.DaysListItem
 import jpark.bro.days.core.designsystem.component.DaysTopBar
 import jpark.bro.days.core.designsystem.preview.ScreenPreviews
 import jpark.bro.days.core.ui.ObserveEvents
-import jpark.bro.days.feature.settings.impl.PolicyDocKey
-import jpark.bro.days.feature.settings.impl.PolicyType
+import jpark.bro.days.feature.settings.api.PolicyDocKey
+import jpark.bro.days.feature.settings.api.PolicyType
 import jpark.bro.days.feature.settings.impl.R
 import org.koin.compose.viewmodel.koinViewModel
 import jpark.bro.days.core.designsystem.R as DesignR

@@ -15,9 +15,11 @@ import jpark.bro.days.core.firebase.sync.FirebaseImageDataSource
 import jpark.bro.days.core.firebase.sync.FirestoreCoupleDataSource
 import jpark.bro.days.core.firebase.sync.FirestoreProfileDataSource
 import jpark.bro.days.core.firebase.sync.FirestoreSyncDataSource
+import jpark.bro.days.core.firebase.sync.FirestoreTermsDataSource
 import jpark.bro.days.core.firebase.sync.ImageRemoteDataSource
 import jpark.bro.days.core.firebase.sync.ProfileRemoteDataSource
 import jpark.bro.days.core.firebase.sync.SyncRemoteDataSource
+import jpark.bro.days.core.firebase.sync.TermsRemoteDataSource
 import org.koin.dsl.module
 
 /**
@@ -33,6 +35,7 @@ val firebaseModule =
         single { RemoteFlags(Firebase.remoteConfig) }
         single<SyncRemoteDataSource> { FirestoreSyncDataSource(Firebase.firestore) }
         single<ProfileRemoteDataSource> { FirestoreProfileDataSource(Firebase.firestore) }
+        single<TermsRemoteDataSource> { FirestoreTermsDataSource(Firebase.firestore) }
         single<CoupleRemoteDataSource> { FirestoreCoupleDataSource(Firebase.firestore) }
         single<ImageRemoteDataSource> { FirebaseImageDataSource(Firebase.firestore, Firebase.storage) }
     }

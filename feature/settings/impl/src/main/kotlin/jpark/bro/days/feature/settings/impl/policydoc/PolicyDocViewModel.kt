@@ -1,7 +1,7 @@
 package jpark.bro.days.feature.settings.impl.policydoc
 
 import jpark.bro.days.core.ui.MviViewModel
-import jpark.bro.days.feature.settings.impl.PolicyDocKey
+import jpark.bro.days.feature.settings.api.PolicyDocKey
 
 internal class PolicyDocViewModel(
     key: PolicyDocKey,

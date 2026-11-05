@@ -3,7 +3,7 @@ package jpark.bro.days.di
 import jpark.bro.days.MainViewModel
 import jpark.bro.days.core.ads.di.adsModule
 import jpark.bro.days.core.data.di.dataModule
-import jpark.bro.days.core.data.repository.AuthRepository
+import jpark.bro.days.core.data.repository.OnboardingRepository
 import jpark.bro.days.core.database.di.databaseModule
 import jpark.bro.days.core.datastore.di.datastoreModule
 import jpark.bro.days.core.firebase.di.firebaseModule
@@ -25,6 +25,7 @@ import jpark.bro.days.navigation.AppSessionEndedHandler
 import jpark.bro.days.navigation.TopLevelDestination
 import jpark.bro.days.navigation.startKeyFor
 import jpark.bro.days.widget.di.widgetModule
+import kotlinx.coroutines.runBlocking
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
@@ -32,10 +33,11 @@ import org.koin.dsl.module
 
 val appModule =
     module {
-        // 로그인했으면 홈, 아니면 온보딩(지금은 로그인부터). 비로그인 사용 없음 (product-spec 3-2)
+        // 로그인 + 약관 동의까지 마쳤으면 홈, 아니면 온보딩. 비로그인 사용 없음 (product-spec 3-2)
+        // 첫 화면을 그리기 전에 정해야 해서 기기 설정(DataStore) 한 번을 기다린다
         single {
             Navigator(
-                startKey = startKeyFor(signedIn = get<AuthRepository>().currentUser() != null),
+                startKey = startKeyFor(onboarded = runBlocking { get<OnboardingRepository>().isOnboarded() }),
                 topLevelKeys = TopLevelDestination.keys,
             )
         }

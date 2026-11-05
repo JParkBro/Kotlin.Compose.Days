@@ -27,5 +27,5 @@ internal class SwitchableUserSession(
 
     override fun observeUserId(): Flow<String?> = userId
 
-    override suspend fun currentUserId(): String = checkNotNull(userId.value) { "로그인이 필요합니다." }
+    override fun currentUserIdOrNull(): String? = userId.value
 }

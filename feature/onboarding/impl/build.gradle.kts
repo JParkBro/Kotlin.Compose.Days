@@ -8,4 +8,5 @@ android {
 
 dependencies {
     implementation(projects.feature.onboarding.api)
+    implementation(projects.feature.settings.api)
 }

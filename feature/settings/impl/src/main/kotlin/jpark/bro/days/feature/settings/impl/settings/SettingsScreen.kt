@@ -54,11 +54,11 @@ import jpark.bro.days.core.model.AppThemeType
 import jpark.bro.days.core.ui.ObserveEvents
 import jpark.bro.days.feature.couple.api.CoupleManageKey
 import jpark.bro.days.feature.couple.api.PairingKey
+import jpark.bro.days.feature.settings.api.ProfileEditKey
 import jpark.bro.days.feature.settings.impl.AccountKey
 import jpark.bro.days.feature.settings.impl.MoreAppsKey
 import jpark.bro.days.feature.settings.impl.NotificationSettingsKey
 import jpark.bro.days.feature.settings.impl.PolicyListKey
-import jpark.bro.days.feature.settings.impl.ProfileEditKey
 import jpark.bro.days.feature.settings.impl.R
 import jpark.bro.days.feature.settings.impl.WidgetSettingsKey
 import jpark.bro.days.feature.settings.impl.settings.components.SettingsMenu
@@ -207,6 +207,7 @@ private fun Context.openStoreListing() {
 private val PreviewState =
     SettingsState(
         profile = ProfileSummary(nickname = "현우", birthDate = LocalDate.of(1998, 4, 12), togetherDays = 510),
+        isCoupled = true,
         partnerName = "지민",
         accountEmail = "hyunwoo@example.com",
     )

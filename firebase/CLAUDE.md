@@ -19,7 +19,7 @@
 - 이미지는 Storage 규칙(`storage.rules`, 6-8에서 추가)으로만 접근한다: 커플 멤버만, `image/webp`, 300KB 이하, 커플당 개수 한도. 공개 읽기 금지.
 - 커플 데이터(`couples/{coupleId}/**`)는 `members`에 포함된 사용자만 읽고 쓴다.
 - 공유 항목은 `delete`를 허용하지 않는다 (soft delete만). `updatedBy == request.auth.uid`를 검사한다.
-- 커플 생성은 `pairCodes`의 `usedBy`를 같은 트랜잭션에서 기록한 경우에만 허용한다 (`getAfter`).
+- 커플 생성과 해제된 커플 되살리기(30일 안 재연결)는 상대가 발급한 `pairCodes`의 `usedBy`를 같은 트랜잭션에서 기록한 경우에만 허용한다 (`getAfter`).
 - 규칙 안의 `get()` · `getAfter()`도 읽기로 과금되므로 호출 수를 늘리는 변경은 이유를 설명한다.
 - 쿼리 리스너는 `serverUpdatedAt > cursor` 조건을 전제로 한다. 그래서 동기화 문서(공유 항목 · 숨긴 기념일)는 `serverUpdatedAt == request.time`만 허용하고 실제 삭제 대신 `deletedAt`을 쓴다. 인덱스가 필요하면 `firestore.indexes.json`에 추가한다.
 

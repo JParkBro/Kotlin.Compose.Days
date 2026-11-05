@@ -11,6 +11,8 @@ dependencies {
     implementation(projects.core.model)
     implementation(projects.core.common)
     implementation(projects.core.database)
+    // 커플 연결 · 해제 전환 처리(CoupleTransitions)는 core:data와 함께 쓴다
+    implementation(projects.core.data)
     implementation(projects.core.firebase)
     implementation(libs.androidx.work.runtime)
     // 앱이 화면에 떠 있을 때만 리스너를 붙인다 (ProcessLifecycleOwner)
@@ -19,4 +21,5 @@ dependencies {
     // SyncEngine 테스트: Robolectric + in-memory Room
     testImplementation(libs.bundles.robolectric)
     testImplementation(libs.bundles.room)
+    testImplementation(projects.core.testing)
 }

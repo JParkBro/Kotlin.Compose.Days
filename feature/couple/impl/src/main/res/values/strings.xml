@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 커플 연결 (product-spec 7장, 시안 couple-my-code · couple-code-input) -->
+    <string name="couple_pairing_title">커플 연결</string>
+    <string name="couple_back">뒤로</string>
+    <string name="couple_pairing_tab_my_code">내 코드</string>
+    <string name="couple_pairing_tab_input">코드 입력</string>
+    <string name="couple_pairing_my_code_title">상대에게 이 코드를 보내주세요</string>
+    <string name="couple_pairing_my_code_subtitle">상대방이 코드를 입력하면 둘만의 홈이 만들어져요</string>
+    <string name="couple_pairing_code_label">초대 코드</string>
+    <string name="couple_pairing_expires_in">%1$s 후 만료</string>
+    <string name="couple_pairing_expired">코드가 만료되었어요</string>
+    <string name="couple_pairing_new_code">새 코드 받기</string>
+    <string name="couple_pairing_copy">코드 복사하기</string>
+    <string name="couple_pairing_copied">코드를 복사했어요</string>
+    <string name="couple_pairing_my_code_hint">상대방이 코드를 이미 보냈다면 위의 \'코드 입력\' 탭을 눌러주세요</string>
+    <string name="couple_pairing_profile_required">상대에게 보일 이름을 먼저 정해 주세요</string>
+    <string name="couple_pairing_set_profile">프로필 설정하기</string>
+    <string name="couple_pairing_issue_failed">코드를 만들지 못했어요. 인터넷 연결을 확인해 주세요.</string>
+    <string name="couple_pairing_retry">다시 시도</string>
+    <string name="couple_pairing_input_title">상대방의 코드를 입력해 주세요</string>
+    <string name="couple_pairing_input_subtitle">상대방 화면에 표시된 6자리 코드를 입력하세요</string>
+    <string name="couple_pairing_input_rule">영문 대문자와 숫자 6자리</string>
+    <string name="couple_pairing_input_hint">내 코드를 먼저 보내고 싶다면 \'내 코드\' 탭을 확인하세요</string>
+    <string name="couple_pairing_connect">연결하기</string>
+    <string name="couple_pairing_check_failed">코드를 확인하지 못했어요. 인터넷 연결을 확인해 주세요.</string>
+
+    <!-- 코드 확인 결과 -->
+    <string name="couple_code_not_found">없는 코드예요. 다시 확인해 주세요.</string>
+    <string name="couple_code_expired">만료된 코드예요. 상대에게 새 코드를 받아 주세요.</string>
+    <string name="couple_code_used">이미 사용된 코드예요. 상대에게 새 코드를 받아 주세요.</string>
+    <string name="couple_code_own">내가 만든 코드예요. 상대의 코드를 입력해 주세요.</string>
+    <string name="couple_code_already_connected">이미 커플로 연결되어 있어요.</string>
+
+    <!-- 연결 확인 (시안 couple-confirm) -->
+    <string name="couple_confirm_title">%1$s 님과 연결할까요?</string>
+    <string name="couple_confirm_subtitle">코드가 확인되었어요. 두 분의 시작일을 확인해 주세요.</string>
+    <string name="couple_start_date">우리가 사귄 날</string>
+    <string name="couple_change">변경</string>
+    <string name="couple_count_first_day">사귄 날을 1일로 세기</string>
+    <string name="couple_count_first_day_description">사귄 날을 0일이 아닌 1일로 세요</string>
+    <string name="couple_together_days">오늘로 함께한 지 %1$d일째 되는 날이에요</string>
+    <string name="couple_confirm_connect">연결하기</string>
+    <string name="couple_confirm_cancel">취소</string>
+    <string name="couple_confirm_failed">연결하지 못했어요. 인터넷 연결을 확인해 주세요.</string>
+
+    <!-- 커플 관리 (시안 couple-manage) -->
+    <string name="couple_manage_title">커플 관리</string>
+    <string name="couple_manage_connected">연결됨</string>
+    <string name="couple_manage_partner_unknown">상대</string>
+    <string name="couple_manage_together">%1$s 님과 함께한 지 %2$d일째</string>
+    <string name="couple_manage_birth_date">생일</string>
+    <string name="couple_manage_connected_since">연결 시작일</string>
+    <string name="couple_manage_unpair">커플 연결 해제</string>
+    <string name="couple_manage_unpair_description">연결을 해제하면 공유하던 디데이와 일정은 각자에게 나만 보기 사본으로 남아요.</string>
+    <string name="couple_manage_update_failed">저장하지 못했어요. 인터넷 연결을 확인해 주세요.</string>
+
+    <!-- 연결 해제 시트 (시안 couple-unpair-sheet) -->
+    <string name="couple_unpair_title">%1$s 님과 연결을 해제할까요?</string>
+    <string name="couple_unpair_subtitle">공유 디데이와 일정은 각자에게 사본으로 남아요</string>
+    <string name="couple_unpair_restore_title">30일 안에 다시 연결하면 복구돼요</string>
+    <string name="couple_unpair_restore_description">같은 상대와 30일 안에 다시 연결하면 공유하던 항목이 그대로 돌아와요.</string>
+    <string name="couple_unpair_delete_copies">공유 항목 사본도 삭제하기</string>
+    <string name="couple_unpair_delete_copies_description">체크하면 내 보관함에서도 공유했던 디데이와 일정이 지워져요.</string>
+    <string name="couple_unpair_confirm">연결 해제</string>
+    <string name="couple_unpair_cancel">취소</string>
+    <string name="couple_unpair_failed">연결을 해제하지 못했어요. 인터넷 연결을 확인해 주세요.</string>
+</resources>

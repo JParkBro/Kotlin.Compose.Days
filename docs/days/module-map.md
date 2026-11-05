@@ -74,7 +74,7 @@ days/
 | `item:api` | `ItemDetailKey` | `id: String` |
 | | `ItemEditKey` | `itemId: String?`, `type: ItemType`, `presetDate: String?`, `presetCategory: Category?`, `presetTitle: String?` (빠른 시작) |
 | `notifications:api` | `NotificationsKey` | – |
-| `settings:api` | `SettingsKey` | – |
+| `settings:api` | `SettingsKey`, `ProfileEditKey` (커플 코드 발급에 이름이 필요해 커플 연결에서도 연다) | – |
 
 ### 4-2. impl 내부 키 (internal)
 
@@ -82,7 +82,7 @@ days/
 |---|---|
 | `onboarding:impl` | `LoginKey`, `TermsKey`, `StartModeKey` |
 | `couple:impl` | `PairCodeConfirmKey` |
-| `settings:impl` | `ProfileEditKey`, `NotificationSettingsKey`, `WidgetSettingsKey`, `AccountKey`, `WithdrawKey`, `PolicyListKey`, `PolicyDocKey(type)`, `MoreAppsKey` |
+| `settings:impl` | `NotificationSettingsKey`, `WidgetSettingsKey`, `AccountKey`, `WithdrawKey`, `PolicyListKey`, `PolicyDocKey(type)`, `MoreAppsKey` |
 
 ### 4-3. app에서 결정하는 목적지
 
@@ -97,7 +97,7 @@ days/
 | impl | 의존하는 api |
 |---|---|
 | `onboarding:impl` | (결과만 알림, app이 목적지 결정) |
-| `couple:impl` | `home` |
+| `couple:impl` | `home`, `settings` (프로필 수정) |
 | `home:impl` | `item`, `couple`, `notifications` |
 | `calendar:impl` | `item` |
 | `item:impl` | – |
@@ -169,7 +169,7 @@ days/
    - 6-5a 동기화 스키마 (#28): Room `couple` · `anniversary_hide` · `sync_cursor`(+ 보이는 항목 = 내 나만 보기 + 내 ACTIVE 커플 공유 항목), `core:firebase` `SyncRemoteDataSource`(Firestore), 규칙: `serverUpdatedAt == request.time`, 숨긴 기념일 soft delete. `user`(프로필 캐시) 테이블은 채우는 단계(6-6 · 6-7)에서 추가
    - 6-5b `core:sync` (#29): `SyncEngine`(Push · Pull 한 단위) · `SyncManager`(로그인 + 포그라운드 + `sync_enabled`일 때만 리스너, 올릴 것이 생기면 `SyncPushWorker` 5초 디바운스, 연결된 커플이 있을 때만 `SyncPullWorker` 6시간). `core:firebase` `RemoteFlags`(Remote Config `sync_enabled`). `core:sync`는 `core:database` · `core:firebase`를 직접 참조한다 (feature가 아니라 허용). Push는 현재 계정이 고친, 연결된 커플 항목만 (`ItemSyncDao`)
    - 6-6a 프로필 (#31): Room `user`(내 프로필 + 상대 캐시), `ProfileRepository`(이름 1~10자 · 생일 선택), `core:firebase` `ProfileRemoteDataSource`(`users/{uid}` 이름 · 생일 merge), `core:sync` `ProfileSync`(내 프로필 Push, 이 기기에 없을 때만 1회 조회, 상대 프로필은 커플 연결 시 리스너). 프로필 수정 화면 · 설정 카드, 공통 `DaysDatePickerDialog`(core:ui)
-   - 6-6b `feature:couple` 연결 · 확인 · 관리 · 해제 · 30일 재연결 (코드 문서에 발급자 이름)
+   - 6-6b `feature:couple` (#32): 커플 연결(내 코드 · 코드 입력 6칸: 칸 선택 · 덮어쓰기) · 연결 확인(사귄 날 · 1일로 세기 · 함께한 날) · 커플 관리 · 해제 시트 · 30일 안 재연결. `core:data` `CoupleRepository` · `CoupleTransitions`(연결 · 해제 전환을 내 동작 · 동기화 리스너 모두 한 곳에서: `users.coupleId`, 내 코드 삭제, 공유 항목 사본 · 재연결 때 사본 정리), `core:firebase` `CoupleRemoteDataSource`(코드 · 연결 트랜잭션), Room `item.copied_from_item_id`, 설정 커플 뱃지 · 함께한 날. `core:sync`는 커플 전환 때문에 `core:data`를 참조
    - 6-6c 카카오톡 공유 · QR · 딥링크
    - 6-7 커플 홈 · 공개 범위 · 공유 표시
    - 6-8 이미지 (Cloud Storage + Storage 규칙): 배경 사진 · 프로필

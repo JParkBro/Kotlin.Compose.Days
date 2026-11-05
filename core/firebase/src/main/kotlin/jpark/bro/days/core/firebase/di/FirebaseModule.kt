@@ -9,6 +9,8 @@ import jpark.bro.days.core.firebase.FUNCTIONS_REGION
 import jpark.bro.days.core.firebase.auth.FirebaseAuthDataSource
 import jpark.bro.days.core.firebase.config.RemoteFlags
 import jpark.bro.days.core.firebase.functions.FirebaseFunctionsDataSource
+import jpark.bro.days.core.firebase.sync.CoupleRemoteDataSource
+import jpark.bro.days.core.firebase.sync.FirestoreCoupleDataSource
 import jpark.bro.days.core.firebase.sync.FirestoreProfileDataSource
 import jpark.bro.days.core.firebase.sync.FirestoreSyncDataSource
 import jpark.bro.days.core.firebase.sync.ProfileRemoteDataSource
@@ -27,4 +29,5 @@ val firebaseModule =
         single { RemoteFlags(Firebase.remoteConfig) }
         single<SyncRemoteDataSource> { FirestoreSyncDataSource(Firebase.firestore) }
         single<ProfileRemoteDataSource> { FirestoreProfileDataSource(Firebase.firestore) }
+        single<CoupleRemoteDataSource> { FirestoreCoupleDataSource(Firebase.firestore) }
     }

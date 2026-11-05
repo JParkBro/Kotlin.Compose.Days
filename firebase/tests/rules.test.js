@@ -124,7 +124,13 @@ describe('숨긴 자동 기념일', () => {
 
 describe('커플 연결', () => {
   async function seedCode({ expiresAt = Date.now() + HOUR, usedBy } = {}) {
-    await seed('pairCodes/K7Q2MX', { creatorUid: A, expiresAt, createdAt: Date.now(), ...(usedBy ? { usedBy } : {}) });
+    await seed('pairCodes/K7Q2MX', {
+      creatorUid: A,
+      creatorNickname: '지민',
+      expiresAt,
+      createdAt: Date.now(),
+      ...(usedBy ? { usedBy } : {}),
+    });
   }
 
   /** B가 코드를 사용하고 같은 트랜잭션에서 커플을 만든다 */
@@ -173,6 +179,35 @@ describe('커플 연결', () => {
     await assertSucceeds(updateDoc(doc(db(A), 'couples/c1'), { status: 'DISCONNECTED', disconnectedAt: 1 }));
     await assertFails(updateDoc(doc(db(A), 'couples/c1'), { members: [A, C] }));
     await assertFails(deleteDoc(doc(db(A), 'couples/c1')));
+  });
+
+  test('코드를 만들 때 발급자 이름은 1~10자 문자열이어야 한다', async () => {
+    const code = (creatorNickname) => ({ creatorUid: A, creatorNickname, expiresAt: Date.now() + HOUR, createdAt: 1 });
+    await assertSucceeds(setDoc(doc(db(A), 'pairCodes/AAAAAA'), code('지민')));
+    await assertFails(setDoc(doc(db(A), 'pairCodes/BBBBBB'), code('')));
+    await assertFails(setDoc(doc(db(A), 'pairCodes/CCCCCC'), code('가'.repeat(11))));
+    await assertFails(setDoc(doc(db(A), 'pairCodes/DDDDDD'), { creatorUid: A, expiresAt: Date.now() + HOUR }));
+  });
+
+  test('해제된 커플은 상대가 발급한 코드를 같은 트랜잭션에서 쓸 때만 되살릴 수 있다', async () => {
+    await seedCouple({ status: 'DISCONNECTED' });
+    await seedCode();
+    // 혼자 되살리기는 거부
+    await assertFails(updateDoc(doc(db(B), 'couples/c1'), { status: 'ACTIVE', pairCode: 'K7Q2MX' }));
+    // 상대(A)의 코드를 쓰면서 되살리기는 허용
+    const firestore = db(B);
+    await assertSucceeds(
+      runTransaction(firestore, async (tx) => {
+        tx.update(doc(firestore, 'pairCodes/K7Q2MX'), { usedBy: B });
+        tx.update(doc(firestore, 'couples/c1'), { status: 'ACTIVE', pairCode: 'K7Q2MX', disconnectedAt: null });
+      }),
+    );
+  });
+
+  test('내가 발급한 코드로는 해제된 커플을 되살릴 수 없다', async () => {
+    await seedCouple({ status: 'DISCONNECTED' });
+    await seed('pairCodes/MYCODE', { creatorUid: B, creatorNickname: '현우', expiresAt: Date.now() + HOUR, createdAt: 1 });
+    await assertFails(updateDoc(doc(db(B), 'couples/c1'), { status: 'ACTIVE', pairCode: 'MYCODE' }));
   });
 });
 

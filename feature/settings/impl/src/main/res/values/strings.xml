@@ -7,6 +7,7 @@
     <string name="settings_main_section_couple">커플</string>
     <string name="settings_main_couple_manage">커플 관리</string>
     <string name="settings_main_couple_connected">%1$s 님과 연결됨</string>
+    <string name="settings_main_couple_connected_unnamed">연결됨</string>
     <string name="settings_main_couple_connect">커플 코드로 연결하기</string>
     <string name="settings_main_section_app">앱 설정</string>
     <string name="settings_main_theme">테마</string>

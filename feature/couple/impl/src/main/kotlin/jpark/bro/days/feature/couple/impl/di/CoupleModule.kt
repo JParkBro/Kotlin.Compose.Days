@@ -21,12 +21,16 @@ import org.koin.dsl.navigation3.navigation
 val coupleModule =
     module {
         viewModelOf(::PairingViewModel)
-        viewModel { params -> PairCodeConfirmViewModel(key = params.get()) }
+        viewModel { params -> PairCodeConfirmViewModel(key = params.get(), coupleRepository = get(), clock = get()) }
         viewModelOf(::CoupleManageViewModel)
 
         navigation<PairingKey> {
             val navigator = get<Navigator>()
-            PairingRoot(onNavigate = navigator::goTo, onBack = navigator::goBack)
+            PairingRoot(
+                onNavigate = navigator::goTo,
+                onConnected = { navigator.replaceAll(HomeKey) },
+                onBack = navigator::goBack,
+            )
         }
         navigation<PairCodeConfirmKey> { key ->
             val navigator = get<Navigator>()

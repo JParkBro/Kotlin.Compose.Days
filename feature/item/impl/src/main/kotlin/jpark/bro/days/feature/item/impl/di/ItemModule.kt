@@ -18,7 +18,9 @@ val itemModule =
         viewModel { params ->
             ItemDetailViewModel(key = params.get(), itemRepository = get(), homeWidgets = get(), clock = get())
         }
-        viewModel { params -> ItemEditViewModel(key = params.get(), itemRepository = get(), clock = get()) }
+        viewModel { params ->
+            ItemEditViewModel(key = params.get(), itemRepository = get(), coupleRepository = get(), clock = get())
+        }
 
         navigation<ItemDetailKey> { key ->
             val navigator = get<Navigator>()

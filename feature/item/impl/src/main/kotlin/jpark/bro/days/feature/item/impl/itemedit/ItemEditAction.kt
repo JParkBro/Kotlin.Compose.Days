@@ -6,6 +6,7 @@ import jpark.bro.days.core.model.CountMode
 import jpark.bro.days.core.model.ItemIcon
 import jpark.bro.days.core.model.RepeatRule
 import jpark.bro.days.core.model.TimeSlot
+import jpark.bro.days.core.model.Visibility
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -37,6 +38,11 @@ internal sealed interface ItemEditAction {
 
     data class ReminderToggled(
         val offsetDays: Int,
+    ) : CommonInput
+
+    /** 커플일 때만 보인다. 공유한 항목은 바꿀 수 없다 */
+    data class VisibilitySelected(
+        val visibility: Visibility,
     ) : CommonInput
 
     data class CategorySelected(

@@ -35,7 +35,6 @@ import jpark.bro.days.core.model.ItemIcon
 import jpark.bro.days.core.model.ItemType
 import jpark.bro.days.core.model.RepeatRule
 import jpark.bro.days.core.model.TimeSlot
-import jpark.bro.days.core.model.Visibility
 import jpark.bro.days.core.model.itemColorFromKey
 import jpark.bro.days.core.ui.label
 import jpark.bro.days.core.ui.scheduleText
@@ -133,13 +132,7 @@ private fun Item.metaText(dday: DdayCount?): String {
                 listOf(content.scheduleText(showPlace = true).ifEmpty { null })
             }
         }
-    val visibility =
-        stringResource(
-            when (content.visibility) {
-                Visibility.PRIVATE -> R.string.item_detail_visibility_private
-                Visibility.SHARED -> R.string.item_detail_visibility_shared
-            },
-        )
+    val visibility = stringResource(content.visibility.label)
     return (parts + visibility).filterNotNull().joinToString(" · ")
 }
 

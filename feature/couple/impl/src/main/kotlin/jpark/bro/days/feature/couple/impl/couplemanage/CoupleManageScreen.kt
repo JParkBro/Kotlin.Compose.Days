@@ -36,7 +36,9 @@ import jpark.bro.days.core.designsystem.component.DaysBadgeSize
 import jpark.bro.days.core.designsystem.component.DaysBadgeTone
 import jpark.bro.days.core.designsystem.component.DaysButtonSize
 import jpark.bro.days.core.designsystem.component.DaysCard
+import jpark.bro.days.core.designsystem.component.DaysIconBadge
 import jpark.bro.days.core.designsystem.component.DaysIconButton
+import jpark.bro.days.core.designsystem.component.DaysListItem
 import jpark.bro.days.core.designsystem.component.DaysSoftButton
 import jpark.bro.days.core.designsystem.component.DaysSwitch
 import jpark.bro.days.core.designsystem.component.DaysToastHost
@@ -55,6 +57,7 @@ import jpark.bro.days.core.designsystem.R as DesignR
 
 @Composable
 internal fun CoupleManageRoot(
+    onOpenAnniversaries: () -> Unit,
     onBack: () -> Unit,
     viewModel: CoupleManageViewModel = koinViewModel(),
 ) {
@@ -68,6 +71,7 @@ internal fun CoupleManageRoot(
             CoupleManageEvent.UpdateFailed -> toastHostState.showSnackbar(updateFailed)
             CoupleManageEvent.UnpairFailed -> toastHostState.showSnackbar(unpairFailed)
             CoupleManageEvent.Disconnected -> onBack()
+            CoupleManageEvent.OpenAnniversaries -> onOpenAnniversaries()
             CoupleManageEvent.NavigateBack -> onBack()
         }
     }
@@ -78,7 +82,7 @@ internal fun CoupleManageRoot(
     }
 }
 
-/** 커플 관리 (product-spec 6장, 시안 couple-manage). 사진 · 나이 · 기념일 알림은 해당 단계에서 */
+/** 커플 관리 (product-spec 6장, 시안 couple-manage). 자동 기념일 숨김은 별도 목록, 사진 · 나이 · 기념일 알림은 해당 단계에서 */
 @Composable
 private fun CoupleManageScreen(
     state: CoupleManageState,
@@ -166,6 +170,15 @@ private fun CoupleManageScreen(
                         modifier = Modifier.testTag("manage_count_first_day"),
                     )
                 }
+            }
+            DaysCard {
+                DaysListItem(
+                    title = stringResource(R.string.couple_manage_anniversaries),
+                    subtitle = stringResource(R.string.couple_manage_anniversaries_desc),
+                    onClick = { onAction(CoupleManageAction.AnniversariesClicked) },
+                    leading = { DaysIconBadge(icon = DesignR.drawable.ic_redeem) },
+                    modifier = Modifier.testTag("manage_anniversaries"),
+                )
             }
             UnpairEntry(onClick = { onAction(CoupleManageAction.UnpairClicked) })
         }

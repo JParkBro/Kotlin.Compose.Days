@@ -189,6 +189,25 @@ class DefaultItemRepositoryTest {
         }
 
     @Test
+    fun `공유한 항목은 나만 보기로 바꿀 수 없고 나만 보기는 공유로 바꿀 수 있음`() =
+        runTest {
+            seedCouple()
+            val private = repository.saveItem(id = null, content = DischargeDday).getOrThrow()
+            val shared = private.content.copy(visibility = Visibility.SHARED, coupleId = COUPLE)
+
+            assertTrue(repository.saveItem(id = private.id, content = shared).isSuccess)
+            assertTrue(repository.saveItem(id = private.id, content = DischargeDday).isFailure)
+            assertEquals(
+                Visibility.SHARED,
+                repository
+                    .observeItem(private.id)
+                    .first()
+                    ?.content
+                    ?.visibility,
+            )
+        }
+
+    @Test
     fun `상대가 만든 공유 항목도 수정 삭제할 수 있고 작성자는 그대로`() =
         runTest {
             seedCouple()

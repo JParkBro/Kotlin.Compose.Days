@@ -30,8 +30,11 @@ import jpark.bro.days.core.designsystem.AppSpacing
 import jpark.bro.days.core.designsystem.AppThemeTokens
 import jpark.bro.days.core.designsystem.component.DaysCard
 import jpark.bro.days.core.designsystem.component.DaysIconButton
+import jpark.bro.days.core.designsystem.component.DaysInfoBox
 import jpark.bro.days.core.designsystem.component.DaysItemIcon
 import jpark.bro.days.core.designsystem.component.DaysListItem
+import jpark.bro.days.core.designsystem.component.DaysSegment
+import jpark.bro.days.core.designsystem.component.DaysSegmentedControl
 import jpark.bro.days.core.designsystem.component.DaysSwitch
 import jpark.bro.days.core.designsystem.component.DdayText
 import jpark.bro.days.core.designsystem.component.DdayTone
@@ -40,6 +43,8 @@ import jpark.bro.days.core.designsystem.component.itemColor
 import jpark.bro.days.core.model.AppThemeType
 import jpark.bro.days.core.model.DdayCount
 import jpark.bro.days.core.model.ItemIcon
+import jpark.bro.days.core.model.Visibility
+import jpark.bro.days.core.ui.label
 import jpark.bro.days.core.ui.toDisplayText
 import jpark.bro.days.feature.item.impl.R
 import java.time.LocalDate
@@ -245,4 +250,37 @@ internal fun ChipFlow(
         horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm),
         verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
     ) { content() }
+}
+
+/** 공개 범위 [우리 둘이 | 나만 보기] (product-spec 2-6 · 4-5). 공유한 항목은 바꿀 수 없어 안내만 한다 */
+@Composable
+internal fun VisibilityPicker(
+    visibility: Visibility,
+    isLocked: Boolean,
+    onSelect: (Visibility) -> Unit,
+) {
+    val options = listOf(Visibility.SHARED, Visibility.PRIVATE)
+    val icons =
+        mapOf(
+            Visibility.SHARED to DesignR.drawable.ic_favorite,
+            Visibility.PRIVATE to DesignR.drawable.ic_person,
+        )
+    Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.sm)) {
+        DaysSegmentedControl(
+            segments = options.map { DaysSegment(text = stringResource(it.label), icon = icons.getValue(it)) },
+            selectedIndex = options.indexOf(visibility),
+            onSelect = { onSelect(options[it]) },
+            modifier = Modifier.testTag("item_edit_visibility"),
+        )
+        DaysInfoBox(
+            text =
+                stringResource(
+                    when {
+                        isLocked -> R.string.item_edit_visibility_locked
+                        visibility == Visibility.SHARED -> R.string.item_edit_visibility_shared_desc
+                        else -> R.string.item_edit_visibility_private_desc
+                    },
+                ),
+        )
+    }
 }

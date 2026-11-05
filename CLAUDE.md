@@ -93,7 +93,7 @@ Kotlin · Jetpack Compose · Navigation 3 · Koin(`koin-compose-navigation3`) ·
 | 목적 | 명령 |
 |---|---|
 | 디버그 빌드 | `./gradlew :app:assembleDevDebug` (`app/google-services.json` 필요, 커밋하지 않음) |
-| Firebase 에뮬레이터 (dev 빌드가 기본으로 연결) | `cd firebase && npm --prefix functions run build && npx firebase emulators:start --only auth,firestore,functions --project days-61328` (`firebase/functions/.env.days-61328` 필요, `firebase/functions/CLAUDE.md`). 기기에서 `10.0.2.2` 연결이 시간 초과되면 `adb reverse tcp:9099 tcp:9099` (8080 · 5001도) + `local.properties` `firebase.emulator.host=127.0.0.1` |
+| Firebase 에뮬레이터 (dev 빌드가 기본으로 연결) | `cd firebase && npm --prefix functions run build && npx firebase emulators:start --only auth,firestore,functions,storage --project days-61328` (`firebase/functions/.env.days-61328` 필요, `firebase/functions/CLAUDE.md`). 기기에서 `10.0.2.2` 연결이 시간 초과되면 `adb reverse tcp:9099 tcp:9099` (8080 · 5001 · 9199도) + `local.properties` `firebase.emulator.host=127.0.0.1` |
 | 전체 단위 테스트 | `./gradlew testDevDebugUnitTest` |
 | 특정 모듈 테스트 | `./gradlew :feature:home:impl:testDevDebugUnitTest` |
 | 포맷 자동 수정 | `./gradlew ktlintFormat` |

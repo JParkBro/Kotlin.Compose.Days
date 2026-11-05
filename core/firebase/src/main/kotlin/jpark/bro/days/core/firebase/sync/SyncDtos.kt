@@ -108,7 +108,7 @@ internal fun itemDtoOf(
             showAsDday = data.boolean("showAsDday"),
             colorKey = data.requiredString("colorKey"),
             iconKey = data.requiredString("iconKey"),
-            backgroundImageId = data.string("backgroundImageId"),
+            backgroundImageId = data.pathId("backgroundImageId"),
             updatedBy = data.requiredString("updatedBy"),
             createdAt = data.requiredLong("createdAt"),
             updatedAt = data.requiredLong("updatedAt"),

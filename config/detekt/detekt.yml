@@ -10,6 +10,9 @@ complexity:
     ignoreAnnotated: ['Composable']
   LongParameterList:
     ignoreAnnotated: ['Composable']
+  TooManyFunctions:
+    # Room @Database는 DAO마다 abstract getter가 하나씩 있어야 한다
+    ignoreAnnotated: ['Database']
 
 coroutines:
   GlobalCoroutineUsage:

@@ -20,4 +20,6 @@ val databaseModule =
         single { get<DaysDatabase>().itemSyncDao() }
         single { get<DaysDatabase>().userDao() }
         single { get<DaysDatabase>().coupleItemDao() }
+        single { get<DaysDatabase>().imageDao() }
+        single { get<DaysDatabase>().imageSyncDao() }
     }

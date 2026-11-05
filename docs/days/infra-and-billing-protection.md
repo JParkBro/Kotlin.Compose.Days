@@ -62,16 +62,18 @@ Function:
 ### 2-2. 이미지 업로드 · 다운로드 · 삭제 (Cloud Storage)
 
 ```
-경로: couples/{coupleId}/images/{imageId}.webp  (+ _thumb.webp)
+경로: couples/{coupleId}/images/{imageId}.webp  (썸네일 없음)
 앱 → Storage SDK putFile / getFile / delete
-Storage 보안 규칙:
+Storage 보안 규칙 (firebase/storage.rules):
   - 로그인 + App Check 강제(콘솔 설정)
-  - firestore.get(couples/{coupleId})로 커플 멤버인지 확인
-  - 쓰기: contentType == image/webp, 크기 ≤ 300KB, 이미지 수 한도 이하 (2-3)
-  - 삭제: 멤버만. 공개 URL · 공개 읽기는 만들지 않는다
+  - firestore.get(couples/{coupleId})로 커플 멤버인지 확인 (해제된 커플 멤버도 읽기 · 삭제는 됨)
+  - 새로 만들기: ACTIVE 커플, contentType == image/webp, 크기 ≤ 300KB, 파일 이름 == usage/images.lastImageId (2-3)
+  - 덮어쓰기 금지. 삭제: 멤버만. 공개 URL · 공개 읽기는 만들지 않는다
 ```
 
-- 앱은 WebP · 긴 변 1080px · 150KB 안팎으로 압축해서 올리고, 받은 이미지는 이미지 ID 단위로 기기에 영구 캐시해 다시 받지 않습니다.
+- 앱은 WebP · 긴 변 1080px · 280KB 이하(품질 85에서 낮춰 가며)로 압축해서 올리고, 받은 이미지는 이미지 ID 단위로 기기(`filesDir/images`)에 영구 저장해 다시 받지 않습니다. 받지 못한 사진은 그 실행 동안 다시 요청하지 않습니다.
+- 썸네일은 두지 않습니다 (2026-11 결정): 받은 사진을 영구 저장하고 표시할 때 줄이므로 썸네일을 따로 받을 일이 없어 업로드 · 규칙 검사 횟수를 절반으로 줄였습니다. 문서에는 사진 id만 두고 경로는 계산합니다.
+- 나만 보기 항목의 사진 · 솔로의 프로필 사진은 올리지 않습니다. 커플의 공유 항목 배경 · 커플일 때 내 프로필 사진만 그 커플 경로에 올립니다.
 - Storage 규칙 안의 `firestore.get()`도 Firestore 읽기로 집계됩니다. 다운로드는 앱 캐시로 횟수를 줄입니다.
 - 버킷 리전은 무료 사용량이 있는 **미국 리전**을 우선 검토합니다. 서울 리전이면 첫 바이트부터 과금되지만 이 앱 규모에서는 금액이 작습니다. 버킷을 만들 때 정합니다.
 
@@ -83,7 +85,7 @@ Storage 보안 규칙:
 |---|---|---|
 | 파일 1개 크기 | 300KB | Storage 규칙 `request.resource.size` |
 | 형식 | `image/webp` | Storage 규칙 `request.resource.contentType` |
-| 커플당 이미지 수 | 30장 (보상형 광고로 추가는 이후) | Firestore `couples/{id}/usage/images`의 `count`를 Firestore 규칙이 +1씩만 · 한도 이하로만 허용하고, Storage 규칙이 그 값을 확인 |
+| 커플당 이미지 수 | 누적 업로드 30번 (지워도 줄지 않음, 보상형 광고로 추가는 이후) | Firestore `couples/{id}/usage/images`의 `count`를 Firestore 규칙이 +1씩만 · 30 이하로만 허용하고 `lastImageId`에 방금 등록한 사진 id를 적는다. Storage 규칙은 그 id의 파일만 새로 만들게 한다 (+1 한 번에 파일 1개). 한도를 다 쓰면 사진은 올린 사람 기기에만 남는다 |
 
 > 사용자당 하루 업로드 수처럼 시간 창이 있는 집계는 규칙만으로 정확히 막기 어렵습니다. 크기 · 개수 한도 + 예산 자동 해제(4-2)로 최악의 금액을 묶습니다.
 
@@ -151,7 +153,7 @@ Cloud Billing 예산 (월 1달러 = 결제 계정 통화 기준 1,000원, 알림
    | 키 | 기본값 | 용도 |
    |---|---|---|
    | `sync_enabled` | true | 동기화 전체 중단 (6-5b 구현: `RemoteFlags`, 앱 시작 · 포그라운드 진입 때 fetch, 최소 간격 1시간) |
-   | `upload_enabled` | true | 이미지 업로드 중단 |
+   | `upload_enabled` | true | 이미지 업로드 중단 (6-8a 구현: 사진이 붙은 공유 항목도 올리지 않고 기다림, 받기 · 지우기는 계속) |
    | `kakao_login_enabled` | true | 카카오 로그인 일시 중단 |
    | `min_supported_version` | 1 | 버그 있는 구버전 강제 업데이트 |
 
@@ -159,15 +161,15 @@ Cloud Billing 예산 (월 1달러 = 결제 계정 통화 기준 1,000원, 알림
 3. **쓰기 디바운스:** 같은 문서를 몇 초 안에 반복해서 쓰지 않습니다.
 4. **이미지 캐시:** 한 번 받은 이미지는 기기에 저장해서 다시 요청하지 않습니다.
 5. **실패 재시도 간격:** 동기화 · 업로드 실패 시 지수 백오프(1초, 2초, 4초 … 최대 수 분)로 재시도합니다. 실패 직후 즉시 무한 재시도하는 버그가 가장 흔한 과금 원인입니다.
-6. **개발 빌드는 에뮬레이터로:** dev 빌드는 **기본으로** 로컬 Firebase 에뮬레이터(Auth 9099 · Firestore 8080)에 연결합니다 (`FirebaseSetup`, `BuildConfig.FIREBASE_EMULATOR_HOST`). Storage · Functions 에뮬레이터는 해당 단계에서 추가합니다.
+6. **개발 빌드는 에뮬레이터로:** dev 빌드는 **기본으로** 로컬 Firebase 에뮬레이터(Auth 9099 · Firestore 8080 · Functions 5001 · Storage 9199)에 연결합니다 (`FirebaseSetup`, `BuildConfig.FIREBASE_EMULATOR_HOST`).
 
    | 상황 | 설정 (`local.properties`) |
    |---|---|
    | Android 에뮬레이터 + Mac 에뮬레이터 (기본) | 없음 (`10.0.2.2`) |
-   | 실기기 (USB) | `firebase.emulator.host=127.0.0.1` + `adb reverse tcp:9099 tcp:9099` · `adb reverse tcp:8080 tcp:8080` (에뮬레이터를 LAN에 열지 않음) |
+   | 실기기 (USB) | `firebase.emulator.host=127.0.0.1` + `adb reverse tcp:9099 tcp:9099` · `adb reverse tcp:8080 tcp:8080` (5001 · 9199도, 에뮬레이터를 LAN에 열지 않음) |
    | 실제 프로젝트로 확인 | `firebase.useEmulator=false` (운영 예산 1,000원에 들어감) |
 
-   에뮬레이터 실행: `cd firebase && npm --prefix functions run build && npx firebase emulators:start --only auth,firestore,functions --project days-61328`. Functions 에뮬레이터는 `KAKAO_APP_ID`가 든 `firebase/functions/.env.days-61328`이 필요하고, App Check 강제도 그대로 적용된다 (토큰 없는 호출은 `UNAUTHENTICATED`). Pub/Sub 에뮬레이터를 켜지 않으므로 `stopBilling`은 에뮬레이터에서 실행되지 않는다. 앱의 프로젝트 ID와 같아야 데이터가 보인다. dev 빌드는 에뮬레이터(http) 연결을 위해 `10.0.2.2` · `localhost` · `127.0.0.1`에만 평문 통신을 허용한다 (`app/src/dev`만, prod는 허용하지 않음).
+   에뮬레이터 실행: `cd firebase && npm --prefix functions run build && npx firebase emulators:start --only auth,firestore,functions,storage --project days-61328`. Functions 에뮬레이터는 `KAKAO_APP_ID`가 든 `firebase/functions/.env.days-61328`이 필요하고, App Check 강제도 그대로 적용된다 (토큰 없는 호출은 `UNAUTHENTICATED`). Pub/Sub 에뮬레이터를 켜지 않으므로 `stopBilling`은 에뮬레이터에서 실행되지 않는다. 앱의 프로젝트 ID와 같아야 데이터가 보인다. dev 빌드는 에뮬레이터(http) 연결을 위해 `10.0.2.2` · `localhost` · `127.0.0.1`에만 평문 통신을 허용한다 (`app/src/dev`만, prod는 허용하지 않음).
 
 ## 6. 출시 전 체크리스트
 
@@ -177,7 +179,7 @@ Cloud Billing 예산 (월 1달러 = 결제 계정 통화 기준 1,000원, 알림
 - [ ] App Check(Play Integrity) 등록 및 Firestore · Storage · Functions 강제 설정
 - [ ] 보안 규칙(Firestore · Storage) 배포 및 에뮬레이터 테스트 (연결 · 공유 · 해제 · 비멤버 접근 거부 · 업로드 크기 · 개수)
 - [x] `kakaoAuth` 함수: 카카오 앱 ID 환경 변수, `maxInstances`, App Check 강제 확인 (2026-11 배포 · 실기기 카카오 로그인으로 확인, 실행 계정 `kakao-auth@`)
-- [ ] Storage 버킷 리전 확인, 공개 URL · 공개 읽기 없음 확인
+- [ ] Storage 기본 버킷을 `us-central1`로 만들기(2026-11 결정, 무료 사용량), 공개 URL · 공개 읽기 없음 확인, `storage.rules` 배포
 - [ ] Remote Config 차단 스위치 4종 등록 및 앱 동작 확인
 - [ ] Firebase(Google) 계정 2단계 인증 설정
 - [ ] 개인정보 처리방침에 데이터 보관 위치(Google Cloud) 명시, Firebase Hosting 배포

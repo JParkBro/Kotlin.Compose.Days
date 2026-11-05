@@ -15,6 +15,8 @@ dependencies {
     api(libs.firebase.auth)
     api(libs.firebase.firestore)
     api(libs.firebase.functions)
+    // 사진 (Storage 보안 규칙으로만 접근, infra-and-billing-protection.md 2-2)
+    implementation(libs.firebase.storage)
     // 원격 차단 스위치 (infra-and-billing-protection.md 5장)
     api(libs.firebase.config)
     api(libs.kotlinx.coroutines.play.services)

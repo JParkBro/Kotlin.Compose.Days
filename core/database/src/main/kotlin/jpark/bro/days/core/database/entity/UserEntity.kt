@@ -19,4 +19,6 @@ data class UserEntity(
     @ColumnInfo(name = "server_updated_at") val serverUpdatedAt: Long?,
     /** Room 전용. [SyncState.name] */
     @ColumnInfo(name = "sync_state") val syncState: String = SyncState.PENDING.name,
+    /** [ImageEntity.id]. 사진이 없으면 null */
+    @ColumnInfo(name = "profile_image_id") val profileImageId: String? = null,
 )

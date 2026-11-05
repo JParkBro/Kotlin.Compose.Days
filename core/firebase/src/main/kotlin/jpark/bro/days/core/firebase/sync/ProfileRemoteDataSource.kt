@@ -10,7 +10,7 @@ import kotlinx.coroutines.tasks.await
 
 /**
  * 프로필 `users/{uid}` (data-model-erd.md 4장). 규칙: 나만 쓰고, 나와 연결된 상대만 읽는다.
- * 쓰기는 이름 · 생일만 merge한다 (coupleId는 커플 연결이 쓴다).
+ * 쓰기는 이름 · 생일 · 프로필 사진 id만 merge한다 (coupleId는 커플 연결이 쓴다).
  */
 interface ProfileRemoteDataSource {
     suspend fun pushProfile(profile: ProfileDto)
@@ -22,12 +22,17 @@ interface ProfileRemoteDataSource {
     fun observeProfile(uid: String): Flow<ProfileDto>
 }
 
-/** [birthDate]는 yyyy-MM-dd 또는 null. [serverUpdatedAtMicros]는 받을 때만 */
+/**
+ * [birthDate]는 yyyy-MM-dd 또는 null. [profileImageId]는 연결된 커플에 올린 사진만 (`couples/{coupleId}/images/{id}.webp`).
+ * [coupleId] · [serverUpdatedAtMicros]는 받을 때만
+ */
 data class ProfileDto(
     val uid: String,
     val nickname: String,
     val birthDate: String?,
     val updatedAt: Long,
+    val profileImageId: String? = null,
+    val coupleId: String? = null,
     val serverUpdatedAtMicros: Long = 0,
 )
 
@@ -39,6 +44,7 @@ internal class FirestoreProfileDataSource(
             mapOf(
                 "nickname" to profile.nickname,
                 "birthDate" to profile.birthDate,
+                "profileImageId" to profile.profileImageId,
                 "updatedAt" to profile.updatedAt,
                 SERVER_UPDATED_AT to FieldValue.serverTimestamp(),
             )
@@ -88,6 +94,8 @@ internal fun profileDtoOf(
             nickname = data.requiredString("nickname"),
             birthDate = data.string("birthDate"),
             updatedAt = data.requiredLong("updatedAt"),
+            profileImageId = data.pathId("profileImageId"),
+            coupleId = data.pathId("coupleId"),
             serverUpdatedAtMicros = serverUpdatedAtMicros,
         )
     }

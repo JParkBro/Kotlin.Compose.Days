@@ -5,12 +5,16 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import jpark.bro.days.core.common.IdGenerator
 import jpark.bro.days.core.data.couple.CoupleTransitions
+import jpark.bro.days.core.data.image.ImageStore
 import jpark.bro.days.core.database.DaysDatabase
 import jpark.bro.days.core.database.entity.UserEntity
 import jpark.bro.days.core.firebase.sync.ProfileDto
 import jpark.bro.days.core.testing.FakeCoupleRemoteDataSource
+import jpark.bro.days.core.testing.FakeImageRemoteDataSource
 import jpark.bro.days.core.testing.testSettingsDataStore
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -42,14 +46,19 @@ class SyncEngineTest {
         )
     }
     private var nextCopyId = 1
+    private val imageRemote = FakeImageRemoteDataSource()
+    private val uploadEnabled = MutableStateFlow(true)
+    private val store = ImageStore(ApplicationProvider.getApplicationContext(), Dispatchers.Unconfined)
+    private val coupleData by lazy {
+        CoupleDataSync(remote, db.itemSyncDao(), db.anniversaryHideDao(), db.syncCursorDao(), db.imageSyncDao())
+    }
     private val engine by lazy {
         SyncEngine(
             remote,
-            db.itemSyncDao(),
-            db.anniversaryHideDao(),
             couples,
-            db.syncCursorDao(),
-            ProfileSync(profileRemote, db.userDao()),
+            coupleData,
+            ProfileSync(profileRemote, db.userDao(), db.imageSyncDao()),
+            ImageSync(imageRemote, db.imageSyncDao(), db.userDao(), store, uploadEnabled),
         )
     }
 
@@ -63,7 +72,10 @@ class SyncEngineTest {
     }
 
     @After
-    fun tearDown() = db.close()
+    fun tearDown() {
+        db.close()
+        store.file("images").deleteRecursively()
+    }
 
     private suspend fun connectCouple() = couples.apply(ME, listOf(coupleDto()))
 
@@ -142,8 +154,8 @@ class SyncEngineTest {
         runTest {
             connectCouple()
 
-            engine.applyItems(COUPLE, listOf(itemDto("a", serverMicros = 30), itemDto("b", serverMicros = 50)))
-            engine.applyItems(COUPLE, listOf(itemDto("c", serverMicros = 40)))
+            coupleData.applyItems(COUPLE, listOf(itemDto("a", serverMicros = 30), itemDto("b", serverMicros = 50)))
+            coupleData.applyItems(COUPLE, listOf(itemDto("c", serverMicros = 40)))
 
             assertEquals(
                 listOf("a", "b", "c"),
@@ -163,7 +175,7 @@ class SyncEngineTest {
             connectCouple()
             db.itemDao().upsertItem(mySharedItem("a").copy(title = "내 수정"))
 
-            engine.applyItems(COUPLE, listOf(itemDto("a", title = "상대 수정")))
+            coupleData.applyItems(COUPLE, listOf(itemDto("a", title = "상대 수정")))
 
             assertEquals("내 수정", db.itemDao().getItem("a")?.title)
         }
@@ -173,7 +185,7 @@ class SyncEngineTest {
         runTest {
             connectCouple()
 
-            engine.applyItems(COUPLE, listOf(itemDto("x", coupleId = "couple-other")))
+            coupleData.applyItems(COUPLE, listOf(itemDto("x", coupleId = "couple-other")))
 
             assertNull(db.itemDao().getItem("x"))
         }

@@ -9,22 +9,26 @@ import jpark.bro.days.core.data.auth.GoogleSignInClient
 import jpark.bro.days.core.data.auth.KakaoSdkSignIn
 import jpark.bro.days.core.data.auth.KakaoSignInClient
 import jpark.bro.days.core.data.couple.CoupleTransitions
+import jpark.bro.days.core.data.image.ImageStore
 import jpark.bro.days.core.data.repository.AnniversaryRepository
 import jpark.bro.days.core.data.repository.AuthRepository
 import jpark.bro.days.core.data.repository.CoupleRepository
 import jpark.bro.days.core.data.repository.DefaultAnniversaryRepository
 import jpark.bro.days.core.data.repository.DefaultAuthRepository
 import jpark.bro.days.core.data.repository.DefaultCoupleRepository
+import jpark.bro.days.core.data.repository.DefaultImageRepository
 import jpark.bro.days.core.data.repository.DefaultItemRepository
 import jpark.bro.days.core.data.repository.DefaultProfileRepository
 import jpark.bro.days.core.data.repository.DefaultSettingsRepository
 import jpark.bro.days.core.data.repository.DefaultWidgetConfigRepository
+import jpark.bro.days.core.data.repository.ImageRepository
 import jpark.bro.days.core.data.repository.ItemRepository
 import jpark.bro.days.core.data.repository.ProfileRepository
 import jpark.bro.days.core.data.repository.SettingsRepository
 import jpark.bro.days.core.data.repository.WidgetConfigRepository
 import jpark.bro.days.core.data.session.FirebaseUserSession
 import jpark.bro.days.core.data.session.UserSession
+import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
@@ -49,6 +53,8 @@ val dataModule =
         single { CoupleTransitions(get(), get(), get(), get(), get(), get()) }
         single<CoupleRepository> { DefaultCoupleRepository(get(), get(), get(), get(), get(), get()) }
         singleOf(::DefaultAnniversaryRepository) bind AnniversaryRepository::class
+        single { ImageStore(androidContext(), Dispatchers.IO) }
+        singleOf(::DefaultImageRepository) bind ImageRepository::class
         singleOf(::DefaultWidgetConfigRepository) bind WidgetConfigRepository::class
     }
 

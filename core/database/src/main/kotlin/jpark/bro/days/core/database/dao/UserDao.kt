@@ -26,6 +26,13 @@ interface UserDao {
     @Query("SELECT COUNT(*) FROM user WHERE id = :userId AND sync_state IN ('PENDING', 'FAILED')")
     fun observeUnsyncedCount(userId: String): Flow<Int>
 
+    /** 프로필 사진을 커플에 올린 뒤 프로필 문서에 사진 id를 다시 적도록 */
+    @Query("UPDATE user SET sync_state = 'PENDING' WHERE id = :userId AND profile_image_id = :imageId")
+    suspend fun markPendingIfProfileImage(
+        userId: String,
+        imageId: String,
+    )
+
     /** 올린 뒤 상태 변경. 올리는 사이 다시 저장된 행(updated_at이 다름)은 PENDING으로 남긴다 */
     @Query("UPDATE user SET sync_state = :syncState WHERE id = :id AND updated_at = :updatedAt")
     suspend fun setSyncState(

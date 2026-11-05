@@ -109,9 +109,7 @@ erDiagram
     IMAGE {
         string id PK
         string owner_user_id FK
-        string couple_id FK
-        string remote_path
-        string thumb_path
+        string remote_couple_id "서버 파일이 있는 커플 (경로는 couples/{id}/images/{id}.webp)"
         int width
         int height
         int bytes
@@ -167,7 +165,7 @@ erDiagram
 | ITEM (나만 보기) | ✓ | ✗ (백업 기능 추가 시 `users/{uid}/items`) | `items` |
 | ITEM (우리 둘이) | ✓ | `couples/{coupleId}/items/{itemId}` | `items` |
 | USER_ITEM_PREF, ITEM_REMINDER | ✓ (내 것만) | ✗ | 기기 간 동기화가 필요해지면 추가 |
-| IMAGE | 로컬 경로 + 업로드 상태 | 메타는 항목 문서에 포함, 파일은 Cloud Storage | `images` + 오브젝트 스토리지 (S3 호환으로 옮김) |
+| IMAGE | 로컬 경로 + 업로드 상태 | 사진 id만 항목 · 프로필 문서에 (`backgroundImageId` · `profileImageId`), 파일은 Cloud Storage | `images` + 오브젝트 스토리지 (S3 호환으로 옮김) |
 | ANNIVERSARY_HIDE | ✓ | `couples/{coupleId}/hiddenAnniversaries/{ruleKey}` | `anniversary_hides` |
 | TERMS_AGREEMENT | ✗ | `users/{uid}` 안의 필드 | `terms_agreements` |
 | 위젯 설정, 테마, 활동 알림 | ✓ (또는 DataStore) | ✗ | ✗ |
@@ -177,7 +175,7 @@ erDiagram
 | 대상 | 추가 컬럼 / 테이블 |
 |---|---|
 | 동기화 대상 테이블 (item, couple, anniversary_hide, user) | `sync_state` (PENDING / SYNCED / FAILED). `user`는 내 행만 올리고 상대 행은 받기만 한다 |
-| image | `local_path`, `upload_state` |
+| image | `local_path` (filesDir 기준, 받기 전이면 null), `upload_state` (`NONE` · `REJECTED` 한도 초과) |
 | item | `copied_from_item_id` (커플 해제 때 만든 나만 보기 사본의 원본 id. 30일 안 재연결 때 고치지 않은 사본 정리) |
 | `sync_cursor` | `key` (예: `items:{coupleId}`, `hiddenAnniversaries:{coupleId}`), `last_pulled_at_micros` (Firestore 서버 시각이 마이크로초라 이 컬럼만 마이크로초. 밀리초로 자르면 같은 문서를 매번 다시 읽는다) |
 | `activity_log` | 상대 활동 알림 목록 (id, type, item_id, actor_user_id, created_at, is_read) |
@@ -187,7 +185,7 @@ erDiagram
 
 ```
 users/{uid}
-  nickname (1~10자), birthDate (yyyy-MM-dd, 없으면 null), authProvider, coupleId, serverUpdatedAt,
+  nickname (1~10자), birthDate (yyyy-MM-dd, 없으면 null), profileImageId (지금 커플에 올린 사진만), authProvider, coupleId, serverUpdatedAt,
   termsVersion, privacyVersion, ageOver14, marketing, agreedAt,
   updatedAt
 
@@ -200,17 +198,17 @@ couples/{coupleId}
 
 couples/{coupleId}/items/{itemId}
   ITEM 필드와 동일 (visibility는 항상 SHARED)
-  backgroundImage: { id, path, thumbPath, width, height }
+  backgroundImageId (사진 id만. 경로는 couples/{coupleId}/images/{id}.webp)
 
 couples/{coupleId}/hiddenAnniversaries/{ruleKey}
   createdAt, deletedAt (숨김 해제), serverUpdatedAt
 
 couples/{coupleId}/usage/images
-  count  (커플당 이미지 수, 규칙이 +1씩 · 한도 이하로만 허용)
+  count  (커플당 누적 업로드 수, 규칙이 +1씩 · 30 이하로만 허용)
+  lastImageId  (방금 등록한 사진 id. Storage 규칙이 이 id의 파일만 새로 만들게 한다)
 
-Cloud Storage (Storage 보안 규칙: 커플 멤버만, webp · 300KB 이하, 공개 URL 없음)
+Cloud Storage (Storage 보안 규칙: 커플 멤버만, webp · 300KB 이하, 덮어쓰기 금지, 공개 URL 없음)
   couples/{coupleId}/images/{imageId}.webp
-  couples/{coupleId}/images/{imageId}_thumb.webp
 ```
 
 ## 5. Room Entity 예시

@@ -15,6 +15,8 @@ internal sealed interface CoupleManageAction {
         val value: Boolean,
     ) : CoupleManageAction
 
+    data object AnniversariesClicked : CoupleManageAction
+
     data object UnpairClicked : CoupleManageAction
 
     data object UnpairDismissed : CoupleManageAction

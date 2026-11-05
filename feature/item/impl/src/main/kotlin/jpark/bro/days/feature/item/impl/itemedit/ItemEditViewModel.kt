@@ -1,6 +1,7 @@
 package jpark.bro.days.feature.item.impl.itemedit
 
 import androidx.lifecycle.viewModelScope
+import jpark.bro.days.core.data.repository.CoupleRepository
 import jpark.bro.days.core.data.repository.ItemRepository
 import jpark.bro.days.core.model.Category
 import jpark.bro.days.core.model.CountMode
@@ -24,14 +25,27 @@ import java.time.LocalDate
 internal class ItemEditViewModel(
     key: ItemEditKey,
     private val itemRepository: ItemRepository,
+    coupleRepository: CoupleRepository,
     clock: Clock,
 ) : MviViewModel<ItemEditState, ItemEditAction, ItemEditEvent>(initialState(key, LocalDate.now(clock))) {
-    /** 수정 중인 원본. 화면에 없는 값(공개 범위 · 완료 · 배경)을 저장할 때 유지한다 */
+    /** 수정 중인 원본. 화면에 없는 값(완료 · 배경)을 저장할 때 유지한다 */
     private var original: Item? = null
     private var originalPinned: Boolean = false
 
     init {
-        key.itemId?.let(::load)
+        viewModelScope.launch {
+            // 연결된 커플은 화면을 여는 시점 기준. 편집 중에 해제되면 공유 저장이 실패하고 안내한다
+            val coupleId = coupleRepository.observeCouple().first()?.id
+            val itemId = key.itemId
+            if (itemId != null) {
+                load(itemId, coupleId)
+            } else {
+                // 커플이면 새 항목은 우리 둘이가 기본 (시안 item-edit-dday)
+                setState {
+                    copy(coupleId = coupleId, visibility = if (coupleId != null) Visibility.SHARED else visibility)
+                }
+            }
+        }
     }
 
     override fun onAction(action: ItemEditAction) {
@@ -49,20 +63,20 @@ internal class ItemEditViewModel(
         }
     }
 
-    private fun load(itemId: String) {
-        setState { copy(isLoading = true) }
-        viewModelScope.launch {
-            val item = itemRepository.observeItem(itemId).first()
-            if (item == null) {
-                sendEvent(ItemEditEvent.NavigateBack)
-                return@launch
-            }
-            val reminders = itemRepository.observeReminders(itemId).first()
-            val pinned = itemRepository.observePinnedItemId().first() == itemId
-            original = item
-            originalPinned = pinned
-            setState { item.toState(today = today, reminders = reminders, pinned = pinned) }
+    private suspend fun load(
+        itemId: String,
+        coupleId: String?,
+    ) {
+        val item = itemRepository.observeItem(itemId).first()
+        if (item == null) {
+            sendEvent(ItemEditEvent.NavigateBack)
+            return
         }
+        val reminders = itemRepository.observeReminders(itemId).first()
+        val pinned = itemRepository.observePinnedItemId().first() == itemId
+        original = item
+        originalPinned = pinned
+        setState { item.toState(today = today, reminders = reminders, pinned = pinned).copy(coupleId = coupleId) }
     }
 
     private fun save() {
@@ -120,6 +134,10 @@ private fun ItemEditState.reduce(action: ItemEditAction.CommonInput): ItemEditSt
 
         is ItemEditAction.MemoChanged -> {
             copy(memo = action.memo)
+        }
+
+        is ItemEditAction.VisibilitySelected -> {
+            if (isVisibilityLocked) this else copy(visibility = action.visibility)
         }
 
         is ItemEditAction.ReminderToggled -> {
@@ -238,6 +256,8 @@ private fun Item.toState(
         showAsDday = content.showAsDday,
         reminderOffsets = reminders.map { it.offsetDays }.toSet(),
         isPinned = pinned,
+        visibility = content.visibility,
+        isVisibilityLocked = content.visibility == Visibility.SHARED,
     )
 
 /** 타입별로 쓰지 않는 값은 비운다 (data-model-erd 항목 타입별 사용 컬럼). 화면에 없는 값은 [original]에서 유지 */
@@ -248,8 +268,12 @@ private fun ItemEditState.toContent(original: ItemContent?): ItemContent {
         title = title.trim(),
         colorKey = color.name,
         iconKey = icon.name,
-        visibility = original?.visibility ?: Visibility.PRIVATE,
-        coupleId = original?.coupleId,
+        visibility = visibility,
+        coupleId =
+            when (visibility) {
+                Visibility.SHARED -> original?.coupleId ?: coupleId
+                Visibility.PRIVATE -> null
+            },
         category = category,
         date = date,
         countMode = countMode.takeIf { isDday },

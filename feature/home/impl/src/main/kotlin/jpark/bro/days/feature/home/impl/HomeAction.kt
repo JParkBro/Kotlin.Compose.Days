@@ -18,6 +18,10 @@ internal sealed interface HomeAction {
         val quickStart: QuickStart,
     ) : HomeAction
 
+    data class FilterSelected(
+        val filter: HomeFilter,
+    ) : HomeAction
+
     data object FabClicked : HomeAction
 
     data object AddSheetDismissed : HomeAction

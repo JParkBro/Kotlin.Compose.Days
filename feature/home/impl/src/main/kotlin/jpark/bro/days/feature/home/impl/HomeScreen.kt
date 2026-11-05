@@ -10,11 +10,13 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -38,8 +40,11 @@ import jpark.bro.days.core.ui.DdayItemRow
 import jpark.bro.days.core.ui.ObserveEvents
 import jpark.bro.days.feature.couple.api.PairingKey
 import jpark.bro.days.feature.home.impl.components.CoupleBanner
+import jpark.bro.days.feature.home.impl.components.CoupleHeroCard
+import jpark.bro.days.feature.home.impl.components.CoupleSummaryRow
 import jpark.bro.days.feature.home.impl.components.HeroCard
 import jpark.bro.days.feature.home.impl.components.HomeEmptyContent
+import jpark.bro.days.feature.home.impl.components.HomeFilterChips
 import jpark.bro.days.feature.home.impl.components.HomeListHeader
 import jpark.bro.days.feature.home.impl.components.NextPlanCard
 import jpark.bro.days.feature.home.impl.components.label
@@ -161,6 +166,7 @@ private fun ColumnScope.HomeEmpty(
                 .padding(top = AppSpacing.xl, bottom = AppSpacing.xxl),
         verticalArrangement = Arrangement.spacedBy(AppSpacing.xl),
     ) {
+        state.content.couple?.let { CoupleHeroCard(couple = it) }
         HomeEmptyContent(
             onQuickStartClick = { onAction(HomeAction.QuickStartClicked(it)) },
             onAddClick = { onAction(HomeAction.AddClicked(ItemType.DDAY)) },
@@ -174,7 +180,7 @@ private fun ColumnScope.HomeEmpty(
     }
 }
 
-/** 히어로 → 다가오는 일정 → 커플 연결 카드 → 디데이 리스트 (product-spec 4-1) */
+/** 히어로 → 다가오는 일정 (커플이면 + 다음 기념일) → 커플 연결 카드 → (필터) → 디데이 리스트 (product-spec 4-1) */
 @Composable
 private fun ColumnScope.HomeList(
     state: HomeState,
@@ -199,12 +205,25 @@ private fun ColumnScope.HomeList(
         content.hero?.let { hero ->
             item(key = "hero") { HeroCard(hero = hero, onClick = { openItem(hero.entry.item) }) }
         }
-        item(key = "next_plan") {
-            NextPlanCard(
-                plan = content.nextPlan,
-                onPlanClick = openItem,
-                onAddClick = { onAction(HomeAction.AddClicked(ItemType.PLAN)) },
-            )
+        val couple = content.couple
+        if (couple != null) {
+            item(key = "couple_hero") { CoupleHeroCard(couple = couple) }
+            item(key = "couple_summary") {
+                CoupleSummaryRow(
+                    plan = content.nextPlan,
+                    couple = couple,
+                    onPlanClick = openItem,
+                    onAddPlanClick = { onAction(HomeAction.AddClicked(ItemType.PLAN)) },
+                )
+            }
+        } else {
+            item(key = "next_plan") {
+                NextPlanCard(
+                    plan = content.nextPlan,
+                    onPlanClick = openItem,
+                    onAddClick = { onAction(HomeAction.AddClicked(ItemType.PLAN)) },
+                )
+            }
         }
         if (state.showCoupleBanner) {
             item(key = "couple_banner") {
@@ -214,19 +233,44 @@ private fun ColumnScope.HomeList(
                 )
             }
         }
-        if (content.rows.isNotEmpty()) {
-            item(key = "list_header") {
-                HomeListHeader(count = content.rows.size, modifier = Modifier.padding(top = AppSpacing.sm))
-            }
-            items(items = content.rows, key = { it.item.id }) { row ->
-                DdayItemRow(
-                    content = row.item.content,
-                    dday = row.dday,
-                    onClick = { openItem(row.item) },
-                    modifier = Modifier.testTag("home_item_${row.item.id}"),
+        homeRows(state = state, onAction = onAction, openItem = openItem)
+    }
+}
+
+/** 리스트 제목 · (커플이면 필터) · 디데이 줄 */
+private fun LazyListScope.homeRows(
+    state: HomeState,
+    onAction: (HomeAction) -> Unit,
+    openItem: (Item) -> Unit,
+) {
+    if (state.content.rows.isEmpty()) return
+    val rows = state.visibleRows
+    item(key = "list_header") {
+        HomeListHeader(count = rows.size, modifier = Modifier.padding(top = AppSpacing.sm))
+    }
+    if (state.isCoupled) {
+        item(key = "filter") {
+            HomeFilterChips(selected = state.filter, onSelect = { onAction(HomeAction.FilterSelected(it)) })
+        }
+        if (rows.isEmpty()) {
+            item(key = "filter_empty") {
+                Text(
+                    text = stringResource(R.string.home_filter_empty),
+                    style = AppThemeTokens.typography.bodyMd,
+                    color = AppThemeTokens.colors.textSecondary,
+                    modifier = Modifier.padding(AppSpacing.md),
                 )
             }
         }
+    }
+    items(items = rows, key = { it.item.id }) { row ->
+        DdayItemRow(
+            content = row.item.content,
+            dday = row.dday,
+            onClick = { openItem(row.item) },
+            showVisibility = state.isCoupled,
+            modifier = Modifier.testTag("home_item_${row.item.id}"),
+        )
     }
 }
 
@@ -254,4 +298,10 @@ private fun HomeEmptyPreview() {
             onAction = {},
         )
     }
+}
+
+@ScreenPreviews
+@Composable
+private fun HomeCouplePreview() {
+    AppTheme { HomeScreen(state = previewCoupleState(), onAction = {}) }
 }

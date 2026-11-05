@@ -77,4 +77,13 @@ class CoupleManageViewModelTest {
     private companion object {
         val PairCodeDate = CoupleManageAction.StartDateSelected(LocalDate.of(2025, 6, 15))
     }
+
+    @Test
+    fun `자동 기념일을 누르면 기념일 목록으로 감`() =
+        runTest {
+            viewModel.event.test {
+                viewModel.onAction(CoupleManageAction.AnniversariesClicked)
+                assertEquals(CoupleManageEvent.OpenAnniversaries, awaitItem())
+            }
+        }
 }

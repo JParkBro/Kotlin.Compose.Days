@@ -44,6 +44,10 @@ internal class CoupleManageViewModel(
                 update(countFirstDayAsOne = action.value)
             }
 
+            CoupleManageAction.AnniversariesClicked -> {
+                sendEvent(CoupleManageEvent.OpenAnniversaries)
+            }
+
             CoupleManageAction.UnpairClicked -> {
                 setState { copy(isUnpairSheetOpen = true, deleteCopies = false) }
             }

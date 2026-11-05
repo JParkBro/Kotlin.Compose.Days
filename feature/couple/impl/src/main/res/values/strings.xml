@@ -51,6 +51,8 @@
     <string name="couple_manage_together">%1$s 님과 함께한 지 %2$d일째</string>
     <string name="couple_manage_birth_date">생일</string>
     <string name="couple_manage_connected_since">연결 시작일</string>
+    <string name="couple_manage_anniversaries">자동 기념일</string>
+    <string name="couple_manage_anniversaries_desc">100일 단위 · 주년 · 생일 중 보지 않을 것을 숨겨요</string>
     <string name="couple_manage_unpair">커플 연결 해제</string>
     <string name="couple_manage_unpair_description">연결을 해제하면 공유하던 디데이와 일정은 각자에게 나만 보기 사본으로 남아요.</string>
     <string name="couple_manage_update_failed">저장하지 못했어요. 인터넷 연결을 확인해 주세요.</string>
@@ -65,4 +67,9 @@
     <string name="couple_unpair_confirm">연결 해제</string>
     <string name="couple_unpair_cancel">취소</string>
     <string name="couple_unpair_failed">연결을 해제하지 못했어요. 인터넷 연결을 확인해 주세요.</string>
+
+    <!-- 자동 기념일 목록 (product-spec 2-3) -->
+    <string name="couple_anniversaries_title">자동 기념일</string>
+    <string name="couple_anniversaries_info">끄면 홈에서 보이지 않고, 상대에게도 함께 숨겨져요.</string>
+    <string name="couple_anniversaries_save_failed">바꾸지 못했어요. 잠시 후 다시 시도해 주세요.</string>
 </resources>

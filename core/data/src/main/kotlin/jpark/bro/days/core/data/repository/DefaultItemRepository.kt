@@ -66,6 +66,10 @@ internal class DefaultItemRepository(
             // 고칠 수 있는 항목 = 보이는 항목 (내 나만 보기 항목, 내 연결된 커플의 공유 항목)
             val existing = id?.let { itemDao.getVisibleItem(it, me) }
             require(id == null || existing != null) { "수정할 항목이 없습니다." }
+            // 공유한 항목을 나만 보기로 돌리면 상대 기기 · 서버에 남은 공유본을 정리할 방법이 없어 막는다 (product-spec 2-6)
+            require(existing?.visibility != Visibility.SHARED.name || content.visibility == Visibility.SHARED) {
+                "공유한 항목은 나만 보기로 바꿀 수 없습니다."
+            }
             content.coupleId?.let { coupleId ->
                 require(itemDao.isActiveCoupleOf(coupleId, me)) { "연결된 커플에만 공유할 수 있습니다." }
             }

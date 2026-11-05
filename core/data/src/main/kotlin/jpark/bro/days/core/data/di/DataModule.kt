@@ -9,8 +9,10 @@ import jpark.bro.days.core.data.auth.GoogleSignInClient
 import jpark.bro.days.core.data.auth.KakaoSdkSignIn
 import jpark.bro.days.core.data.auth.KakaoSignInClient
 import jpark.bro.days.core.data.couple.CoupleTransitions
+import jpark.bro.days.core.data.repository.AnniversaryRepository
 import jpark.bro.days.core.data.repository.AuthRepository
 import jpark.bro.days.core.data.repository.CoupleRepository
+import jpark.bro.days.core.data.repository.DefaultAnniversaryRepository
 import jpark.bro.days.core.data.repository.DefaultAuthRepository
 import jpark.bro.days.core.data.repository.DefaultCoupleRepository
 import jpark.bro.days.core.data.repository.DefaultItemRepository
@@ -46,6 +48,7 @@ val dataModule =
         singleOf(::DefaultProfileRepository) bind ProfileRepository::class
         single { CoupleTransitions(get(), get(), get(), get(), get(), get()) }
         single<CoupleRepository> { DefaultCoupleRepository(get(), get(), get(), get(), get(), get()) }
+        singleOf(::DefaultAnniversaryRepository) bind AnniversaryRepository::class
         singleOf(::DefaultWidgetConfigRepository) bind WidgetConfigRepository::class
     }
 

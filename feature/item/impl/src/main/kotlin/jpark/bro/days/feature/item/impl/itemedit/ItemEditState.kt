@@ -10,6 +10,7 @@ import jpark.bro.days.core.model.ItemIcon
 import jpark.bro.days.core.model.ItemType
 import jpark.bro.days.core.model.RepeatRule
 import jpark.bro.days.core.model.TimeSlot
+import jpark.bro.days.core.model.Visibility
 import jpark.bro.days.core.model.defaultIcon
 import java.time.LocalDate
 import java.time.LocalTime
@@ -55,8 +56,15 @@ internal data class ItemEditState(
     val showAsDday: Boolean = false,
     val reminderOffsets: Set<Int> = emptySet(),
     val isPinned: Boolean = false,
+    /** 연결된 커플 id. 있을 때만 공개 범위를 고른다 (product-spec 4-5) */
+    val coupleId: String? = null,
+    val visibility: Visibility = Visibility.PRIVATE,
+    /** 이미 공유한 항목은 나만 보기로 바꿀 수 없다 (product-spec 2-6) */
+    val isVisibilityLocked: Boolean = false,
     val dialog: ItemEditDialog? = null,
 ) {
+    val showVisibility: Boolean get() = coupleId != null
+
     val isNew: Boolean get() = itemId == null
 
     /** 제목 필수, 디데이는 기준일 필수 (product-spec 2-1) */

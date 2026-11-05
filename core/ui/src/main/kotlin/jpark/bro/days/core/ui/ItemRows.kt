@@ -16,12 +16,14 @@ import jpark.bro.days.core.model.ItemContent
 import jpark.bro.days.core.model.ItemIcon
 import jpark.bro.days.core.model.RepeatRule
 import jpark.bro.days.core.model.TimeSlot
+import jpark.bro.days.core.model.Visibility
 import jpark.bro.days.core.model.itemColorFromKey
 import java.time.LocalDate
 
 /**
- * 디데이 한 줄 (홈 리스트 · 캘린더 공용): 아이콘 · 제목 · 날짜 · 반복 뱃지 · D-day.
- * 숫자는 7일 이내면 danger, 나머지는 text-primary (theme-guide 5.5). [date]는 반복 항목의 도래일처럼 기준일과 다를 때 넘긴다
+ * 디데이 한 줄 (홈 리스트 · 캘린더 공용): 아이콘 · 제목 · 날짜 · 공개 범위 · 반복 뱃지 · D-day.
+ * 숫자는 7일 이내면 danger, 나머지는 text-primary (theme-guide 5.5). [date]는 반복 항목의 도래일처럼 기준일과 다를 때 넘긴다.
+ * [showVisibility]는 커플일 때만 켠다 (솔로는 모두 나만 보기라 붙이지 않음, product-spec 4-1)
  */
 @Composable
 fun DdayItemRow(
@@ -30,6 +32,7 @@ fun DdayItemRow(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     date: LocalDate? = content.date,
+    showVisibility: Boolean = false,
 ) {
     val dateText = date?.toDisplayText().orEmpty()
     DaysCard(modifier = modifier, onClick = onClick) {
@@ -40,6 +43,16 @@ fun DdayItemRow(
                 DaysItemIcon(icon = ItemIcon.fromKey(content.iconKey), color = itemColorFromKey(content.colorKey))
             },
             trailing = {
+                if (showVisibility) {
+                    DaysBadge(
+                        text = stringResource(content.visibility.label),
+                        tone =
+                            when (content.visibility) {
+                                Visibility.SHARED -> DaysBadgeTone.SHARED
+                                Visibility.PRIVATE -> DaysBadgeTone.PRIVATE
+                            },
+                    )
+                }
                 if (content.repeatRule != RepeatRule.NONE) {
                     DaysBadge(text = stringResource(content.repeatRule.label), tone = DaysBadgeTone.CATEGORY)
                 }

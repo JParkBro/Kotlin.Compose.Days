@@ -81,7 +81,7 @@ days/
 | 모듈 | 키 |
 |---|---|
 | `onboarding:impl` | `LoginKey`, `TermsKey`, `StartModeKey` |
-| `couple:impl` | `PairCodeConfirmKey` |
+| `couple:impl` | `PairCodeConfirmKey`, `AnniversaryListKey` |
 | `settings:impl` | `NotificationSettingsKey`, `WidgetSettingsKey`, `AccountKey`, `WithdrawKey`, `PolicyListKey`, `PolicyDocKey(type)`, `MoreAppsKey` |
 
 ### 4-3. app에서 결정하는 목적지
@@ -113,7 +113,7 @@ days/
 | 로그인 | 있음 | 로그인 성공 이동, 에러 스낵바 |
 | 약관 동의 | 있음 | 정책 문서 열기, 완료 이동 |
 | 시작 방식 | 있음 | 결과 전달 |
-| 내 코드 | 있음 | 복사 완료 스낵바, 카카오톡 공유, 연결 감지 시 이동 |
+| 내 코드 | 있음 | 복사 완료 스낵바, 연결 감지 시 이동 |
 | 코드 입력 | 있음 | 확인 화면 이동, 에러 |
 | 연결 확인 | 있음 | 홈 이동 |
 | 홈 | 있음 | 상세 · 추가 · 알림 · 커플 연결 이동 |
@@ -124,7 +124,8 @@ days/
 | 설정 | 있음 | 하위 화면 이동 |
 | 위젯 설정 목록 | 있음 | 뒤로, 위젯 추가 실패 안내 |
 | 위젯 하나 설정 (:widget Activity) | 있음 | 닫기, 저장 실패 안내 |
-| 커플 관리 | 있음 | 연결 해제 완료 |
+| 커플 관리 | 있음 | 연결 해제 완료, 자동 기념일 목록 이동 |
+| 자동 기념일 | 있음 | 숨김 저장 실패, 연결이 끊기면 뒤로 |
 | 계정 관리 · 탈퇴 | 있음 | 결과 전달 (세션 종료) |
 | 정책 문서 보기 | 없음 (`Nothing`) | – |
 
@@ -170,8 +171,7 @@ days/
    - 6-5b `core:sync` (#29): `SyncEngine`(Push · Pull 한 단위) · `SyncManager`(로그인 + 포그라운드 + `sync_enabled`일 때만 리스너, 올릴 것이 생기면 `SyncPushWorker` 5초 디바운스, 연결된 커플이 있을 때만 `SyncPullWorker` 6시간). `core:firebase` `RemoteFlags`(Remote Config `sync_enabled`). `core:sync`는 `core:database` · `core:firebase`를 직접 참조한다 (feature가 아니라 허용). Push는 현재 계정이 고친, 연결된 커플 항목만 (`ItemSyncDao`)
    - 6-6a 프로필 (#31): Room `user`(내 프로필 + 상대 캐시), `ProfileRepository`(이름 1~10자 · 생일 선택), `core:firebase` `ProfileRemoteDataSource`(`users/{uid}` 이름 · 생일 merge), `core:sync` `ProfileSync`(내 프로필 Push, 이 기기에 없을 때만 1회 조회, 상대 프로필은 커플 연결 시 리스너). 프로필 수정 화면 · 설정 카드, 공통 `DaysDatePickerDialog`(core:ui)
    - 6-6b `feature:couple` (#32): 커플 연결(내 코드 · 코드 입력 6칸: 칸 선택 · 덮어쓰기) · 연결 확인(사귄 날 · 1일로 세기 · 함께한 날) · 커플 관리 · 해제 시트 · 30일 안 재연결. `core:data` `CoupleRepository` · `CoupleTransitions`(연결 · 해제 전환을 내 동작 · 동기화 리스너 모두 한 곳에서: `users.coupleId`, 내 코드 삭제, 공유 항목 사본 · 재연결 때 사본 정리), `core:firebase` `CoupleRemoteDataSource`(코드 · 연결 트랜잭션), Room `item.copied_from_item_id`, 설정 커플 뱃지 · 함께한 날. `core:sync`는 커플 전환 때문에 `core:data`를 참조
-   - 6-6c 카카오톡 공유 · QR · 딥링크
-   - 6-7 커플 홈 · 공개 범위 · 공유 표시
+   - 6-7 커플 홈 · 공개 범위 · 공유 표시 (#33): 홈 커플 히어로(함께한 날) · 다음 일정 | 다음 기념일(진행 바) · 필터(전체 / 우리 / 나만) · 리스트 공개 범위 뱃지, 연결되면 연결 유도 카드 숨김. 디데이 · 일정 수정의 공개 범위(커플일 때만, 새 항목은 우리 둘이 기본, 공유한 항목은 나만 보기로 바꿀 수 없음 · `saveItem`도 막음). `core:data` `AnniversaryRepository`(숨김은 Room PENDING → 기존 동기화), `core:domain` `nextAnniversary`(생일 포함), 커플 관리 → 자동 기념일 목록(앞으로 1년, 숨김 토글). 캘린더의 자동 기념일 표시는 이후
    - 6-8 이미지 (Cloud Storage + Storage 규칙): 배경 사진 · 프로필
 7. `feature:onboarding`(소개 · 약관 · 시작 방식, 로그인은 6단계에서), `feature:settings`, `feature:notifications`, `core:notification`
 8. `core:ads`, 광고 제거 구매

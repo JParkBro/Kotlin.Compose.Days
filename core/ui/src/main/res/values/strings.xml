@@ -20,6 +20,16 @@
     <string name="common_add_sheet_plan">일정</string>
     <string name="common_add_sheet_plan_desc">약속이나 할 일을 적어요</string>
 
+    <!-- 공개 범위 (product-spec 2-6) -->
+    <string name="common_visibility_shared">우리 둘이</string>
+    <string name="common_visibility_private">나만 보기</string>
+
+    <!-- 자동 기념일 (product-spec 2-3) -->
+    <string name="common_anniversary_days">%1$d일</string>
+    <string name="common_anniversary_years">%1$d주년</string>
+    <string name="common_anniversary_birthday">%1$s 생일</string>
+    <string name="common_anniversary_birthday_unknown">생일</string>
+
     <!-- 디데이 줄 -->
     <string name="common_since">%1$s부터</string>
 

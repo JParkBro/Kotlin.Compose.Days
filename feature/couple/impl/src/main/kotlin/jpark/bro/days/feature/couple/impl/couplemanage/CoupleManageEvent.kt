@@ -8,5 +8,7 @@ internal sealed interface CoupleManageEvent {
     /** 내가 해제했거나 상대가 해제해 연결이 끝남 */
     data object Disconnected : CoupleManageEvent
 
+    data object OpenAnniversaries : CoupleManageEvent
+
     data object NavigateBack : CoupleManageEvent
 }

@@ -2,12 +2,15 @@ package jpark.bro.days.feature.home.impl
 
 import jpark.bro.days.core.model.AppThemeType
 import jpark.bro.days.core.model.CountMode
+import jpark.bro.days.core.model.Couple
 import jpark.bro.days.core.model.Item
 import jpark.bro.days.core.model.ItemContent
 import jpark.bro.days.core.model.ItemIcon
 import jpark.bro.days.core.model.ItemType
 import jpark.bro.days.core.model.RepeatRule
 import jpark.bro.days.core.model.TimeSlot
+import jpark.bro.days.core.model.UserProfile
+import jpark.bro.days.core.model.Visibility
 import java.time.LocalDate
 
 /** product-spec 9장 솔로 샘플 (오늘 = 2026.11.05) */
@@ -70,3 +73,31 @@ internal fun previewState(pinnedItemId: String?) =
         content = buildHomeContent(PreviewItems, pinnedItemId, PreviewToday),
         showCoupleBanner = true,
     )
+
+/** product-spec 9장 커플 샘플: 현우(나) · 지민, 사귄 날 2025.06.14 (1일 세기) */
+@Suppress("MagicNumber") // 샘플 데이터
+internal fun previewCoupleState(): HomeState {
+    val shared = setOf("mom", "dinner")
+    val items =
+        PreviewItems.map { item ->
+            if (item.id in shared) {
+                item.copy(content = item.content.copy(visibility = Visibility.SHARED, coupleId = "couple-1"))
+            } else {
+                item
+            }
+        }
+    val couple =
+        buildCoupleSummary(
+            couple = Couple("couple-1", "user-jimin", LocalDate.of(2025, 6, 14), countFirstDayAsOne = true),
+            me = UserProfile("user-me", "현우", LocalDate.of(1998, 4, 12)),
+            partner = UserProfile("user-jimin", "지민", LocalDate.of(1999, 9, 28)),
+            hiddenRuleKeys = emptySet(),
+            today = PreviewToday,
+        )
+    return HomeState(
+        isLoading = false,
+        hasItems = true,
+        today = PreviewToday,
+        content = buildHomeContent(items, pinnedItemId = null, today = PreviewToday, couple = couple),
+    )
+}

@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import jpark.bro.days.core.model.AppThemeType
 import jpark.bro.days.core.model.Category
 import jpark.bro.days.core.model.CountMode
+import jpark.bro.days.core.model.Couple
 import jpark.bro.days.core.model.Item
 import jpark.bro.days.core.model.ItemContent
 import jpark.bro.days.core.model.ItemIcon
@@ -11,6 +12,8 @@ import jpark.bro.days.core.model.ItemReminder
 import jpark.bro.days.core.model.ItemType
 import jpark.bro.days.core.model.RepeatRule
 import jpark.bro.days.core.model.TimeSlot
+import jpark.bro.days.core.model.Visibility
+import jpark.bro.days.core.testing.FakeCoupleRepository
 import jpark.bro.days.core.testing.FakeItemRepository
 import jpark.bro.days.core.testing.MainDispatcherRule
 import jpark.bro.days.feature.item.api.ItemEditKey
@@ -58,12 +61,17 @@ class ItemEditViewModelTest {
         )
 
     private val repository = FakeItemRepository(initial = listOf(quitSmoking))
+    private val coupleRepository = FakeCoupleRepository()
 
     private fun viewModel(
         itemId: String? = null,
         type: ItemType = ItemType.DDAY,
         presetDate: String? = null,
-    ) = ItemEditViewModel(ItemEditKey(itemId, type, presetDate), repository, clock)
+    ) = ItemEditViewModel(ItemEditKey(itemId, type, presetDate), repository, coupleRepository, clock)
+
+    private fun connect() {
+        coupleRepository.couple.value = Couple("couple-1", "user-jimin", LocalDate.of(2025, 6, 14), true)
+    }
 
     @Test
     fun `새 디데이는 오늘 날짜로 시작하고 제목이 비어 있으면 저장 버튼 비활성`() {
@@ -87,6 +95,7 @@ class ItemEditViewModelTest {
             ItemEditViewModel(
                 ItemEditKey(null, ItemType.DDAY, null, presetCategory = Category.GOAL, presetTitle = "전역일"),
                 repository,
+                coupleRepository,
                 clock,
             ).state.value
 
@@ -286,5 +295,80 @@ class ItemEditViewModelTest {
             }
 
             assertFalse(viewModel.state.value.isSaving)
+        }
+
+    @Test
+    fun `솔로면 공개 범위를 고르지 않고 나만 보기로 저장`() =
+        runTest {
+            val viewModel = viewModel()
+            assertFalse(viewModel.state.value.showVisibility)
+
+            viewModel.onAction(ItemEditAction.TitleChanged("전역일"))
+            viewModel.onAction(ItemEditAction.SaveClicked)
+
+            val saved = repository.observeItems().first().first { it.content.title == "전역일" }
+            assertEquals(Visibility.PRIVATE, saved.content.visibility)
+            assertNull(saved.content.coupleId)
+        }
+
+    @Test
+    fun `커플이면 새 항목은 우리 둘이가 기본이고 커플 id와 함께 저장`() =
+        runTest {
+            connect()
+            val viewModel = viewModel()
+            assertTrue(viewModel.state.value.showVisibility)
+            assertEquals(Visibility.SHARED, viewModel.state.value.visibility)
+
+            viewModel.onAction(ItemEditAction.TitleChanged("제주 여행"))
+            viewModel.onAction(ItemEditAction.SaveClicked)
+
+            val saved = repository.observeItems().first().first { it.content.title == "제주 여행" }
+            assertEquals(Visibility.SHARED, saved.content.visibility)
+            assertEquals("couple-1", saved.content.coupleId)
+        }
+
+    @Test
+    fun `커플이어도 나만 보기를 고르면 커플 id 없이 저장`() =
+        runTest {
+            connect()
+            val viewModel = viewModel()
+
+            viewModel.onAction(ItemEditAction.VisibilitySelected(Visibility.PRIVATE))
+            viewModel.onAction(ItemEditAction.TitleChanged("토익 시험"))
+            viewModel.onAction(ItemEditAction.SaveClicked)
+
+            val saved = repository.observeItems().first().first { it.content.title == "토익 시험" }
+            assertEquals(Visibility.PRIVATE, saved.content.visibility)
+            assertNull(saved.content.coupleId)
+        }
+
+    @Test
+    fun `기존 나만 보기 항목은 수정할 때 우리 둘이로 바꿀 수 있음`() =
+        runTest {
+            connect()
+            val viewModel = viewModel(itemId = quitSmoking.id)
+            assertEquals(Visibility.PRIVATE, viewModel.state.value.visibility)
+            assertFalse(viewModel.state.value.isVisibilityLocked)
+
+            viewModel.onAction(ItemEditAction.VisibilitySelected(Visibility.SHARED))
+            viewModel.onAction(ItemEditAction.SaveClicked)
+
+            val saved = repository.observeItem(quitSmoking.id).first()
+            assertEquals(Visibility.SHARED, saved?.content?.visibility)
+            assertEquals("couple-1", saved?.content?.coupleId)
+        }
+
+    @Test
+    fun `공유한 항목은 잠겨 있어 나만 보기를 골라도 바뀌지 않음`() =
+        runTest {
+            connect()
+            val sharedContent = quitSmoking.content.copy(visibility = Visibility.SHARED, coupleId = "couple-1")
+            val sharedId = repository.saveItem(id = null, content = sharedContent).getOrThrow().id
+            val viewModel = viewModel(itemId = sharedId)
+            assertTrue(viewModel.state.value.isVisibilityLocked)
+
+            viewModel.onAction(ItemEditAction.VisibilitySelected(Visibility.PRIVATE))
+
+            assertEquals(Visibility.SHARED, viewModel.state.value.visibility)
         }
 }

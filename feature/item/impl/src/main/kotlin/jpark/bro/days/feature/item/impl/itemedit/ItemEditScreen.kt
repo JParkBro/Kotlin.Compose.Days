@@ -40,6 +40,7 @@ import jpark.bro.days.core.model.ItemIcon
 import jpark.bro.days.core.model.ItemType
 import jpark.bro.days.core.model.RepeatRule
 import jpark.bro.days.core.model.TimeSlot
+import jpark.bro.days.core.model.Visibility
 import jpark.bro.days.core.ui.DaysDatePickerDialog
 import jpark.bro.days.core.ui.ObserveEvents
 import jpark.bro.days.core.ui.label
@@ -54,6 +55,7 @@ import jpark.bro.days.feature.item.impl.itemedit.components.IconColorPicker
 import jpark.bro.days.feature.item.impl.itemedit.components.ItemPreviewCard
 import jpark.bro.days.feature.item.impl.itemedit.components.ItemTimePickerDialog
 import jpark.bro.days.feature.item.impl.itemedit.components.SwitchRow
+import jpark.bro.days.feature.item.impl.itemedit.components.VisibilityPicker
 import jpark.bro.days.feature.item.impl.itemedit.components.label
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -198,6 +200,15 @@ private fun ItemEditForm(
                     modifier = Modifier.testTag("item_edit_reminder_$offset"),
                 )
             }
+        }
+    }
+    if (state.showVisibility) {
+        EditSection(title = stringResource(R.string.item_edit_visibility)) {
+            VisibilityPicker(
+                visibility = state.visibility,
+                isLocked = state.isVisibilityLocked,
+                onSelect = { onAction(ItemEditAction.VisibilitySelected(it)) },
+            )
         }
     }
     if (isDday) {
@@ -396,6 +407,7 @@ private fun ItemEditDdayPreview() {
                     countFirstDayAsOne = true,
                     reminderOffsets = setOf(0, 7),
                     isPinned = true,
+                    coupleId = "couple-1",
                 ),
             onAction = {},
         )
@@ -419,6 +431,9 @@ private fun ItemEditPlanPreview() {
                     place = "성수동 카페거리",
                     showAsDday = true,
                     reminderOffsets = setOf(1),
+                    coupleId = "couple-1",
+                    visibility = Visibility.SHARED,
+                    isVisibilityLocked = true,
                 ),
             onAction = {},
         )

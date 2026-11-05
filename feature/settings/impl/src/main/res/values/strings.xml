@@ -63,6 +63,7 @@
     <string name="settings_widget_background_theme">테마색</string>
     <string name="settings_widget_background_dark">다크</string>
     <string name="settings_widget_background_white">화이트</string>
+    <string name="settings_widget_background_photo">사진</string>
     <string name="settings_widget_row_desc">%1$s · %2$s</string>
     <string name="settings_widget_guide">홈 화면의 빈 곳을 길게 누른 뒤 위젯에서 데이즈를 골라 추가하세요. 놓은 위젯은 길게 눌러서도 설정할 수 있어요.</string>
     <string name="settings_widget_empty">아직 홈 화면에 놓인 위젯이 없어요</string>
@@ -106,6 +107,11 @@
     <string name="settings_profile_birth_date_change">변경</string>
     <string name="settings_profile_birth_date_clear">지우기</string>
     <string name="settings_profile_birth_date_hint">커플로 연결되면 두 사람의 생일이 기념일로 자동 표시돼요.</string>
+    <string name="settings_profile_photo">프로필 사진</string>
+    <string name="settings_profile_photo_change">사진 변경</string>
+    <string name="settings_profile_photo_remove">사진 삭제</string>
+    <string name="settings_profile_photo_failed">사진을 불러오지 못했어요. 다른 사진을 골라 주세요.</string>
+    <string name="settings_profile_photo_hint">커플로 연결되면 상대에게도 보여요. 혼자 쓸 때는 이 기기에만 저장돼요.</string>
     <string name="settings_profile_save">저장하기</string>
     <string name="settings_profile_save_failed">저장하지 못했어요. 다시 시도해 주세요.</string>
 </resources>

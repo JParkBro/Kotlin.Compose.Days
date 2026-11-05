@@ -13,6 +13,7 @@ import jpark.bro.days.core.model.Item
 import jpark.bro.days.core.model.ItemType
 import jpark.bro.days.core.model.UserBirthday
 import jpark.bro.days.core.model.UserProfile
+import java.io.File
 import java.time.LocalDate
 
 /**
@@ -30,12 +31,25 @@ internal data class HomeContent(
 internal data class CoupleSummary(
     val myName: String?,
     val partnerName: String?,
+    /** 프로필 사진 파일. 없으면 이름 첫 글자 */
+    val myPhoto: File? = null,
+    val partnerPhoto: File? = null,
     val startDate: LocalDate,
     val togetherDays: Int,
     val nextAnniversary: NextAnniversary?,
     /** 생일 기념일 이름에 쓰는 userId → 이름 */
     val nicknames: Map<String, String>,
 )
+
+/** 솔로면 null */
+internal fun buildCoupleSummary(
+    source: CoupleSource,
+    today: LocalDate,
+): CoupleSummary? =
+    source.couple?.let { couple ->
+        buildCoupleSummary(couple, source.me, source.partner, source.hidden, today)
+            .copy(myPhoto = source.myPhoto, partnerPhoto = source.partnerPhoto)
+    }
 
 /** 연결된 커플 + 두 사람 프로필 + 숨긴 기념일로 [CoupleSummary]를 만든다 */
 internal fun buildCoupleSummary(

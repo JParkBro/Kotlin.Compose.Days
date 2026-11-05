@@ -1,8 +1,11 @@
 package jpark.bro.days.feature.item.impl.itemedit
 
 import androidx.lifecycle.viewModelScope
+import jpark.bro.days.core.data.image.ImageDraft
 import jpark.bro.days.core.data.repository.CoupleRepository
+import jpark.bro.days.core.data.repository.ImageRepository
 import jpark.bro.days.core.data.repository.ItemRepository
+import jpark.bro.days.core.data.repository.observeImageFileOrNull
 import jpark.bro.days.core.model.Category
 import jpark.bro.days.core.model.CountMode
 import jpark.bro.days.core.model.Item
@@ -17,22 +20,35 @@ import jpark.bro.days.core.model.defaultIcon
 import jpark.bro.days.core.model.itemColorFromKey
 import jpark.bro.days.core.ui.MviViewModel
 import jpark.bro.days.feature.item.api.ItemEditKey
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.time.Clock
 import java.time.LocalDate
 
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class ItemEditViewModel(
     key: ItemEditKey,
     private val itemRepository: ItemRepository,
     coupleRepository: CoupleRepository,
+    imageRepository: ImageRepository,
     clock: Clock,
 ) : MviViewModel<ItemEditState, ItemEditAction, ItemEditEvent>(initialState(key, LocalDate.now(clock))) {
-    /** 수정 중인 원본. 화면에 없는 값(완료 · 배경)을 저장할 때 유지한다 */
+    /** 수정 중인 원본. 화면에 없는 값(완료)을 저장할 때 유지한다 */
     private var original: Item? = null
     private var originalPinned: Boolean = false
+    private val photo = ImageDraft(imageRepository, original = null)
+    private val photoId = MutableStateFlow<String?>(null)
 
     init {
+        photoId
+            .flatMapLatest(imageRepository::observeImageFileOrNull)
+            .onEach { file -> setState { copy(backgroundFile = file) } }
+            .launchIn(viewModelScope)
         viewModelScope.launch {
             // 연결된 커플은 화면을 여는 시점 기준. 편집 중에 해제되면 공유 저장이 실패하고 안내한다
             val coupleId = coupleRepository.observeCouple().first()?.id
@@ -57,7 +73,10 @@ internal class ItemEditViewModel(
             is ItemEditAction.DateSelected -> setState { copy(date = action.date, dialog = null) }
             ItemEditAction.DialogDismissed -> setState { copy(dialog = null) }
             ItemEditAction.SaveClicked -> save()
-            ItemEditAction.CancelClicked -> sendEvent(ItemEditEvent.NavigateBack)
+            ItemEditAction.CancelClicked -> cancel()
+            ItemEditAction.PhotoClicked -> sendEvent(ItemEditEvent.OpenPhotoPicker)
+            is ItemEditAction.PhotoPicked -> editPhoto { replace(action.uri).onFailure { photoFailed() } }
+            ItemEditAction.PhotoRemoved -> editPhoto { remove() }
             ItemEditAction.DeleteClicked -> setState { copy(dialog = ItemEditDialog.DELETE_CONFIRM) }
             ItemEditAction.DeleteConfirmed -> delete()
         }
@@ -76,7 +95,29 @@ internal class ItemEditViewModel(
         val pinned = itemRepository.observePinnedItemId().first() == itemId
         original = item
         originalPinned = pinned
+        photo.reset(item.content.backgroundImageId)
+        photoId.value = photo.current
         setState { item.toState(today = today, reminders = reminders, pinned = pinned).copy(coupleId = coupleId) }
+    }
+
+    private fun editPhoto(block: suspend ImageDraft.() -> Unit) {
+        if (currentState.isPhotoWorking) return
+        setState { copy(isPhotoWorking = true) }
+        viewModelScope.launch {
+            photo.block()
+            photoId.value = photo.current
+            setState { copy(backgroundImageId = photo.current, isPhotoWorking = false) }
+        }
+    }
+
+    private fun photoFailed() = sendEvent(ItemEditEvent.PhotoFailed)
+
+    /** 저장하지 않고 닫으면 새로 고른 사진을 버린다 */
+    private fun cancel() {
+        viewModelScope.launch {
+            photo.abandon()
+            sendEvent(ItemEditEvent.NavigateBack)
+        }
     }
 
     private fun save() {
@@ -94,6 +135,7 @@ internal class ItemEditViewModel(
             if (state.type == ItemType.DDAY && state.isPinned != originalPinned) {
                 itemRepository.setPinned(saved.id, state.isPinned).getOrElse { return@launch saveFailed() }
             }
+            photo.commit()
             sendEvent(ItemEditEvent.NavigateBack)
         }
     }
@@ -109,8 +151,10 @@ internal class ItemEditViewModel(
         viewModelScope.launch {
             itemRepository
                 .deleteItem(itemId)
-                .onSuccess { sendEvent(ItemEditEvent.NavigateBack) }
-                .onFailure {
+                .onSuccess {
+                    photo.abandon()
+                    sendEvent(ItemEditEvent.NavigateBack)
+                }.onFailure {
                     setState { copy(isSaving = false) }
                     sendEvent(ItemEditEvent.DeleteFailed)
                 }
@@ -258,6 +302,7 @@ private fun Item.toState(
         isPinned = pinned,
         visibility = content.visibility,
         isVisibilityLocked = content.visibility == Visibility.SHARED,
+        backgroundImageId = content.backgroundImageId,
     )
 
 /** 타입별로 쓰지 않는 값은 비운다 (data-model-erd 항목 타입별 사용 컬럼). 화면에 없는 값은 [original]에서 유지 */
@@ -285,6 +330,7 @@ private fun ItemEditState.toContent(original: ItemContent?): ItemContent {
         memo = memo.trim().ifEmpty { null },
         isDone = original?.isDone ?: false,
         showAsDday = !isDday && showAsDday,
-        backgroundImageId = original?.backgroundImageId,
+        // 배경 사진은 디데이만 (product-spec 4-5)
+        backgroundImageId = backgroundImageId.takeIf { isDday },
     )
 }

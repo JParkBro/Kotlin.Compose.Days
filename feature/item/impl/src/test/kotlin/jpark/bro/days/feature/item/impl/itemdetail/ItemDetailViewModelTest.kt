@@ -9,12 +9,14 @@ import jpark.bro.days.core.model.ItemContent
 import jpark.bro.days.core.model.ItemType
 import jpark.bro.days.core.model.WidgetSize
 import jpark.bro.days.core.testing.FakeHomeWidgets
+import jpark.bro.days.core.testing.FakeImageRepository
 import jpark.bro.days.core.testing.FakeItemRepository
 import jpark.bro.days.core.testing.MainDispatcherRule
 import jpark.bro.days.feature.item.api.ItemDetailKey
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -58,7 +60,9 @@ class ItemDetailViewModelTest {
     private val repository = FakeItemRepository(listOf(together, discharge))
     private val homeWidgets = FakeHomeWidgets()
 
-    private fun viewModel(id: String) = ItemDetailViewModel(ItemDetailKey(id), repository, homeWidgets, clock)
+    private val images = FakeImageRepository()
+
+    private fun viewModel(id: String) = ItemDetailViewModel(ItemDetailKey(id), repository, images, homeWidgets, clock)
 
     @Test
     fun `항목과 오늘 기준 D-day를 불러옴`() {
@@ -166,5 +170,20 @@ class ItemDetailViewModelTest {
                 viewModel.onAction(ItemDetailAction.WidgetSizeSelected(WidgetSize.SMALL))
                 assertEquals(ItemDetailEvent.WidgetAddFailed, awaitItem())
             }
+        }
+
+    @Test
+    fun `배경 사진이 있으면 그 파일을 보여주고 없으면 null`() =
+        runTest {
+            val photo = images.add("bg")
+            val withPhoto =
+                repository
+                    .saveItem(
+                        id = null,
+                        content = discharge.content.copy(backgroundImageId = "bg"),
+                    ).getOrThrow()
+
+            assertEquals(photo, viewModel(withPhoto.id).state.value.backgroundFile)
+            assertNull(viewModel(discharge.id).state.value.backgroundFile)
         }
 }

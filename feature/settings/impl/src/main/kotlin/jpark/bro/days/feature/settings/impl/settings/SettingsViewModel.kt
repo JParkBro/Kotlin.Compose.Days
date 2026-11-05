@@ -3,23 +3,31 @@ package jpark.bro.days.feature.settings.impl.settings
 import androidx.lifecycle.viewModelScope
 import jpark.bro.days.core.data.repository.AuthRepository
 import jpark.bro.days.core.data.repository.CoupleRepository
+import jpark.bro.days.core.data.repository.ImageRepository
 import jpark.bro.days.core.data.repository.ProfileRepository
 import jpark.bro.days.core.data.repository.SettingsRepository
+import jpark.bro.days.core.data.repository.observeImageFileOrNull
 import jpark.bro.days.core.domain.dday.daysSince
 import jpark.bro.days.core.model.ThemeSetting
 import jpark.bro.days.core.ui.MviViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.time.Clock
 import java.time.LocalDate
 
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class SettingsViewModel(
     private val settingsRepository: SettingsRepository,
     authRepository: AuthRepository,
     profileRepository: ProfileRepository,
     coupleRepository: CoupleRepository,
+    imageRepository: ImageRepository,
     clock: Clock,
 ) : MviViewModel<SettingsState, SettingsAction, SettingsEvent>(SettingsState()) {
     init {
@@ -41,6 +49,13 @@ internal class SettingsViewModel(
                 )
             }
         }.launchIn(viewModelScope)
+        profileRepository
+            .observeMyProfile()
+            .map { it?.profileImageId }
+            .distinctUntilChanged()
+            .flatMapLatest(imageRepository::observeImageFileOrNull)
+            .onEach { file -> setState { copy(profilePhoto = file) } }
+            .launchIn(viewModelScope)
         settingsRepository
             .observeThemeSetting()
             .onEach { setting -> setState { copy(themeSetting = setting) } }

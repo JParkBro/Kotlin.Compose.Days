@@ -441,6 +441,8 @@ WCAG 기준: 일반 텍스트 4.5:1 이상, 큰 텍스트(24px 이상 또는 18.
 
 외부 웹 페이지는 `core:ui`의 `DaysWebView`(배경 `bg`, https 한 사이트만 · Play 스토어 링크는 스토어로 · 그 밖은 막음, 파일 접근 · JS 인터페이스 없음)로 엽니다 (다른 앱 둘러보기, 이후 정책 문서).
 
+사진은 `core:ui`의 `DaysPhoto`(기기에 저장된 파일만, Coil, 잘라서 채움) · `ProfileAvatar`(사진 → 이름 첫 글자 → 사람 아이콘)로 보여주고, 고르기는 `rememberPhotoPicker`(시스템 사진 선택기, 권한 없음)를 씁니다. 사진 위 글자는 `AppFixedColors.onImage`, 가독성 막은 `AppFixedColors.imageScrim`입니다.
+
 **Preview** (`core/designsystem/.../preview/DaysPreviews.kt`)
 - `@ComponentPreviews`: 라이트 · 다크 · 글꼴 2배. 컴포넌트 견본은 `DaysPreviewSurface { }` 안에 둡니다.
 - `@ScreenPreviews`: 핸드폰(411×891dp) 라이트 · 다크 · 글꼴 2배 · 가로. 태블릿은 대상이 아니라서 넣지 않습니다.

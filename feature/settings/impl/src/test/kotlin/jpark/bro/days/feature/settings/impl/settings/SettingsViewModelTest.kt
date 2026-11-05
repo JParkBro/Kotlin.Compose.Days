@@ -10,6 +10,7 @@ import jpark.bro.days.core.model.ThemeSetting
 import jpark.bro.days.core.model.UserProfile
 import jpark.bro.days.core.testing.FakeAuthRepository
 import jpark.bro.days.core.testing.FakeCoupleRepository
+import jpark.bro.days.core.testing.FakeImageRepository
 import jpark.bro.days.core.testing.FakeProfileRepository
 import jpark.bro.days.core.testing.FakeSettingsRepository
 import jpark.bro.days.core.testing.MainDispatcherRule
@@ -36,8 +37,9 @@ class SettingsViewModelTest {
     private val profileRepository = FakeProfileRepository()
     private val coupleRepository = FakeCoupleRepository()
     private val clock = Clock.fixed(LocalDate.of(2026, 11, 5).atStartOfDay(ZoneOffset.UTC).toInstant(), ZoneOffset.UTC)
+    private val images = FakeImageRepository()
     private val viewModel by lazy {
-        SettingsViewModel(repository, authRepository, profileRepository, coupleRepository, clock)
+        SettingsViewModel(repository, authRepository, profileRepository, coupleRepository, images, clock)
     }
 
     @Test
@@ -168,4 +170,12 @@ class SettingsViewModelTest {
                 assertEquals(SettingsEvent.Navigate(SettingsDestination.COUPLE), awaitItem())
             }
         }
+
+    @Test
+    fun `프로필 사진이 있으면 카드에 그 사진 파일을 보여줌`() {
+        val photo = images.add("face")
+        profileRepository.myProfile.value = UserProfile("user-me", "현우", null, profileImageId = "face")
+
+        assertEquals(photo, viewModel.state.value.profilePhoto)
+    }
 }

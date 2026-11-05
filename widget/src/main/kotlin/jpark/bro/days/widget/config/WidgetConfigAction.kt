@@ -12,6 +12,10 @@ internal sealed interface WidgetConfigAction {
         val background: WidgetBackground,
     ) : WidgetConfigAction
 
+    data class ShowProfileChanged(
+        val show: Boolean,
+    ) : WidgetConfigAction
+
     data object SaveClicked : WidgetConfigAction
 
     data object CloseClicked : WidgetConfigAction

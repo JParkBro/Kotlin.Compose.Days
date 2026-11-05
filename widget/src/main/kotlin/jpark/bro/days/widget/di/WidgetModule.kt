@@ -2,6 +2,7 @@ package jpark.bro.days.widget.di
 
 import jpark.bro.days.core.data.repository.HomeWidgets
 import jpark.bro.days.widget.DefaultHomeWidgets
+import jpark.bro.days.widget.WidgetPhotos
 import jpark.bro.days.widget.WidgetUpdater
 import jpark.bro.days.widget.config.WidgetConfigViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -16,13 +17,14 @@ val widgetModule =
         single<CoroutineScope> { CoroutineScope(SupervisorJob()) }
         single { WidgetUpdater(androidContext(), get(), get(), get(), get(), get()) }
         single<HomeWidgets> { DefaultHomeWidgets(androidContext(), get()) }
+        factory { WidgetPhotos(get(), get()) }
         viewModel { params ->
             WidgetConfigViewModel(
-                widgetId = params.get(),
-                size = params.get(),
+                target = params.get(),
                 itemRepository = get(),
                 widgetConfigRepository = get(),
                 settingsRepository = get(),
+                photos = get(),
                 clock = get(),
             )
         }

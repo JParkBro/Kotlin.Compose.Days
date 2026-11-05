@@ -43,6 +43,7 @@ import jpark.bro.days.core.designsystem.component.DaysItemIcon
 import jpark.bro.days.core.designsystem.component.DaysListItem
 import jpark.bro.days.core.designsystem.component.DaysPrimaryButton
 import jpark.bro.days.core.designsystem.component.DaysSection
+import jpark.bro.days.core.designsystem.component.DaysSwitch
 import jpark.bro.days.core.designsystem.component.DaysToastHost
 import jpark.bro.days.core.designsystem.component.DaysTopBar
 import jpark.bro.days.core.designsystem.component.ddayLabel
@@ -51,9 +52,11 @@ import jpark.bro.days.core.designsystem.preview.ScreenPreviews
 import jpark.bro.days.core.model.ItemIcon
 import jpark.bro.days.core.model.WidgetBackground
 import jpark.bro.days.core.model.itemColorFromKey
+import jpark.bro.days.core.ui.DaysPhoto
 import jpark.bro.days.core.ui.ObserveEvents
 import jpark.bro.days.core.ui.label
 import jpark.bro.days.widget.R
+import jpark.bro.days.widget.effective
 import jpark.bro.days.widget.widgetColorScheme
 import jpark.bro.days.core.designsystem.R as DesignR
 
@@ -117,6 +120,19 @@ private fun WidgetConfigScreen(
             if (!state.isLoading) {
                 ItemChoices(state = state, onAction = onAction)
                 BackgroundChoices(state = state, onAction = onAction)
+                DaysCard {
+                    DaysListItem(
+                        title = stringResource(R.string.widget_config_profile),
+                        subtitle = stringResource(R.string.widget_config_profile_desc),
+                        trailing = {
+                            DaysSwitch(
+                                checked = state.showProfile,
+                                onCheckedChange = { onAction(WidgetConfigAction.ShowProfileChanged(it)) },
+                                modifier = Modifier.testTag("widget_config_profile"),
+                            )
+                        },
+                    )
+                }
             }
         }
         DaysPrimaryButton(
@@ -149,7 +165,9 @@ private fun PreviewArea(state: WidgetConfigState) {
         WidgetPreviewCard(
             display = state.display,
             size = state.size,
-            colors = widgetColorScheme(state.theme, state.background),
+            colors = widgetColorScheme(state.theme, state.background.effective(hasPhoto = state.photo != null)),
+            photo = state.photo.takeIf { state.background == WidgetBackground.PHOTO },
+            profiles = if (state.showProfile) state.profiles else emptyList(),
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -237,6 +255,14 @@ private fun BackgroundChoices(
             color = colors.textSecondary,
             modifier = Modifier.padding(horizontal = AppSpacing.xs),
         )
+        if (state.background == WidgetBackground.PHOTO) {
+            Text(
+                text = stringResource(R.string.widget_config_background_photo_hint),
+                style = AppThemeTokens.typography.bodySm,
+                color = colors.textTertiary,
+                modifier = Modifier.padding(horizontal = AppSpacing.xs),
+            )
+        }
         Row(horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm)) {
             WidgetBackground.entries.forEach { background ->
                 val selected = background == state.background
@@ -264,6 +290,13 @@ private fun BackgroundChoices(
                                     .border(1.dp, colors.border, AppShapes.md),
                             contentAlignment = Alignment.Center,
                         ) {
+                            if (background == WidgetBackground.PHOTO) {
+                                DaysPhoto(
+                                    file = state.photo,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(44.dp),
+                                )
+                            }
                             Box(
                                 modifier =
                                     Modifier
@@ -290,6 +323,7 @@ private val WidgetBackground.label: Int
             WidgetBackground.THEME -> R.string.widget_config_background_theme
             WidgetBackground.DARK -> R.string.widget_config_background_dark
             WidgetBackground.WHITE -> R.string.widget_config_background_white
+            WidgetBackground.PHOTO -> R.string.widget_config_background_photo
         }
 
 @ScreenPreviews

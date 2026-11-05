@@ -48,6 +48,7 @@ import jpark.bro.days.core.model.Couple
 import jpark.bro.days.core.model.UserProfile
 import jpark.bro.days.core.ui.DaysDatePickerDialog
 import jpark.bro.days.core.ui.ObserveEvents
+import jpark.bro.days.core.ui.ProfileAvatar
 import jpark.bro.days.core.ui.toDisplayText
 import jpark.bro.days.feature.couple.impl.R
 import jpark.bro.days.feature.couple.impl.couplemanage.components.UnpairSheet
@@ -82,7 +83,7 @@ internal fun CoupleManageRoot(
     }
 }
 
-/** 커플 관리 (product-spec 6장, 시안 couple-manage). 자동 기념일 숨김은 별도 목록, 사진 · 나이 · 기념일 알림은 해당 단계에서 */
+/** 커플 관리 (product-spec 6장, 시안 couple-manage). 자동 기념일 숨김은 별도 목록, 나이 · 기념일 알림은 해당 단계에서 */
 @Composable
 private fun CoupleManageScreen(
     state: CoupleManageState,
@@ -213,20 +214,7 @@ private fun PartnerCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(AppSpacing.md),
             ) {
-                Box(
-                    modifier =
-                        Modifier
-                            .size(56.dp)
-                            .clip(AppShapes.full)
-                            .background(colors.primarySoft),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(
-                        painterResource(DesignR.drawable.ic_favorite),
-                        contentDescription = null,
-                        tint = colors.primary,
-                    )
-                }
+                ProfileAvatar(file = state.partnerPhoto, name = state.partner?.nickname)
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = partnerName,

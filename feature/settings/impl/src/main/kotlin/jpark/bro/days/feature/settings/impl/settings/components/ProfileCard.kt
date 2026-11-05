@@ -27,8 +27,10 @@ import jpark.bro.days.core.designsystem.component.DaysBadgeTone
 import jpark.bro.days.core.designsystem.component.DaysButtonSize
 import jpark.bro.days.core.designsystem.component.DaysCard
 import jpark.bro.days.core.designsystem.component.DaysSoftButton
+import jpark.bro.days.core.ui.ProfileAvatar
 import jpark.bro.days.feature.settings.impl.R
 import jpark.bro.days.feature.settings.impl.settings.ProfileSummary
+import java.io.File
 import java.time.format.DateTimeFormatter
 import jpark.bro.days.core.designsystem.R as DesignR
 
@@ -37,17 +39,19 @@ private val BirthDateFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yy
 @Composable
 internal fun ProfileCard(
     profile: ProfileSummary?,
+    photo: File?,
     onEditClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     DaysCard(modifier = modifier) {
-        ProfileCardContent(profile = profile, onEditClick = onEditClick)
+        ProfileCardContent(profile = profile, photo = photo, onEditClick = onEditClick)
     }
 }
 
 @Composable
 private fun ProfileCardContent(
     profile: ProfileSummary?,
+    photo: File?,
     onEditClick: () -> Unit,
 ) {
     val colors = AppThemeTokens.colors
@@ -60,21 +64,7 @@ private fun ProfileCardContent(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(AppSpacing.md),
     ) {
-        Box(
-            modifier =
-                Modifier
-                    .size(56.dp)
-                    .clip(AppShapes.full)
-                    .background(colors.fill),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                painter = painterResource(DesignR.drawable.ic_person),
-                contentDescription = null,
-                tint = colors.textTertiary,
-                modifier = Modifier.size(28.dp),
-            )
-        }
+        ProfileAvatar(file = photo, name = profile?.nickname)
         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(AppSpacing.xs)) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,

@@ -1,14 +1,9 @@
 package jpark.bro.days.feature.home.impl
 
 import androidx.lifecycle.viewModelScope
-import jpark.bro.days.core.data.repository.AnniversaryRepository
-import jpark.bro.days.core.data.repository.CoupleRepository
 import jpark.bro.days.core.data.repository.ItemRepository
-import jpark.bro.days.core.data.repository.ProfileRepository
 import jpark.bro.days.core.data.repository.SettingsRepository
-import jpark.bro.days.core.model.Couple
 import jpark.bro.days.core.model.ItemType
-import jpark.bro.days.core.model.UserProfile
 import jpark.bro.days.core.ui.MviViewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
@@ -19,29 +14,18 @@ import java.time.LocalDate
 internal class HomeViewModel(
     itemRepository: ItemRepository,
     private val settingsRepository: SettingsRepository,
-    coupleRepository: CoupleRepository,
-    profileRepository: ProfileRepository,
-    anniversaryRepository: AnniversaryRepository,
+    coupleSource: HomeCoupleSource,
     private val clock: Clock,
 ) : MviViewModel<HomeState, HomeAction, HomeEvent>(HomeState()) {
     init {
-        val coupleSource =
-            combine(
-                coupleRepository.observeCouple(),
-                profileRepository.observeMyProfile(),
-                profileRepository.observePartnerProfile(),
-                anniversaryRepository.observeHiddenRuleKeys(),
-                ::CoupleSource,
-            )
         combine(
             itemRepository.observeItems(),
             itemRepository.observePinnedItemId(),
             settingsRepository.observeCoupleBannerDismissed(),
-            coupleSource,
+            coupleSource.observe(),
         ) { items, pinnedItemId, bannerDismissed, source ->
             val today = LocalDate.now(clock)
-            val couple =
-                source.couple?.let { buildCoupleSummary(it, source.me, source.partner, source.hidden, today) }
+            val couple = buildCoupleSummary(source, today)
             setState {
                 copy(
                     isLoading = false,
@@ -102,10 +86,3 @@ internal class HomeViewModel(
         }
     }
 }
-
-private data class CoupleSource(
-    val couple: Couple?,
-    val me: UserProfile?,
-    val partner: UserProfile?,
-    val hidden: Set<String>,
-)

@@ -2,17 +2,26 @@ package jpark.bro.days.feature.couple.impl.couplemanage
 
 import androidx.lifecycle.viewModelScope
 import jpark.bro.days.core.data.repository.CoupleRepository
+import jpark.bro.days.core.data.repository.ImageRepository
 import jpark.bro.days.core.data.repository.ProfileRepository
+import jpark.bro.days.core.data.repository.observeImageFileOrNull
 import jpark.bro.days.core.ui.MviViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.time.Clock
 import java.time.LocalDate
 
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class CoupleManageViewModel(
     private val coupleRepository: CoupleRepository,
     profileRepository: ProfileRepository,
+    imageRepository: ImageRepository,
     clock: Clock,
 ) : MviViewModel<CoupleManageState, CoupleManageAction, CoupleManageEvent>(
         CoupleManageState(today = LocalDate.now(clock)),
@@ -23,6 +32,13 @@ internal class CoupleManageViewModel(
             setState { copy(isLoading = false, couple = couple, partner = partner) }
             if (wasConnected && couple == null) sendEvent(CoupleManageEvent.Disconnected)
         }.launchIn(viewModelScope)
+        profileRepository
+            .observePartnerProfile()
+            .map { it?.profileImageId }
+            .distinctUntilChanged()
+            .flatMapLatest(imageRepository::observeImageFileOrNull)
+            .onEach { file -> setState { copy(partnerPhoto = file) } }
+            .launchIn(viewModelScope)
     }
 
     override fun onAction(action: CoupleManageAction) {

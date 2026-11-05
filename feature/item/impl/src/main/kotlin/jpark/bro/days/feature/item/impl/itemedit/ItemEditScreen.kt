@@ -44,10 +44,12 @@ import jpark.bro.days.core.model.Visibility
 import jpark.bro.days.core.ui.DaysDatePickerDialog
 import jpark.bro.days.core.ui.ObserveEvents
 import jpark.bro.days.core.ui.label
+import jpark.bro.days.core.ui.rememberPhotoPicker
 import jpark.bro.days.core.ui.toDisplayText
 import jpark.bro.days.feature.item.api.ItemEditKey
 import jpark.bro.days.feature.item.impl.R
 import jpark.bro.days.feature.item.impl.itemedit.components.ChipFlow
+import jpark.bro.days.feature.item.impl.itemedit.components.CoverPhotoPicker
 import jpark.bro.days.feature.item.impl.itemedit.components.DateRow
 import jpark.bro.days.feature.item.impl.itemedit.components.DeleteConfirmDialog
 import jpark.bro.days.feature.item.impl.itemedit.components.EditSection
@@ -73,12 +75,16 @@ internal fun ItemEditRoot(
     val toastHostState = remember { SnackbarHostState() }
     val saveFailed = stringResource(R.string.item_edit_save_failed)
     val deleteFailed = stringResource(R.string.item_edit_delete_failed)
+    val photoFailed = stringResource(R.string.item_edit_photo_failed)
+    val openPhotoPicker = rememberPhotoPicker { viewModel.onAction(ItemEditAction.PhotoPicked(it)) }
 
     ObserveEvents(viewModel.event) { event ->
         when (event) {
             ItemEditEvent.NavigateBack -> onBack()
             ItemEditEvent.SaveFailed -> toastHostState.showSnackbar(saveFailed)
             ItemEditEvent.DeleteFailed -> toastHostState.showSnackbar(deleteFailed)
+            ItemEditEvent.OpenPhotoPicker -> openPhotoPicker()
+            ItemEditEvent.PhotoFailed -> toastHostState.showSnackbar(photoFailed)
         }
     }
 
@@ -170,6 +176,17 @@ private fun ItemEditForm(
             onIconSelect = { onAction(ItemEditAction.IconSelected(it)) },
             onColorSelect = { onAction(ItemEditAction.ColorSelected(it)) },
         )
+    }
+    if (isDday) {
+        EditSection(title = stringResource(R.string.item_edit_photo)) {
+            CoverPhotoPicker(
+                file = state.backgroundFile,
+                hasPhoto = state.backgroundImageId != null,
+                isWorking = state.isPhotoWorking,
+                onPick = { onAction(ItemEditAction.PhotoClicked) },
+                onRemove = { onAction(ItemEditAction.PhotoRemoved) },
+            )
+        }
     }
     if (isDday) DdayFields(state = state, onAction = onAction) else PlanFields(state = state, onAction = onAction)
     EditSection(title = stringResource(R.string.item_edit_memo)) {

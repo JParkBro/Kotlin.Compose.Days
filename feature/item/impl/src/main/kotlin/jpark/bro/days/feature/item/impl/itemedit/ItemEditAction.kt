@@ -85,6 +85,15 @@ internal sealed interface ItemEditAction {
         val enabled: Boolean,
     ) : PlanInput
 
+    /** 배경 사진 (디데이만). 사진 선택기를 연다 */
+    data object PhotoClicked : ItemEditAction
+
+    data class PhotoPicked(
+        val uri: String,
+    ) : ItemEditAction
+
+    data object PhotoRemoved : ItemEditAction
+
     data object DateClicked : ItemEditAction
 
     data class DateSelected(

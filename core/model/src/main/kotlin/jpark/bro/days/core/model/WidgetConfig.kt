@@ -15,6 +15,9 @@ enum class WidgetBackground {
     THEME,
     DARK,
     WHITE,
+
+    /** 보여주는 디데이의 배경 사진. 사진이 없는 디데이면 [THEME]처럼 보인다 */
+    PHOTO,
 }
 
 /**

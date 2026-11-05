@@ -8,14 +8,18 @@ import jpark.bro.days.core.model.Item
 import jpark.bro.days.core.model.ItemContent
 import jpark.bro.days.core.model.ItemType
 import jpark.bro.days.core.model.ThemeSetting
+import jpark.bro.days.core.model.UserProfile
 import jpark.bro.days.core.model.WidgetBackground
 import jpark.bro.days.core.model.WidgetConfig
 import jpark.bro.days.core.model.WidgetSize
+import jpark.bro.days.core.testing.FakeImageRepository
 import jpark.bro.days.core.testing.FakeItemRepository
+import jpark.bro.days.core.testing.FakeProfileRepository
 import jpark.bro.days.core.testing.FakeSettingsRepository
 import jpark.bro.days.core.testing.FakeWidgetConfigRepository
 import jpark.bro.days.core.testing.MainDispatcherRule
 import jpark.bro.days.widget.WidgetDisplay
+import jpark.bro.days.widget.WidgetPhotos
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -56,17 +60,24 @@ class WidgetConfigViewModelTest {
     )
 
     private val discharge = dday("discharge", "전역일", LocalDate.of(2027, 3, 19))
-    private val toeic = dday("toeic", "토익 시험", LocalDate.of(2026, 11, 8))
+
+    /** 가장 가까운 디데이(자동 선택). 커버 사진이 있다 */
+    private val toeic =
+        dday("toeic", "토익 시험", LocalDate.of(2026, 11, 8)).let {
+            it.copy(content = it.content.copy(backgroundImageId = "toeic-bg"))
+        }
     private val configs = FakeWidgetConfigRepository()
+    private val images = FakeImageRepository()
+    private val profiles = FakeProfileRepository(me = UserProfile("user-me", "현우", null, profileImageId = "face"))
 
     private fun viewModel(saved: WidgetConfig? = null): WidgetConfigViewModel {
         saved?.let { kotlinx.coroutines.runBlocking { configs.saveConfig(it) } }
         return WidgetConfigViewModel(
-            widgetId = 7,
-            size = WidgetSize.MEDIUM,
+            target = WidgetTarget(widgetId = 7, size = WidgetSize.MEDIUM),
             itemRepository = FakeItemRepository(listOf(discharge, toeic)),
             widgetConfigRepository = configs,
             settingsRepository = FakeSettingsRepository(ThemeSetting(AppThemeType.NAVY, AppThemeMode.SYSTEM)),
+            photos = WidgetPhotos(images, profiles),
             clock = clock,
         )
     }
@@ -129,5 +140,28 @@ class WidgetConfigViewModelTest {
             }
 
             assertNull(configs.getConfig(7))
+        }
+
+    @Test
+    fun `사진 배경 · 프로필 표시를 저장하고 미리보기에 디데이 사진과 내 프로필이 보임`() =
+        runTest {
+            val bg = images.add("toeic-bg")
+            val face = images.add("face")
+            val viewModel = viewModel()
+
+            viewModel.onAction(WidgetConfigAction.BackgroundSelected(WidgetBackground.PHOTO))
+            viewModel.onAction(WidgetConfigAction.ShowProfileChanged(true))
+
+            val state = viewModel.state.value
+            assertEquals(bg, state.photo)
+            assertEquals(listOf(face), state.profiles.map { it.photo })
+
+            viewModel.event.test {
+                viewModel.onAction(WidgetConfigAction.SaveClicked)
+                awaitItem()
+            }
+            val saved = configs.getConfig(7)
+            assertEquals(WidgetBackground.PHOTO, saved?.background)
+            assertEquals(true, saved?.showProfile)
         }
 }

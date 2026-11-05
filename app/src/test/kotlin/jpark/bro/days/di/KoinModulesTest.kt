@@ -6,7 +6,6 @@ import androidx.navigation3.runtime.NavKey
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import jpark.bro.days.core.model.WidgetSize
 import jpark.bro.days.feature.item.api.ItemDetailKey
 import jpark.bro.days.feature.item.api.ItemEditKey
 import kotlinx.coroutines.CoroutineDispatcher
@@ -30,8 +29,8 @@ class KoinModulesTest {
     fun `모든 Koin 모듈의 의존성이 해결됨`() {
         // Navigator(startKey, topLevelKeys)는 appModule에서 값을 직접 넣어 만든다
         val navigatorArgs = listOf(NavKey::class, Set::class)
-        // 위젯 설정 ViewModel은 위젯 id · 크기를 parametersOf로 받는다
-        val widgetConfigArgs = listOf(Int::class, WidgetSize::class)
+        // 위젯 설정 ViewModel은 위젯 id · 크기(WidgetTarget, widget 모듈 internal)를 parametersOf로 받는다
+        val widgetConfigArgs = listOf(Class.forName("jpark.bro.days.widget.config.WidgetTarget").kotlin)
         // Firebase SDK 인스턴스는 Koin이 아니라 Firebase.auth · functions · remoteConfig가 만들어 데이터 소스에 넘긴다
         val firebaseTypes = listOf(FirebaseAuth::class, FirebaseFunctions::class, FirebaseRemoteConfig::class)
         // 사진 저장소의 IO 디스패처, 사진 동기화의 업로드 스위치(RemoteFlags.uploadEnabled)는 모듈에서 값을 넣는다

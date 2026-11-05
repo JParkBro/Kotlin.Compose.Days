@@ -64,6 +64,12 @@
     <string name="item_edit_reminder_same_day">당일</string>
     <string name="item_edit_reminder_days_before">%1$d일 전</string>
 
+    <string name="item_edit_photo">커버 사진 (선택)</string>
+    <string name="item_edit_photo_add">사진 추가</string>
+    <string name="item_edit_photo_change">사진 변경</string>
+    <string name="item_edit_photo_remove">사진 삭제</string>
+    <string name="item_edit_photo_description">커버 사진</string>
+    <string name="item_edit_photo_failed">사진을 불러오지 못했어요. 다른 사진을 골라 주세요.</string>
     <string name="item_edit_visibility">공개 범위</string>
     <string name="item_edit_visibility_shared_desc">상대방과 함께 보고 둘 다 수정할 수 있어요.</string>
     <string name="item_edit_visibility_private_desc">내 기기에만 저장되고 상대에게 보이지 않아요.</string>

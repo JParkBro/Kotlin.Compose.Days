@@ -51,16 +51,17 @@ class DefaultProfileRepositoryTest {
     @Test
     fun `저장하면 앞뒤 공백을 지우고 올릴 대상(PENDING)이 됨`() =
         runTest {
-            repository.saveMyProfile("  현우 ", LocalDate.of(1998, 4, 12)).getOrThrow()
+            repository.saveMyProfile("  현우 ", LocalDate.of(1998, 4, 12), null).getOrThrow()
 
             assertEquals(UserProfile(ME, "현우", LocalDate.of(1998, 4, 12)), repository.observeMyProfile().first())
+            assertEquals(null, repository.observeMyProfile().first()?.profileImageId)
             assertEquals("PENDING", syncStateOf(ME))
         }
 
     @Test
     fun `생일은 비워 둘 수 있음`() =
         runTest {
-            repository.saveMyProfile("현우", null).getOrThrow()
+            repository.saveMyProfile("현우", null, null).getOrThrow()
 
             assertNull(repository.observeMyProfile().first()?.birthDate)
         }
@@ -68,20 +69,20 @@ class DefaultProfileRepositoryTest {
     @Test
     fun `이름이 비었거나 10자를 넘거나 생일이 오늘 이후면 실패`() =
         runTest {
-            assertTrue(repository.saveMyProfile("   ", null).isFailure)
-            assertTrue(repository.saveMyProfile("가".repeat(11), null).isFailure)
-            assertTrue(repository.saveMyProfile("현우", LocalDate.of(2026, 11, 6)).isFailure)
-            assertTrue(repository.saveMyProfile("가".repeat(10), LocalDate.of(2026, 11, 5)).isSuccess)
+            assertTrue(repository.saveMyProfile("   ", null, null).isFailure)
+            assertTrue(repository.saveMyProfile("가".repeat(11), null, null).isFailure)
+            assertTrue(repository.saveMyProfile("현우", LocalDate.of(2026, 11, 6), null).isFailure)
+            assertTrue(repository.saveMyProfile("가".repeat(10), LocalDate.of(2026, 11, 5), null).isSuccess)
         }
 
     @Test
     fun `로그아웃 상태면 내 프로필이 없고 저장은 실패`() =
         runTest {
-            repository.saveMyProfile("현우", null).getOrThrow()
+            repository.saveMyProfile("현우", null, null).getOrThrow()
             session.userId.value = null
 
             assertNull(repository.observeMyProfile().first())
-            assertTrue(repository.saveMyProfile("현우", null).isFailure)
+            assertTrue(repository.saveMyProfile("현우", null, null).isFailure)
         }
 
     @Test
@@ -108,4 +109,14 @@ class DefaultProfileRepositoryTest {
 
     private fun couple(status: String) =
         CoupleEntity(COUPLE, PARTNER, ME, "2025-06-14", true, status, "K7Q2MX", null, 0, 0, 0)
+
+    @Test
+    fun `프로필 사진 id를 저장하고 지울 수 있음`() =
+        runTest {
+            repository.saveMyProfile("현우", null, "photo-1").getOrThrow()
+            assertEquals("photo-1", repository.observeMyProfile().first()?.profileImageId)
+
+            repository.saveMyProfile("현우", null, null).getOrThrow()
+            assertNull(repository.observeMyProfile().first()?.profileImageId)
+        }
 }

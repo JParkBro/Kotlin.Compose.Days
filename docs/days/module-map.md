@@ -173,14 +173,14 @@ days/
    - 6-6b `feature:couple` (#32): 커플 연결(내 코드 · 코드 입력 6칸: 칸 선택 · 덮어쓰기) · 연결 확인(사귄 날 · 1일로 세기 · 함께한 날) · 커플 관리 · 해제 시트 · 30일 안 재연결. `core:data` `CoupleRepository` · `CoupleTransitions`(연결 · 해제 전환을 내 동작 · 동기화 리스너 모두 한 곳에서: `users.coupleId`, 내 코드 삭제, 공유 항목 사본 · 재연결 때 사본 정리), `core:firebase` `CoupleRemoteDataSource`(코드 · 연결 트랜잭션), Room `item.copied_from_item_id`, 설정 커플 뱃지 · 함께한 날. `core:sync`는 커플 전환 때문에 `core:data`를 참조
    - 6-7 커플 홈 · 공개 범위 · 공유 표시 (#33): 홈 커플 히어로(함께한 날) · 다음 일정 | 다음 기념일(진행 바) · 필터(전체 / 우리 / 나만) · 리스트 공개 범위 뱃지, 연결되면 연결 유도 카드 숨김. 디데이 · 일정 수정의 공개 범위(커플일 때만, 새 항목은 우리 둘이 기본, 공유한 항목은 나만 보기로 바꿀 수 없음 · `saveItem`도 막음). `core:data` `AnniversaryRepository`(숨김은 Room PENDING → 기존 동기화), `core:domain` `nextAnniversary`(생일 포함), 커플 관리 → 자동 기념일 목록(앞으로 1년, 숨김 토글). 캘린더의 자동 기념일 표시는 이후
    - 6-8a 사진 저장 · 업로드 기반 (#34): `firebase/storage.rules`(커플 멤버만 · webp · 300KB · 덮어쓰기 금지 · 방금 등록한 `lastImageId`만) + Firestore `usage/images` 카운터(+1씩 · 누적 30), Storage 에뮬레이터 9199. Room `image` · `user.profile_image_id`, `core:firebase` `ImageRemoteDataSource`, `core:data` `ImageStore`(WebP 1080px · 280KB 이하) · `ImageRepository`(가져오기 · 받아서 영구 저장 · 버리기), `core:sync` `ImageSync`(사진 → 프로필 → 공유 항목 순, 사진 올리기 전 항목은 기다림, `upload_enabled`) · `CoupleDataSync`(공유 항목 · 숨긴 기념일을 `SyncEngine`에서 분리). 썸네일 없음, 문서에는 사진 id만
-   - 6-8b 사진 화면: 디데이 배경 사진 선택 · 상세 배경, 프로필 사진, 커플 홈 사진, 위젯 사진 배경 · 프로필 (Coil 3)
+   - 6-8b 사진 화면 (#35): Coil 3(`coil-compose`, 기기 파일만) · `core:ui` `DaysPhoto` · `ProfileAvatar` · `rememberPhotoPicker`(PickVisualMedia), `core:data` `ImageDraft`(고르는 중인 사진: 저장 뒤 이전 사진 · 취소 시 새 사진 버리기). 디데이 커버 사진 선택 · 상세 배경(image-scrim + on-image), 프로필 사진(수정 · 설정 카드 · 커플 관리 · 커플 홈 히어로, 홈은 `HomeCoupleSource`로 묶음), 위젯 사진 배경(`WidgetBackground.PHOTO` = 보여주는 디데이의 커버 사진) · 프로필 원(커플 두 사람 · 솔로 나), 위젯 설정 ViewModel 키는 `WidgetTarget`
 7. `feature:onboarding`(소개 · 약관 · 시작 방식, 로그인은 6단계에서), `feature:settings`, `feature:notifications`, `core:notification`
 8. `core:ads`, 광고 제거 구매
 9. `policy-site/`(Firebase Hosting), 출시 체크리스트 (`infra-and-billing-protection.md`)
 
 ## 10. widget 모듈 (Glance)
 
-> 상태: **1차 완료.** 위젯 본체(#20), 위젯 설정 · 상세의 "위젯 추가"(#21). 사진 배경 · 프로필은 이후 단계. 기획은 `product-spec.md` 8장, 시안은 `design/settings-widget/`.
+> 상태: **1차 완료.** 위젯 본체(#20), 위젯 설정 · 상세의 "위젯 추가"(#21), 사진 배경 · 프로필(#35). 기획은 `product-spec.md` 8장, 시안은 `design/settings-widget/`.
 
 **모듈 · 빌드**
 - [x] `:widget` 모듈 (`days.android.library` + `days.android.compose` + `days.koin`), catalog에 `glance-appwidget` · `glance-preview` · `work-runtime`
@@ -191,7 +191,7 @@ days/
 - [x] 표시: 아이콘 · 제목 · D-day(+ 중간은 기준일). 고른 디데이가 없으면 홈 히어로와 같은 규칙(`core:domain` `featured`)
 - [x] 배경: 테마색(기기 다크 모드를 따름) · 다크 · 화이트. 앱과 같은 팔레트
 - [x] 탭: 앱을 `AppIntents.EXTRA_OPEN_ITEM_ID`와 함께 열고, `MainActivity`가 `[HomeKey, ItemDetailKey]` 백스택을 만든다 (`singleTop` + `onNewIntent`)
-- [ ] 사진 배경 · 프로필 사진 표시 (이미지 저장소 · 커플 프로필 단계)
+- [x] 사진 배경(보여주는 디데이의 커버 사진) · 프로필 사진 표시 (#35). 비트맵은 RemoteViews 한도 때문에 배경 720px · 프로필 96px로 줄여 읽는다
 
 **설정 · 데이터**
 - [x] Room `widget_config` (widget_id, item_id, size, background_type, show_profile), `WidgetConfigRepository`. 위젯을 지우면 설정도 지움

@@ -16,10 +16,22 @@ import org.koin.dsl.navigation3.navigation
 val itemModule =
     module {
         viewModel { params ->
-            ItemDetailViewModel(key = params.get(), itemRepository = get(), homeWidgets = get(), clock = get())
+            ItemDetailViewModel(
+                key = params.get(),
+                itemRepository = get(),
+                imageRepository = get(),
+                homeWidgets = get(),
+                clock = get(),
+            )
         }
         viewModel { params ->
-            ItemEditViewModel(key = params.get(), itemRepository = get(), coupleRepository = get(), clock = get())
+            ItemEditViewModel(
+                key = params.get(),
+                itemRepository = get(),
+                coupleRepository = get(),
+                imageRepository = get(),
+                clock = get(),
+            )
         }
 
         navigation<ItemDetailKey> { key ->

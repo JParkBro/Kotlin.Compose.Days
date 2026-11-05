@@ -12,6 +12,7 @@ import jpark.bro.days.core.model.RepeatRule
 import jpark.bro.days.core.model.TimeSlot
 import jpark.bro.days.core.model.Visibility
 import jpark.bro.days.core.model.defaultIcon
+import java.io.File
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -61,6 +62,11 @@ internal data class ItemEditState(
     val visibility: Visibility = Visibility.PRIVATE,
     /** 이미 공유한 항목은 나만 보기로 바꿀 수 없다 (product-spec 2-6) */
     val isVisibilityLocked: Boolean = false,
+    /** 배경 사진 id와 파일 (디데이만, product-spec 4-5) */
+    val backgroundImageId: String? = null,
+    val backgroundFile: File? = null,
+    /** 고른 사진을 줄이는 중 */
+    val isPhotoWorking: Boolean = false,
     val dialog: ItemEditDialog? = null,
 ) {
     val showVisibility: Boolean get() = coupleId != null
@@ -69,7 +75,8 @@ internal data class ItemEditState(
 
     /** 제목 필수, 디데이는 기준일 필수 (product-spec 2-1) */
     val canSave: Boolean
-        get() = !isLoading && !isSaving && title.isNotBlank() && (type == ItemType.PLAN || date != null)
+        get() =
+            !isLoading && !isSaving && !isPhotoWorking && title.isNotBlank() && (type == ItemType.PLAN || date != null)
 
     /** 위쪽 미리보기 카드의 D-day. 날짜가 없으면 null */
     val previewDday: DdayCount?

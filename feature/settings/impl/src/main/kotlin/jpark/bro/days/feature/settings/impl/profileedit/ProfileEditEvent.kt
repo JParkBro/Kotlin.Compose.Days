@@ -7,4 +7,9 @@ internal sealed interface ProfileEditEvent {
     data object SaveFailed : ProfileEditEvent
 
     data object NavigateBack : ProfileEditEvent
+
+    data object OpenPhotoPicker : ProfileEditEvent
+
+    /** 고른 사진을 읽거나 줄이지 못함 */
+    data object PhotoFailed : ProfileEditEvent
 }

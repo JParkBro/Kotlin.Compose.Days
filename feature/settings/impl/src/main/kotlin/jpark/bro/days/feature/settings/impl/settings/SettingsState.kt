@@ -3,6 +3,7 @@ package jpark.bro.days.feature.settings.impl.settings
 import jpark.bro.days.core.model.AppThemeMode
 import jpark.bro.days.core.model.AppThemeType
 import jpark.bro.days.core.model.ThemeSetting
+import java.io.File
 import java.time.LocalDate
 
 internal data class SettingsState(
@@ -13,6 +14,8 @@ internal data class SettingsState(
     /** 상대 이름. 연결됐어도 상대 프로필을 아직 받지 못했으면 null */
     val partnerName: String? = null,
     val accountEmail: String? = null,
+    /** 내 프로필 사진 파일. 없으면 이름 첫 글자 */
+    val profilePhoto: File? = null,
     val themeSetting: ThemeSetting = ThemeSetting(),
     /** null이면 테마 시트 닫힘 */
     val themeSheet: ThemeSheetState? = null,

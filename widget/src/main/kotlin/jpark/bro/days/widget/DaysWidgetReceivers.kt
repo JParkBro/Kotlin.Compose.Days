@@ -52,13 +52,17 @@ abstract class DaysWidgetReceiver :
         }
     }
 
+    /**
+     * GlanceAppWidgetReceiver.onUpdate가 이미 goAsync()를 불렀으면 두 번째 호출은 null을 준다
+     * (그때는 Glance가 잡은 대기 결과가 리시버를 살려 둔다)
+     */
     private fun runAsync(block: suspend () -> Unit) {
-        val pending = goAsync()
+        val pending: PendingResult? = goAsync()
         scope.launch {
             try {
                 block()
             } finally {
-                pending.finish()
+                pending?.finish()
             }
         }
     }
@@ -99,7 +103,7 @@ class WidgetPinnedReceiver :
                     WidgetConfig(widgetId = widgetId, size = size, itemId = intent.getStringExtra(EXTRA_ITEM_ID)),
                 )
             } finally {
-                pending.finish()
+                pending?.finish()
             }
         }
     }
@@ -128,7 +132,7 @@ class WidgetTimeChangedReceiver :
                 widgetUpdater.updateAll()
                 widgetUpdater.scheduleNextMidnight()
             } finally {
-                pending.finish()
+                pending?.finish()
             }
         }
     }

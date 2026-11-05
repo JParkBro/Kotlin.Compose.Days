@@ -75,6 +75,7 @@ days/
 | | `ItemEditKey` | `itemId: String?`, `type: ItemType`, `presetDate: String?`, `presetCategory: Category?`, `presetTitle: String?` (빠른 시작) |
 | `notifications:api` | `NotificationsKey` | – |
 | `settings:api` | `SettingsKey`, `ProfileEditKey` (커플 코드 발급에 이름이 필요해 커플 연결에서도 연다) | – |
+| | `PolicyDocKey` (온보딩 약관 동의의 "보기"에서도 연다) | `type: PolicyType` |
 
 ### 4-2. impl 내부 키 (internal)
 
@@ -82,21 +83,21 @@ days/
 |---|---|
 | `onboarding:impl` | `LoginKey`, `TermsKey`, `StartModeKey` |
 | `couple:impl` | `PairCodeConfirmKey`, `AnniversaryListKey` |
-| `settings:impl` | `NotificationSettingsKey`, `WidgetSettingsKey`, `AccountKey`, `WithdrawKey`, `PolicyListKey`, `PolicyDocKey(type)`, `MoreAppsKey` |
+| `settings:impl` | `NotificationSettingsKey`, `WidgetSettingsKey`, `AccountKey`, `WithdrawKey`, `PolicyListKey`, `MoreAppsKey` |
 
 ### 4-3. app에서 결정하는 목적지
 
 | 상황 | 결과 타입 (api) | app의 처리 |
 |---|---|---|
-| 앱 시작 | – | 온보딩 미완료 → `OnboardingKey`, 완료 → `HomeKey` |
-| 온보딩 완료 | `OnboardingResult.Solo` / `Couple` | `replaceAll(HomeKey)` / `replaceAll(PairingKey)` |
+| 앱 시작 | – | 온보딩 미완료(로그아웃 또는 이 기기에서 약관 동의 전) → `OnboardingKey`, 완료 → `HomeKey` |
+| 온보딩 완료 | `OnboardingResult.Solo` / `Couple` | `replaceAll(HomeKey)` / `replaceAll(HomeKey)` + `goTo(PairingKey)` (연결을 닫으면 홈) |
 | 로그아웃 · 탈퇴 | `SessionEnded` | `replaceAll(OnboardingKey)` |
 
 ## 5. 기능 간 의존 관계
 
 | impl | 의존하는 api |
 |---|---|
-| `onboarding:impl` | (결과만 알림, app이 목적지 결정) |
+| `onboarding:impl` | `settings` (정책 문서 보기). 끝나면 결과만 알리고 app이 목적지 결정 |
 | `couple:impl` | `home`, `settings` (프로필 수정) |
 | `home:impl` | `item`, `couple`, `notifications` |
 | `calendar:impl` | `item` |
@@ -175,6 +176,7 @@ days/
    - 6-8a 사진 저장 · 업로드 기반 (#34): `firebase/storage.rules`(커플 멤버만 · webp · 300KB · 덮어쓰기 금지 · 방금 등록한 `lastImageId`만) + Firestore `usage/images` 카운터(+1씩 · 누적 30), Storage 에뮬레이터 9199. Room `image` · `user.profile_image_id`, `core:firebase` `ImageRemoteDataSource`, `core:data` `ImageStore`(WebP 1080px · 280KB 이하) · `ImageRepository`(가져오기 · 받아서 영구 저장 · 버리기), `core:sync` `ImageSync`(사진 → 프로필 → 공유 항목 순, 사진 올리기 전 항목은 기다림, `upload_enabled`) · `CoupleDataSync`(공유 항목 · 숨긴 기념일을 `SyncEngine`에서 분리). 썸네일 없음, 문서에는 사진 id만
    - 6-8b 사진 화면 (#35): Coil 3(`coil-compose`, 기기 파일만) · `core:ui` `DaysPhoto` · `ProfileAvatar` · `rememberPhotoPicker`(PickVisualMedia), `core:data` `ImageDraft`(고르는 중인 사진: 저장 뒤 이전 사진 · 취소 시 새 사진 버리기). 디데이 커버 사진 선택 · 상세 배경(image-scrim + on-image), 프로필 사진(수정 · 설정 카드 · 커플 관리 · 커플 홈 히어로, 홈은 `HomeCoupleSource`로 묶음), 위젯 사진 배경(`WidgetBackground.PHOTO` = 보여주는 디데이의 커버 사진) · 프로필 원(커플 두 사람 · 솔로 나), 위젯 설정 ViewModel 키는 `WidgetTarget`
 7. `feature:onboarding`(소개 · 약관 · 시작 방식, 로그인은 6단계에서), `feature:settings`, `feature:notifications`, `core:notification`
+   - 7-1 온보딩 (#36): 소개(3장, 기기마다 한 번: DataStore `intro_seen`, 본 뒤로는 로그인부터) → 로그인 → 약관 동의(필수 3 + 마케팅 선택, `users/{uid}`에 `termsVersion` · `privacyVersion` · `ageOver14` · `marketing` · `agreedAt` merge, `core:firebase` `TermsRemoteDataSource`) → 시작 방식(커플 추천 기본). `core:data` `OnboardingRepository`: 동의한 계정을 DataStore `terms_agreed_users`에 남기고, 기록이 없으면 로그인 직후 서버 동의 기록을 한 번 읽어(다시 설치 · 다른 기기) 이미 동의했으면 약관 · 시작 방식 없이 홈으로. 앱 시작은 로그인 + 이 기기 동의 기록이 있을 때만 홈. `PolicyDocKey` · `PolicyType`을 `settings:api`로 옮김 (정책 문서 화면은 9단계)
 8. `core:ads`, 광고 제거 구매
 9. `policy-site/`(Firebase Hosting), 출시 체크리스트 (`infra-and-billing-protection.md`)
 

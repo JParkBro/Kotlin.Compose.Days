@@ -8,6 +8,7 @@ import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import jpark.bro.days.feature.item.api.ItemDetailKey
 import jpark.bro.days.feature.item.api.ItemEditKey
+import jpark.bro.days.feature.settings.api.PolicyDocKey
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.StateFlow
 import org.junit.Test
@@ -18,11 +19,8 @@ import kotlin.reflect.KClass
 class KoinModulesTest {
     /** 화면 키를 parametersOf로 받는 ViewModel의 생성자 타입. feature 내부(internal) 키는 이름으로 찾는다. */
     private val navKeyTypes: List<KClass<*>> =
-        listOf(ItemDetailKey::class, ItemEditKey::class) +
-            listOf(
-                "jpark.bro.days.feature.couple.impl.PairCodeConfirmKey",
-                "jpark.bro.days.feature.settings.impl.PolicyDocKey",
-            ).map { Class.forName(it).kotlin }
+        listOf(ItemDetailKey::class, ItemEditKey::class, PolicyDocKey::class) +
+            listOf("jpark.bro.days.feature.couple.impl.PairCodeConfirmKey").map { Class.forName(it).kotlin }
 
     @OptIn(KoinExperimentalAPI::class)
     @Test

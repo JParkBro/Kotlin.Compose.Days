@@ -1,6 +1,6 @@
 package jpark.bro.days.feature.settings.impl.policylist
 
-import jpark.bro.days.feature.settings.impl.PolicyType
+import jpark.bro.days.feature.settings.api.PolicyType
 
 internal sealed interface PolicyListEvent {
     data class OpenPolicy(

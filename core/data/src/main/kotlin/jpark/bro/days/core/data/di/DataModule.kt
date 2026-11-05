@@ -18,11 +18,13 @@ import jpark.bro.days.core.data.repository.DefaultAuthRepository
 import jpark.bro.days.core.data.repository.DefaultCoupleRepository
 import jpark.bro.days.core.data.repository.DefaultImageRepository
 import jpark.bro.days.core.data.repository.DefaultItemRepository
+import jpark.bro.days.core.data.repository.DefaultOnboardingRepository
 import jpark.bro.days.core.data.repository.DefaultProfileRepository
 import jpark.bro.days.core.data.repository.DefaultSettingsRepository
 import jpark.bro.days.core.data.repository.DefaultWidgetConfigRepository
 import jpark.bro.days.core.data.repository.ImageRepository
 import jpark.bro.days.core.data.repository.ItemRepository
+import jpark.bro.days.core.data.repository.OnboardingRepository
 import jpark.bro.days.core.data.repository.ProfileRepository
 import jpark.bro.days.core.data.repository.SettingsRepository
 import jpark.bro.days.core.data.repository.WidgetConfigRepository
@@ -55,6 +57,7 @@ val dataModule =
         singleOf(::DefaultAnniversaryRepository) bind AnniversaryRepository::class
         single { ImageStore(androidContext(), Dispatchers.IO) }
         singleOf(::DefaultImageRepository) bind ImageRepository::class
+        singleOf(::DefaultOnboardingRepository) bind OnboardingRepository::class
         singleOf(::DefaultWidgetConfigRepository) bind WidgetConfigRepository::class
     }
 

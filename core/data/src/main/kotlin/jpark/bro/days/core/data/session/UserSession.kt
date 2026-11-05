@@ -10,7 +10,10 @@ internal interface UserSession {
     fun observeUserId(): Flow<String?>
 
     /** 로그인하지 않았으면 예외 (Repository가 Result 실패로 바꾼다) */
-    suspend fun currentUserId(): String
+    suspend fun currentUserId(): String = checkNotNull(currentUserIdOrNull()) { "로그인이 필요합니다." }
+
+    /** 기다리지 않고 지금 값만 본다. 인증 리스너는 메인 스레드로 알려 와 앱 시작(runBlocking)에서는 이것을 쓴다 */
+    fun currentUserIdOrNull(): String?
 }
 
 internal class FirebaseUserSession(
@@ -18,5 +21,5 @@ internal class FirebaseUserSession(
 ) : UserSession {
     override fun observeUserId(): Flow<String?> = authDataSource.observeUser().map { it?.uid }
 
-    override suspend fun currentUserId(): String = checkNotNull(authDataSource.currentUser?.uid) { "로그인이 필요합니다." }
+    override fun currentUserIdOrNull(): String? = authDataSource.currentUser?.uid
 }

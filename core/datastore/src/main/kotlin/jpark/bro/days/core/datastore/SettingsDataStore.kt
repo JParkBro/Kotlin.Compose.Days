@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import jpark.bro.days.core.model.ThemeSetting
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -40,6 +41,20 @@ class SettingsDataStore(
         }
     }
 
+    /** 온보딩 소개를 이 기기에서 본 적 있는지. 본 뒤로는 로그인부터 */
+    suspend fun introSeen(): Boolean = dataStore.data.first()[INTRO_SEEN] ?: false
+
+    suspend fun setIntroSeen() {
+        dataStore.edit { prefs -> prefs[INTRO_SEEN] = true }
+    }
+
+    /** 이 기기에서 약관 동의를 마친(또는 서버에서 확인한) 계정. 한 기기에 여러 계정이 로그인할 수 있다 */
+    suspend fun termsAgreed(userId: String): Boolean = userId in dataStore.data.first()[TERMS_AGREED_USERS].orEmpty()
+
+    suspend fun setTermsAgreed(userId: String) {
+        dataStore.edit { prefs -> prefs[TERMS_AGREED_USERS] = prefs[TERMS_AGREED_USERS].orEmpty() + userId }
+    }
+
     suspend fun setThemeSetting(setting: ThemeSetting) {
         dataStore.edit { prefs ->
             prefs[THEME_TYPE] = setting.type.name
@@ -52,6 +67,8 @@ class SettingsDataStore(
         val THEME_MODE = stringPreferencesKey("theme_mode")
         val COUPLE_BANNER_DISMISSED = booleanPreferencesKey("couple_banner_dismissed")
         val ISSUED_PAIR_CODE = stringPreferencesKey("issued_pair_code")
+        val INTRO_SEEN = booleanPreferencesKey("intro_seen")
+        val TERMS_AGREED_USERS = stringSetPreferencesKey("terms_agreed_users")
     }
 }
 

@@ -10,8 +10,8 @@ import jpark.bro.days.feature.onboarding.api.OnboardingResultHandler
 import jpark.bro.days.feature.settings.api.SessionEnded
 import jpark.bro.days.feature.settings.api.SessionEndedHandler
 
-/** 앱을 켰을 때 첫 화면: 로그인했으면 홈, 아니면 온보딩 */
-internal fun startKeyFor(signedIn: Boolean): NavKey = if (signedIn) HomeKey else OnboardingKey
+/** 앱을 켰을 때 첫 화면: 온보딩(로그인 · 약관 동의)을 마쳤으면 홈, 아니면 온보딩 */
+internal fun startKeyFor(onboarded: Boolean): NavKey = if (onboarded) HomeKey else OnboardingKey
 
 /** 온보딩 완료 후 목적지 (module-map 4-3) */
 internal class AppOnboardingResultHandler(
@@ -19,8 +19,15 @@ internal class AppOnboardingResultHandler(
 ) : OnboardingResultHandler {
     override fun handle(result: OnboardingResult) {
         when (result) {
-            OnboardingResult.Solo -> navigator.replaceAll(HomeKey)
-            OnboardingResult.Couple -> navigator.replaceAll(PairingKey)
+            OnboardingResult.Solo -> {
+                navigator.replaceAll(HomeKey)
+            }
+
+            // 커플 연결을 닫으면 홈으로 돌아오게 홈 위에 연다
+            OnboardingResult.Couple -> {
+                navigator.replaceAll(HomeKey)
+                navigator.goTo(PairingKey)
+            }
         }
     }
 }

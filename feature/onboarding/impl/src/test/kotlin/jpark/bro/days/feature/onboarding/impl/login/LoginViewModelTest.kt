@@ -3,6 +3,7 @@ package jpark.bro.days.feature.onboarding.impl.login
 import app.cash.turbine.test
 import jpark.bro.days.core.model.AuthProvider
 import jpark.bro.days.core.testing.FakeAuthRepository
+import jpark.bro.days.core.testing.FakeOnboardingRepository
 import jpark.bro.days.core.testing.MainDispatcherRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -17,7 +18,8 @@ class LoginViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val authRepository = FakeAuthRepository()
-    private val viewModel by lazy { LoginViewModel(authRepository) }
+    private val onboardingRepository = FakeOnboardingRepository()
+    private val viewModel by lazy { LoginViewModel(authRepository, onboardingRepository) }
 
     @Test
     fun `구글 버튼을 누르면 계정 선택을 요청하고 버튼을 막음`() =
@@ -41,17 +43,45 @@ class LoginViewModelTest {
         }
 
     @Test
-    fun `토큰을 받으면 Firebase에 로그인하고 다음으로 감`() =
+    fun `토큰을 받으면 Firebase에 로그인하고 약관 동의로 감`() =
         runTest {
             viewModel.onAction(LoginAction.GoogleLoginClicked)
 
             viewModel.event.test {
                 skipItems(1)
                 viewModel.onAction(LoginAction.GoogleIdTokenReceived("token-1"))
-                assertEquals(LoginEvent.LoggedIn, awaitItem())
+                assertEquals(LoginEvent.LoggedIn(termsAgreed = false), awaitItem())
             }
             assertEquals(listOf("token-1"), authRepository.googleIdTokens)
             assertNotNull(authRepository.currentUser())
+            assertFalse(viewModel.state.value.isSigningIn)
+        }
+
+    @Test
+    fun `이미 약관에 동의한 계정이면 온보딩을 끝냄`() =
+        runTest {
+            onboardingRepository.termsAgreed = true
+            viewModel.onAction(LoginAction.GoogleLoginClicked)
+
+            viewModel.event.test {
+                skipItems(1)
+                viewModel.onAction(LoginAction.GoogleIdTokenReceived("token-1"))
+                assertEquals(LoginEvent.LoggedIn(termsAgreed = true), awaitItem())
+            }
+        }
+
+    @Test
+    fun `동의 기록을 확인하지 못하면 약관을 다시 받음`() =
+        runTest {
+            onboardingRepository.termsAgreed = true
+            onboardingRepository.failNext = true
+            viewModel.onAction(LoginAction.GoogleLoginClicked)
+
+            viewModel.event.test {
+                skipItems(1)
+                viewModel.onAction(LoginAction.GoogleIdTokenReceived("token-1"))
+                assertEquals(LoginEvent.LoggedIn(termsAgreed = false), awaitItem())
+            }
         }
 
     @Test
@@ -122,7 +152,7 @@ class LoginViewModelTest {
             viewModel.event.test {
                 skipItems(1)
                 viewModel.onAction(LoginAction.KakaoAccessTokenReceived("kakao-token-1"))
-                assertEquals(LoginEvent.LoggedIn, awaitItem())
+                assertEquals(LoginEvent.LoggedIn(termsAgreed = false), awaitItem())
             }
             assertEquals(listOf("kakao-token-1"), authRepository.kakaoAccessTokens)
             assertEquals(AuthProvider.KAKAO, authRepository.currentUser()?.provider)

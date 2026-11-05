@@ -51,11 +51,19 @@ interface ItemSyncDao {
     suspend fun upsertItem(item: ItemEntity)
 }
 
-/** [userId]가 올려야 할 공유 항목 조건 (`:userId` 필요) */
+/**
+ * [userId]가 올려야 할 공유 항목 조건 (`:userId` 필요).
+ * 배경 사진을 아직 그 커플에 올리지 않았으면 기다린다: 상대가 사진 없는 항목을 받지 않게 (사진 업로드가 먼저 돈다)
+ */
 private const val UNSYNCED_BY_USER = """
     sync_state IN ('PENDING', 'FAILED') AND visibility = 'SHARED' AND updated_by = :userId
     AND couple_id IN (
         SELECT id FROM couple
         WHERE status = 'ACTIVE' AND (member1_user_id = :userId OR member2_user_id = :userId)
+    )
+    AND NOT EXISTS (
+        SELECT 1 FROM image i
+        WHERE i.id = item.background_image_id AND i.deleted_at IS NULL AND i.local_path IS NOT NULL
+        AND i.upload_state != 'REJECTED' AND (i.remote_couple_id IS NULL OR i.remote_couple_id != item.couple_id)
     )
 """

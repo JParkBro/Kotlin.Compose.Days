@@ -172,7 +172,8 @@ days/
    - 6-6a 프로필 (#31): Room `user`(내 프로필 + 상대 캐시), `ProfileRepository`(이름 1~10자 · 생일 선택), `core:firebase` `ProfileRemoteDataSource`(`users/{uid}` 이름 · 생일 merge), `core:sync` `ProfileSync`(내 프로필 Push, 이 기기에 없을 때만 1회 조회, 상대 프로필은 커플 연결 시 리스너). 프로필 수정 화면 · 설정 카드, 공통 `DaysDatePickerDialog`(core:ui)
    - 6-6b `feature:couple` (#32): 커플 연결(내 코드 · 코드 입력 6칸: 칸 선택 · 덮어쓰기) · 연결 확인(사귄 날 · 1일로 세기 · 함께한 날) · 커플 관리 · 해제 시트 · 30일 안 재연결. `core:data` `CoupleRepository` · `CoupleTransitions`(연결 · 해제 전환을 내 동작 · 동기화 리스너 모두 한 곳에서: `users.coupleId`, 내 코드 삭제, 공유 항목 사본 · 재연결 때 사본 정리), `core:firebase` `CoupleRemoteDataSource`(코드 · 연결 트랜잭션), Room `item.copied_from_item_id`, 설정 커플 뱃지 · 함께한 날. `core:sync`는 커플 전환 때문에 `core:data`를 참조
    - 6-7 커플 홈 · 공개 범위 · 공유 표시 (#33): 홈 커플 히어로(함께한 날) · 다음 일정 | 다음 기념일(진행 바) · 필터(전체 / 우리 / 나만) · 리스트 공개 범위 뱃지, 연결되면 연결 유도 카드 숨김. 디데이 · 일정 수정의 공개 범위(커플일 때만, 새 항목은 우리 둘이 기본, 공유한 항목은 나만 보기로 바꿀 수 없음 · `saveItem`도 막음). `core:data` `AnniversaryRepository`(숨김은 Room PENDING → 기존 동기화), `core:domain` `nextAnniversary`(생일 포함), 커플 관리 → 자동 기념일 목록(앞으로 1년, 숨김 토글). 캘린더의 자동 기념일 표시는 이후
-   - 6-8 이미지 (Cloud Storage + Storage 규칙): 배경 사진 · 프로필
+   - 6-8a 사진 저장 · 업로드 기반 (#34): `firebase/storage.rules`(커플 멤버만 · webp · 300KB · 덮어쓰기 금지 · 방금 등록한 `lastImageId`만) + Firestore `usage/images` 카운터(+1씩 · 누적 30), Storage 에뮬레이터 9199. Room `image` · `user.profile_image_id`, `core:firebase` `ImageRemoteDataSource`, `core:data` `ImageStore`(WebP 1080px · 280KB 이하) · `ImageRepository`(가져오기 · 받아서 영구 저장 · 버리기), `core:sync` `ImageSync`(사진 → 프로필 → 공유 항목 순, 사진 올리기 전 항목은 기다림, `upload_enabled`) · `CoupleDataSync`(공유 항목 · 숨긴 기념일을 `SyncEngine`에서 분리). 썸네일 없음, 문서에는 사진 id만
+   - 6-8b 사진 화면: 디데이 배경 사진 선택 · 상세 배경, 프로필 사진, 커플 홈 사진, 위젯 사진 배경 · 프로필 (Coil 3)
 7. `feature:onboarding`(소개 · 약관 · 시작 방식, 로그인은 6단계에서), `feature:settings`, `feature:notifications`, `core:notification`
 8. `core:ads`, 광고 제거 구매
 9. `policy-site/`(Firebase Hosting), 출시 체크리스트 (`infra-and-billing-protection.md`)

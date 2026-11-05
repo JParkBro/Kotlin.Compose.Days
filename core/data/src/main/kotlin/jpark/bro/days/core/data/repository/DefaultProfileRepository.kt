@@ -65,6 +65,7 @@ internal class DefaultProfileRepository(
                     updatedAt = clock.millis(),
                     serverUpdatedAt = existing?.serverUpdatedAt,
                     syncState = SyncState.PENDING.name,
+                    profileImageId = existing?.profileImageId,
                 ),
             )
             UserProfile(userId = me, nickname = trimmed, birthDate = birthDate)

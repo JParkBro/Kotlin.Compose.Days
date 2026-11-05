@@ -10,26 +10,32 @@ import kotlinx.coroutines.tasks.await
 /**
  * 원격 차단 스위치 (infra-and-billing-protection.md 5장). 이상 사용량이 보이면 콘솔에서 꺼서 바로 멈춘다.
  * 값은 마지막으로 활성화된 설정(기기에 저장됨) 또는 기본값이다. fetch는 무료이고, 앱이 화면에 올라올 때 [refresh]한다.
- * 나머지 스위치(upload_enabled · kakao_login_enabled · min_supported_version)는 해당 기능을 만들 때 추가한다.
+ * 나머지 스위치(kakao_login_enabled · min_supported_version)는 해당 기능을 만들 때 추가한다.
  */
 class RemoteFlags(
     private val remoteConfig: FirebaseRemoteConfig,
 ) {
     private val syncEnabledState = MutableStateFlow(remoteConfig.getBoolean(SYNC_ENABLED))
+    private val uploadEnabledState = MutableStateFlow(remoteConfig.getBoolean(UPLOAD_ENABLED))
 
     /** false면 동기화 리스너 · Push · Pull을 모두 멈춘다 */
     val syncEnabled: StateFlow<Boolean> = syncEnabledState.asStateFlow()
+
+    /** false면 사진 업로드를 멈춘다. 사진이 붙은 공유 항목도 올리지 않고 기다린다 (받기 · 지우기는 계속) */
+    val uploadEnabled: StateFlow<Boolean> = uploadEnabledState.asStateFlow()
 
     /** 실패해도 마지막 값을 그대로 쓴다 (네트워크 없음 등) */
     suspend fun refresh() {
         suspendRunCatching { remoteConfig.fetchAndActivate().await() }
         syncEnabledState.value = remoteConfig.getBoolean(SYNC_ENABLED)
+        uploadEnabledState.value = remoteConfig.getBoolean(UPLOAD_ENABLED)
     }
 
     companion object {
         const val SYNC_ENABLED = "sync_enabled"
+        const val UPLOAD_ENABLED = "upload_enabled"
 
         /** 콘솔에 값이 없거나 한 번도 받지 못했을 때 */
-        val DEFAULTS: Map<String, Any> = mapOf(SYNC_ENABLED to true)
+        val DEFAULTS: Map<String, Any> = mapOf(SYNC_ENABLED to true, UPLOAD_ENABLED to true)
     }
 }

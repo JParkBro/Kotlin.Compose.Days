@@ -49,6 +49,35 @@ class SyncDtosTest {
     }
 
     @Test
+    fun `배경 사진 id가 경로를 바꾸는 형식이면 사진 없음으로 읽음`() {
+        val map = birthday.toFirestoreMap()
+
+        assertEquals(
+            "11111111-1111-1111-1111-111111111111",
+            itemDtoOf("item-1", map + ("backgroundImageId" to "11111111-1111-1111-1111-111111111111"), 0)
+                ?.backgroundImageId,
+        )
+        assertNull(itemDtoOf("item-1", map + ("backgroundImageId" to "../../shared_prefs/x"), 0)?.backgroundImageId)
+        assertNull(itemDtoOf("item-1", map + ("backgroundImageId" to ""), 0)?.backgroundImageId)
+    }
+
+    @Test
+    fun `상대 프로필의 사진 id와 커플 id도 형식이 틀리면 없음`() {
+        val data =
+            mapOf(
+                "nickname" to "지민",
+                "updatedAt" to 1L,
+                "profileImageId" to "../x",
+                "coupleId" to "couple-1",
+            )
+
+        val profile = profileDtoOf("user-partner", data, 0)
+
+        assertNull(profile?.profileImageId)
+        assertEquals("couple-1", profile?.coupleId)
+    }
+
+    @Test
     fun `필수 필드가 없거나 타입이 다르거나 공유가 아닌 문서는 건너뜀`() {
         val map = birthday.toFirestoreMap()
 
@@ -90,7 +119,10 @@ class SyncDtosTest {
     fun `프로필은 이름이 있어야 하고 생일은 없어도 됨`() {
         val data = mapOf("nickname" to "지민", "updatedAt" to 1L)
 
-        assertEquals(ProfileDto("user-partner", "지민", null, 1, 9), profileDtoOf("user-partner", data, 9))
+        assertEquals(
+            ProfileDto("user-partner", "지민", null, 1, serverUpdatedAtMicros = 9),
+            profileDtoOf("user-partner", data, 9),
+        )
         assertNull(profileDtoOf("user-partner", mapOf("coupleId" to "couple-1"), 0))
     }
 }

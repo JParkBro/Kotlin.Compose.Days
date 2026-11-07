@@ -16,6 +16,7 @@ Firebase(Blaze) 한 곳으로 구성한 서버, 각 흐름의 구현 포인트, 
    │                                 └─ Admin SDK로 커스텀 토큰 발급 → 앱이 signInWithCustomToken()
    ├─ 커플 데이터 동기화 ─────────▶ Firestore (보안 규칙)
    ├─ 이미지 업로드 · 다운로드 ───▶ Cloud Storage (Storage 보안 규칙: 커플 멤버만, 크기 · 형식 제한)
+   ├─ 보상형 광고 ───────────────▶ AdMob ──SSV 콜백──▶ Cloud Functions admobReward (onRequest, 서명 확인 → 사진 bonus +1)
    └─ 원격 설정 · 차단 스위치 ────▶ Remote Config
 
 [Firebase Hosting] 약관 · 개인정보 처리방침 · 오픈소스 라이선스 페이지
@@ -28,7 +29,7 @@ Firebase(Blaze) 한 곳으로 구성한 서버, 각 흐름의 구현 포인트, 
 |---|---|---|---|
 | Firebase Auth | Google 로그인, 커스텀 토큰 로그인 | 기본 Authentication은 사용자 수 제한 없음 | – (Identity Platform으로 올리지 않음) |
 | Firestore | 커플 데이터 | 읽기 5만 · 쓰기 2만 · 삭제 2만 / 일, 1GiB | 종량 과금 |
-| Cloud Functions (2세대) | 카카오 토큰 발급, 결제 자동 해제 | 호출 200만 / 월 등 | 종량 과금 |
+| Cloud Functions (2세대) | 카카오 토큰 발급, 보상형 광고 확인(사진 +1장), 결제 자동 해제 | 호출 200만 / 월 등 | 종량 과금 |
 | Cloud Storage | 이미지 저장 | 미국 리전(`us-central1` · `us-east1` · `us-west1`) 버킷만 저장 5GB 등 무료 | 종량 과금 |
 | Firebase Hosting | 정책 문서 정적 페이지 | 저장 10GB, 전송 360MB / 일 | 종량 과금 |
 | Remote Config, App Check | 차단 스위치, 위변조 차단 | 무료 | – |
@@ -85,7 +86,7 @@ Storage 보안 규칙 (firebase/storage.rules):
 |---|---|---|
 | 파일 1개 크기 | 300KB | Storage 규칙 `request.resource.size` |
 | 형식 | `image/webp` | Storage 규칙 `request.resource.contentType` |
-| 커플당 이미지 수 | 누적 업로드 30번 (지워도 줄지 않음, 보상형 광고로 추가는 이후) | Firestore `couples/{id}/usage/images`의 `count`를 Firestore 규칙이 +1씩만 · 30 이하로만 허용하고 `lastImageId`에 방금 등록한 사진 id를 적는다. Storage 규칙은 그 id의 파일만 새로 만들게 한다 (+1 한 번에 파일 1개). 한도를 다 쓰면 사진은 올린 사람 기기에만 남는다 |
+| 커플당 이미지 수 | 누적 업로드 30번 + 보상형 광고 1번당 1장(최대 +30, 2-5). 지워도 줄지 않음 | Firestore `couples/{id}/usage/images`의 `count`를 Firestore 규칙이 +1씩만 · `30 + bonus` 이하로만 허용하고 (`bonus`는 앱이 바꿀 수 없고 `admobReward` 함수만 올림) `lastImageId`에 방금 등록한 사진 id를 적는다. Storage 규칙은 그 id의 파일만 새로 만들게 한다 (+1 한 번에 파일 1개). 한도를 다 쓰면 사진은 올린 사람 기기에만 남는다 |
 
 > 사용자당 하루 업로드 수처럼 시간 창이 있는 집계는 규칙만으로 정확히 막기 어렵습니다. 크기 · 개수 한도 + 예산 자동 해제(4-2)로 최악의 금액을 묶습니다.
 
@@ -93,6 +94,27 @@ Storage 보안 규칙 (firebase/storage.rules):
 
 - `policy-site/`의 개인정보 처리방침, 서비스 이용약관, 오픈소스 라이선스를 같은 Firebase 프로젝트의 Hosting에 배포합니다 (주소 예: `days-61328.web.app`).
 - Play 스토어 등록에 개인정보 처리방침 URL이 필요하므로 이 주소를 사용합니다. 앱의 "약관 및 정책" 화면은 이 페이지를 웹뷰로 엽니다.
+
+### 2-5. 보상형 광고로 사진 +1장 (`firebase/functions/` `admobReward`)
+
+```
+앱: 사진을 고를 때(커플 프로필 사진 · 공유 항목 커버) usage/images를 한 번 읽어 한도를 다 썼으면
+    "광고 보고 사진 1장 더 올리기" 시트 → AdMob 보상형 광고 (SSV 옵션: user_id = uid, custom_data = coupleId)
+AdMob 서버 → GET admobReward?…&signature=…&key_id=… (광고를 끝까지 봤을 때, 실패하면 AdMob이 다시 보냄)
+Function:
+  1. AdMob 공개 키(verifier-keys.json, 하루 캐시 · 모르는 keyId면 한 번 다시 받음)로 ECDSA 서명 확인 → 틀리면 403
+  2. ad_unit이 우리 광고 단위(ADMOB_REWARD_AD_UNITS)인지, user_id · custom_data · transaction_id가 있는지 → 아니면 200 무시
+  3. 트랜잭션: 커플이 ACTIVE이고 uid가 멤버인지, couples/{id}/adRewards/{transactionId}가 없는지(한 번만), bonus < 30인지
+     → usage/images.bonus +1, adRewards/{transactionId} 기록
+앱: usage/images 리스너로 bonus가 오를 때까지 최대 20초 기다렸다가 사진 선택기를 연다 (늦으면 "잠시 후 다시")
+```
+
+- **App Check 예외:** AdMob 서버가 부르는 공개 HTTPS 함수라 App Check를 강제할 수 없습니다 (2026-11 결정). 대신 AdMob 서명 · 우리 광고 단위 · 커플 멤버를 확인합니다. 다른 AdMob 계정의 광고 단위가 이 URL을 콜백으로 써도 `ad_unit`이 달라 보상하지 않습니다.
+- 사용량: 광고 1번을 끝까지 볼 때 함수 호출 1번 + Firestore 읽기 3 · 쓰기 2. 앱은 시트를 띄울 때 읽기 1번, 보상을 기다릴 때 리스너(읽기 1 + 바뀔 때 1). 서명이 틀린 호출은 Firestore에 닿기 전에 거부합니다.
+- 최악의 경우: 누군가 URL을 계속 호출하면 함수 호출 수만 늘고(`maxInstances` 1, 무료 200만 / 월), 커플당 사진은 최대 60장 × 300KB = 18MB입니다. 마지막은 예산 알림 + `stopBilling`입니다.
+- 실행 계정: 전용 서비스 계정 `admob-reward@days-61328.iam.gserviceaccount.com`에 Firestore 쓰기 권한(`roles/datastore.user`)만 줍니다. 키 파일은 만들지 않습니다.
+- 설정 값: `firebase/functions/.env.days-61328`의 `ADMOB_REWARD_AD_UNITS`(보상형 광고 단위 id의 `/` 뒤 숫자, 쉼표로 여럿). 비어 있으면 모든 콜백을 무시합니다. AdMob 콘솔의 광고 단위 → "서버 측 확인" 콜백 URL에 함수 URL을 넣습니다.
+- 앱: dev 빌드는 Google 샘플 광고 단위라 SSV 콜백이 오지 않습니다 (보상을 기다리다 "잠시 후 다시"). 끝까지 확인하려면 prod 광고 단위 + 테스트 기기 등록 + 배포된 함수가 필요합니다. 맞춤 광고 동의(UMP)는 광고를 처음 띄울 때 확인합니다 (동의가 필요한 지역만 화면이 뜸).
 
 ## 3. 과금 방어의 원칙
 
@@ -179,6 +201,8 @@ Cloud Billing 예산 (월 1달러 = 결제 계정 통화 기준 1,000원, 알림
 - [ ] App Check(Play Integrity) 등록 및 Firestore · Storage · Functions 강제 설정
 - [ ] 보안 규칙(Firestore · Storage) 배포 및 에뮬레이터 테스트 (연결 · 공유 · 해제 · 비멤버 접근 거부 · 업로드 크기 · 개수)
 - [x] `kakaoAuth` 함수: 카카오 앱 ID 환경 변수, `maxInstances`, App Check 강제 확인 (2026-11 배포 · 실기기 카카오 로그인으로 확인, 실행 계정 `kakao-auth@`)
+- [ ] `admobReward` 함수: 실행 계정 `admob-reward@`(`roles/datastore.user`만) 만들기, `.env.days-61328`에 `ADMOB_REWARD_AD_UNITS`, 배포 후 AdMob 광고 단위의 서버 측 확인 콜백 URL 등록 · "URL 확인"(→ 200 `ignored`)
+- [ ] AdMob 앱 · 보상형 광고 단위 만들기, `local.properties`에 `admob.appId` · `admob.rewardedAdUnitId` (없으면 prod도 Google 샘플 광고), 테스트 기기로 사진 +1장 끝까지 확인
 - [ ] Storage 기본 버킷을 `us-central1`로 만들기(2026-11 결정, 무료 사용량), 공개 URL · 공개 읽기 없음 확인, `storage.rules` 배포
 - [ ] Remote Config 차단 스위치 4종 등록 및 앱 동작 확인
 - [ ] Firebase(Google) 계정 2단계 인증 설정

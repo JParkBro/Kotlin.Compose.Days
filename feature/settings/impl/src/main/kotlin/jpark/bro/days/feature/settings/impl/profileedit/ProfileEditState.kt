@@ -1,5 +1,6 @@
 package jpark.bro.days.feature.settings.impl.profileedit
 
+import jpark.bro.days.core.model.ImageUploadQuota
 import jpark.bro.days.core.model.UserProfile
 import java.io.File
 import java.time.LocalDate
@@ -11,8 +12,12 @@ internal data class ProfileEditState(
     /** 저장할 프로필 사진 id와 그 파일 (없으면 이름 첫 글자) */
     val photoId: String? = null,
     val photoFile: File? = null,
-    /** 고른 사진을 줄이는 중 */
+    /** 사진 한도를 확인하거나 고른 사진을 줄이는 중 */
     val isPhotoWorking: Boolean = false,
+    /** 커플 사진 한도를 다 써서 보여주는 시트 (null이면 닫힘) */
+    val imageLimit: ImageUploadQuota? = null,
+    /** 광고를 보는 중이거나 보상 반영을 기다리는 중 */
+    val isRewardWorking: Boolean = false,
     /** 저장된 값. 바뀐 것이 없으면 저장 버튼을 끈다 */
     val saved: UserProfile? = null,
     val today: LocalDate = LocalDate.MIN,

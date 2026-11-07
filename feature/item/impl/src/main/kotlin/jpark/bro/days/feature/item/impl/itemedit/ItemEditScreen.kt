@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import jpark.bro.days.core.ads.rememberRewardedAdLauncher
 import jpark.bro.days.core.designsystem.AppSpacing
 import jpark.bro.days.core.designsystem.AppTheme
 import jpark.bro.days.core.designsystem.AppThemeTokens
@@ -42,6 +43,7 @@ import jpark.bro.days.core.model.RepeatRule
 import jpark.bro.days.core.model.TimeSlot
 import jpark.bro.days.core.model.Visibility
 import jpark.bro.days.core.ui.DaysDatePickerDialog
+import jpark.bro.days.core.ui.ImageLimitSheet
 import jpark.bro.days.core.ui.ObserveEvents
 import jpark.bro.days.core.ui.label
 import jpark.bro.days.core.ui.rememberNotificationPermissionRequest
@@ -65,6 +67,7 @@ import org.koin.core.parameter.parametersOf
 import java.time.LocalDate
 import java.time.LocalTime
 import jpark.bro.days.core.designsystem.R as DesignR
+import jpark.bro.days.core.ui.R as UiR
 
 @Composable
 internal fun ItemEditRoot(
@@ -77,7 +80,10 @@ internal fun ItemEditRoot(
     val saveFailed = stringResource(R.string.item_edit_save_failed)
     val deleteFailed = stringResource(R.string.item_edit_delete_failed)
     val photoFailed = stringResource(R.string.item_edit_photo_failed)
+    val adFailed = stringResource(UiR.string.common_image_limit_ad_failed)
+    val rewardPending = stringResource(UiR.string.common_image_limit_reward_pending)
     val openPhotoPicker = rememberPhotoPicker { viewModel.onAction(ItemEditAction.PhotoPicked(it)) }
+    val showRewardedAd = rememberRewardedAdLauncher { viewModel.onAction(ItemEditAction.RewardedAdFinished(it)) }
     val requestNotificationPermission = rememberNotificationPermissionRequest()
 
     ObserveEvents(viewModel.event) { event ->
@@ -88,6 +94,9 @@ internal fun ItemEditRoot(
             ItemEditEvent.OpenPhotoPicker -> openPhotoPicker()
             ItemEditEvent.PhotoFailed -> toastHostState.showSnackbar(photoFailed)
             ItemEditEvent.RequestNotificationPermission -> requestNotificationPermission()
+            is ItemEditEvent.ShowRewardedAd -> showRewardedAd(event.request)
+            ItemEditEvent.RewardedAdFailed -> toastHostState.showSnackbar(adFailed)
+            ItemEditEvent.RewardPending -> toastHostState.showSnackbar(rewardPending)
         }
     }
 
@@ -383,6 +392,14 @@ private fun ItemEditDialogs(
         null -> {
             Unit
         }
+    }
+    state.imageLimit?.let { quota ->
+        ImageLimitSheet(
+            quota = quota,
+            isWorking = state.isRewardWorking,
+            onWatchAd = { onAction(ItemEditAction.WatchAdClicked) },
+            onDismiss = { onAction(ItemEditAction.ImageLimitDismissed) },
+        )
     }
 }
 

@@ -1,8 +1,8 @@
 package jpark.bro.days.core.notification.di
 
-import jpark.bro.days.core.notification.ReminderDelivery
 import jpark.bro.days.core.notification.ReminderNotifier
 import jpark.bro.days.core.notification.ReminderScheduler
+import jpark.bro.days.core.notification.TodayRemindersCollector
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
@@ -10,6 +10,7 @@ import org.koin.dsl.module
 val notificationModule =
     module {
         single { ReminderNotifier(androidContext()) }
-        single { ReminderScheduler(androidContext(), get(), get()) }
-        factory { ReminderDelivery(get(), get(), get(), get(), get(), get()) }
+        // CoroutineScope: 앱 프로세스와 수명이 같은 범위 (widgetModule이 등록)
+        single { ReminderScheduler(androidContext(), get(), get(), get(), get()) }
+        factory { TodayRemindersCollector(get(), get(), get(), get(), get(), get()) }
     }

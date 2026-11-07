@@ -141,7 +141,7 @@ class ItemEditViewModelTest {
             assertEquals(LocalDate.of(2027, 3, 19), saved.content.date)
             assertEquals(CountMode.DDAY, saved.content.countMode)
             assertEquals(
-                listOf(ItemReminder(0, ItemReminder.SendTime), ItemReminder(7, ItemReminder.SendTime)),
+                listOf(ItemReminder(0, ItemReminder.DefaultTime), ItemReminder(7, ItemReminder.DefaultTime)),
                 repository.observeReminders(saved.id).first(),
             )
             assertEquals(saved.id, repository.observePinnedItemId().first())
@@ -181,7 +181,7 @@ class ItemEditViewModelTest {
     @Test
     fun `수정으로 들어오면 저장된 값과 알림 대표 고정을 불러옴`() =
         runTest {
-            repository.setReminders(quitSmoking.id, listOf(ItemReminder(1, ItemReminder.SendTime)))
+            repository.setReminders(quitSmoking.id, listOf(ItemReminder(1, ItemReminder.DefaultTime)))
             repository.setPinned(quitSmoking.id, pinned = true)
 
             val state = viewModel(itemId = quitSmoking.id).state.value

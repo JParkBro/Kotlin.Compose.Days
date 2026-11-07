@@ -4,8 +4,10 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
+import jpark.bro.days.core.model.NotificationSettings
 import jpark.bro.days.core.model.ThemeSetting
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -23,6 +25,27 @@ class SettingsDataStore(
                 mode = prefs[THEME_MODE].toEnumOr(default.mode),
             )
         }
+
+    /** 알림 설정 (product-spec 6장). 고를 수 없는 시각이 저장돼 있으면 기본값 */
+    val notificationSettings: Flow<NotificationSettings> =
+        dataStore.data.map { prefs ->
+            val default = NotificationSettings()
+            NotificationSettings(
+                anniversaryEnabled = prefs[REMINDER_ANNIVERSARY_ENABLED] ?: default.anniversaryEnabled,
+                planEnabled = prefs[REMINDER_PLAN_ENABLED] ?: default.planEnabled,
+                sendHour =
+                    prefs[REMINDER_SEND_HOUR]?.takeIf { it in NotificationSettings.SendHours } ?: default.sendHour,
+            )
+        }
+
+    suspend fun setNotificationSettings(settings: NotificationSettings) {
+        require(settings.sendHour in NotificationSettings.SendHours) { "고를 수 없는 알림 시각입니다." }
+        dataStore.edit { prefs ->
+            prefs[REMINDER_ANNIVERSARY_ENABLED] = settings.anniversaryEnabled
+            prefs[REMINDER_PLAN_ENABLED] = settings.planEnabled
+            prefs[REMINDER_SEND_HOUR] = settings.sendHour
+        }
+    }
 
     /** 홈의 "커플 코드로 연결하기" 카드를 닫았는지 (product-spec 4-1) */
     val coupleBannerDismissed: Flow<Boolean> = dataStore.data.map { prefs -> prefs[COUPLE_BANNER_DISMISSED] ?: false }
@@ -69,6 +92,9 @@ class SettingsDataStore(
         val ISSUED_PAIR_CODE = stringPreferencesKey("issued_pair_code")
         val INTRO_SEEN = booleanPreferencesKey("intro_seen")
         val TERMS_AGREED_USERS = stringSetPreferencesKey("terms_agreed_users")
+        val REMINDER_ANNIVERSARY_ENABLED = booleanPreferencesKey("reminder_anniversary_enabled")
+        val REMINDER_PLAN_ENABLED = booleanPreferencesKey("reminder_plan_enabled")
+        val REMINDER_SEND_HOUR = intPreferencesKey("reminder_send_hour")
     }
 }
 

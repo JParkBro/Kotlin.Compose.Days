@@ -1,5 +1,6 @@
 package jpark.bro.days.core.data.repository
 
+import jpark.bro.days.core.model.NotificationSettings
 import jpark.bro.days.core.model.ThemeSetting
 import kotlinx.coroutines.flow.Flow
 
@@ -14,6 +15,12 @@ interface SettingsRepository {
 
     /** 테마 선택 시트에서 고르는 동안 저장하지 않고 앱에 바로 보여준다. null이면 미리보기를 끝낸다. */
     fun setThemePreview(setting: ThemeSetting?)
+
+    /** 알림 설정 (기기에만 저장) */
+    fun observeNotificationSettings(): Flow<NotificationSettings>
+
+    /** 고를 수 없는 시각([NotificationSettings.SendHours] 밖)이면 실패 */
+    suspend fun setNotificationSettings(settings: NotificationSettings): Result<Unit>
 
     /** 홈의 커플 연결 카드를 닫았는지 (기기에만 저장) */
     fun observeCoupleBannerDismissed(): Flow<Boolean>

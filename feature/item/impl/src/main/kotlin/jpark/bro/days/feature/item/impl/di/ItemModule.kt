@@ -30,6 +30,7 @@ val itemModule =
                 itemRepository = get(),
                 coupleRepository = get(),
                 imageRepository = get(),
+                imageQuotaRepository = get(),
                 clock = get(),
             )
         }

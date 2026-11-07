@@ -1,5 +1,6 @@
 package jpark.bro.days.feature.item.impl.itemedit
 
+import jpark.bro.days.core.ads.RewardedAdResult
 import jpark.bro.days.core.model.AppThemeType
 import jpark.bro.days.core.model.Category
 import jpark.bro.days.core.model.CountMode
@@ -85,14 +86,26 @@ internal sealed interface ItemEditAction {
         val enabled: Boolean,
     ) : PlanInput
 
-    /** 배경 사진 (디데이만). 사진 선택기를 연다 */
-    data object PhotoClicked : ItemEditAction
+    /** 배경 사진 (디데이만) · 커플 사진 한도 시트 */
+    sealed interface PhotoInput : ItemEditAction
+
+    /** 사진 선택기를 연다. 커플 공유 항목이고 사진 한도를 다 썼으면 한도 시트를 먼저 띄운다 */
+    data object PhotoClicked : PhotoInput
 
     data class PhotoPicked(
         val uri: String,
-    ) : ItemEditAction
+    ) : PhotoInput
 
-    data object PhotoRemoved : ItemEditAction
+    data object PhotoRemoved : PhotoInput
+
+    /** 사진 한도 시트: 광고 보고 1장 더 */
+    data object WatchAdClicked : PhotoInput
+
+    data class RewardedAdFinished(
+        val result: RewardedAdResult,
+    ) : PhotoInput
+
+    data object ImageLimitDismissed : PhotoInput
 
     data object DateClicked : ItemEditAction
 

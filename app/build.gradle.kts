@@ -20,6 +20,10 @@ val localProperties =
             ?.use(::load)
     }
 
+/** Google 샘플 AdMob 앱 ID · 보상형 광고 단위 (항상 테스트 광고) */
+val admobSampleAppId = "ca-app-pub-3940256099942544~3347511713"
+val admobSampleRewardedAdUnitId = "ca-app-pub-3940256099942544/5224354917"
+
 android {
     namespace = "jpark.bro.days"
 
@@ -31,6 +35,17 @@ android {
             buildConfigField("String", "KAKAO_NATIVE_APP_KEY", "\"$key\"")
             manifestPlaceholders["kakaoScheme"] = "kakao$key"
         }
+
+        // AdMob 앱 ID · 보상형 광고 단위. dev는 Google 샘플(테스트 광고, SSV 콜백 없음),
+        // prod는 local.properties admob.appId · admob.rewardedAdUnitId (없으면 샘플: 출시 전 체크리스트)
+        fun com.android.build.api.dsl.ApplicationProductFlavor.admob(useSample: Boolean) {
+            val appId = localProperties.getProperty("admob.appId").takeUnless { useSample } ?: admobSampleAppId
+            val rewarded =
+                localProperties.getProperty("admob.rewardedAdUnitId").takeUnless { useSample }
+                    ?: admobSampleRewardedAdUnitId
+            manifestPlaceholders["admobAppId"] = appId
+            buildConfigField("String", "ADMOB_REWARDED_AD_UNIT_ID", "\"$rewarded\"")
+        }
         // dev는 기본으로 로컬 Firebase 에뮬레이터에 연결한다 (dev · prod가 한 프로젝트를 써서 운영 사용량 · 예산을 지키기 위해)
         // 실제 프로젝트로 테스트할 때만 local.properties에 firebase.useEmulator=false
         // 실기기는 firebase.emulator.host=127.0.0.1 + adb reverse (에뮬레이터 기본값 10.0.2.2 = Mac의 localhost)
@@ -39,10 +54,12 @@ android {
             val host = localProperties.getProperty("firebase.emulator.host", "10.0.2.2")
             buildConfigField("String", "FIREBASE_EMULATOR_HOST", if (useEmulator) "\"$host\"" else "null")
             kakaoNativeAppKey("KAKAO_NATIVE_APP_KEY_DEV")
+            admob(useSample = true)
         }
         named("prod") {
             buildConfigField("String", "FIREBASE_EMULATOR_HOST", "null")
             kakaoNativeAppKey("KAKAO_NATIVE_APP_KEY_PROD")
+            admob(useSample = false)
         }
     }
 }

@@ -205,8 +205,12 @@ couples/{coupleId}/hiddenAnniversaries/{ruleKey}
   createdAt, deletedAt (숨김 해제), serverUpdatedAt
 
 couples/{coupleId}/usage/images
-  count  (커플당 누적 업로드 수, 규칙이 +1씩 · 30 이하로만 허용)
+  count  (커플당 누적 업로드 수, 규칙이 +1씩 · 30 + bonus 이하로만 허용. 함수가 먼저 만든 문서에는 없을 수 있음 = 0)
   lastImageId  (방금 등록한 사진 id. Storage 규칙이 이 id의 파일만 새로 만들게 한다)
+  bonus  (보상형 광고로 늘린 한도, 최대 30. admobReward 함수만 올리고 앱은 바꿀 수 없음)
+
+couples/{coupleId}/adRewards/{transactionId}
+  uid, createdAt  (AdMob 보상 거래 id. 같은 콜백이 다시 와도 한 번만 보상. 앱은 읽기 · 쓰기 불가)
 
 Cloud Storage (Storage 보안 규칙: 커플 멤버만, webp · 300KB 이하, 덮어쓰기 금지, 공개 URL 없음)
   couples/{coupleId}/images/{imageId}.webp

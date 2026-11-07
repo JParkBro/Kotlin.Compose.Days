@@ -35,6 +35,9 @@ class FakeItemRepository(
     override fun observeReminders(itemId: String): Flow<List<ItemReminder>> =
         reminders.map { all -> all[itemId].orEmpty().sortedBy { it.offsetDays } }
 
+    override fun observeAllReminders(): Flow<Map<String, List<ItemReminder>>> =
+        reminders.map { all -> all.mapValues { (_, list) -> list.sortedBy { it.offsetDays } } }
+
     override suspend fun saveItem(
         id: String?,
         content: ItemContent,

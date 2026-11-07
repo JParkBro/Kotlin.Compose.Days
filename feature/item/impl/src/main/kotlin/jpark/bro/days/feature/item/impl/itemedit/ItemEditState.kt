@@ -19,13 +19,9 @@ import java.time.LocalTime
 private const val SAME_DAY = 0
 private const val ONE_DAY_BEFORE = 1
 private const val ONE_WEEK_BEFORE = 7
-private const val REMINDER_HOUR = 9
 
 /** 알림 선택지 (product-spec 4-5): 당일 · 1일 전 · 7일 전 */
 internal val ReminderOffsets: List<Int> = listOf(SAME_DAY, ONE_DAY_BEFORE, ONE_WEEK_BEFORE)
-
-/** 알림 발송 시각: 오전 9시 (product-spec 4-5) */
-internal val ReminderTime: LocalTime = LocalTime.of(REMINDER_HOUR, 0)
 
 internal enum class ItemEditDialog {
     DATE,

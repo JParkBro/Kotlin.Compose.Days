@@ -124,11 +124,14 @@ class ItemEditViewModelTest {
         runTest {
             val viewModel = viewModel(presetDate = "2027-03-19")
             viewModel.onAction(ItemEditAction.TitleChanged(" 전역일 "))
-            viewModel.onAction(ItemEditAction.ReminderToggled(7))
-            viewModel.onAction(ItemEditAction.ReminderToggled(0))
             viewModel.onAction(ItemEditAction.PinnedChanged(true))
 
             viewModel.event.test {
+                viewModel.onAction(ItemEditAction.ReminderToggled(7))
+                viewModel.onAction(ItemEditAction.ReminderToggled(0))
+                assertEquals(ItemEditEvent.RequestNotificationPermission, awaitItem())
+                assertEquals(ItemEditEvent.RequestNotificationPermission, awaitItem())
+
                 viewModel.onAction(ItemEditAction.SaveClicked)
                 assertEquals(ItemEditEvent.NavigateBack, awaitItem())
             }
@@ -138,10 +141,25 @@ class ItemEditViewModelTest {
             assertEquals(LocalDate.of(2027, 3, 19), saved.content.date)
             assertEquals(CountMode.DDAY, saved.content.countMode)
             assertEquals(
-                listOf(ItemReminder(0, ReminderTime), ItemReminder(7, ReminderTime)),
+                listOf(ItemReminder(0, ItemReminder.SendTime), ItemReminder(7, ItemReminder.SendTime)),
                 repository.observeReminders(saved.id).first(),
             )
             assertEquals(saved.id, repository.observePinnedItemId().first())
+        }
+
+    @Test
+    fun `알림을 켜면 알림 권한을 요청하고 끄면 요청하지 않음`() =
+        runTest {
+            val viewModel = viewModel(presetDate = "2027-03-19")
+
+            viewModel.event.test {
+                viewModel.onAction(ItemEditAction.ReminderToggled(1))
+                assertEquals(ItemEditEvent.RequestNotificationPermission, awaitItem())
+
+                viewModel.onAction(ItemEditAction.ReminderToggled(1))
+                expectNoEvents()
+            }
+            assertEquals(emptySet<Int>(), viewModel.state.value.reminderOffsets)
         }
 
     @Test
@@ -163,7 +181,7 @@ class ItemEditViewModelTest {
     @Test
     fun `수정으로 들어오면 저장된 값과 알림 대표 고정을 불러옴`() =
         runTest {
-            repository.setReminders(quitSmoking.id, listOf(ItemReminder(1, ReminderTime)))
+            repository.setReminders(quitSmoking.id, listOf(ItemReminder(1, ItemReminder.SendTime)))
             repository.setPinned(quitSmoking.id, pinned = true)
 
             val state = viewModel(itemId = quitSmoking.id).state.value

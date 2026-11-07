@@ -22,6 +22,9 @@ interface ItemRepository {
     /** 내 알림. offsetDays 오름차순 */
     fun observeReminders(itemId: String): Flow<List<ItemReminder>>
 
+    /** 내 알림 전체 (항목 id → offsetDays 오름차순). 지운 항목의 알림도 있을 수 있어 [observeItems]와 맞춰 쓴다 */
+    fun observeAllReminders(): Flow<Map<String, List<ItemReminder>>>
+
     /**
      * [id]가 null이면 새로 만들고, 있으면 그 항목을 수정한다.
      * 제목이 비었거나 타입별 필수 값이 없으면 실패한다.

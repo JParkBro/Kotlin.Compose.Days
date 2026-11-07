@@ -3,6 +3,7 @@ package jpark.bro.days.feature.settings.impl.settings
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.content.res.Configuration
 import android.net.Uri
 import androidx.annotation.DrawableRes
@@ -61,6 +62,7 @@ import jpark.bro.days.feature.settings.impl.MoreAppsKey
 import jpark.bro.days.feature.settings.impl.PolicyListKey
 import jpark.bro.days.feature.settings.impl.R
 import jpark.bro.days.feature.settings.impl.WidgetSettingsKey
+import jpark.bro.days.feature.settings.impl.addebug.AdDebugRoot
 import jpark.bro.days.feature.settings.impl.settings.components.SettingsMenu
 import jpark.bro.days.feature.settings.impl.settings.components.ThemeSheet
 import jpark.bro.days.feature.settings.impl.settings.components.ThemeSheetContent
@@ -116,6 +118,8 @@ internal fun SettingsRoot(
             state = state,
             appVersion = remember(context) { context.versionName() },
             onAction = viewModel::onAction,
+            // 디버그 빌드에서만: 커플 사진 한도 · 보상형 광고 확인 (출시 빌드에는 ViewModel도 만들지 않음)
+            debugSection = if (remember(context) { context.isDebuggable() }) ({ AdDebugRoot() }) else null,
         )
         DaysToastHost(hostState = snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
     }
@@ -127,6 +131,7 @@ private fun SettingsScreen(
     appVersion: String,
     onAction: (SettingsAction) -> Unit,
     modifier: Modifier = Modifier,
+    debugSection: (@Composable () -> Unit)? = null,
 ) {
     val scrollState = rememberScrollState()
     Column(
@@ -148,6 +153,7 @@ private fun SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(AppSpacing.lg),
         ) {
             SettingsMenu(state = state, onAction = onAction)
+            debugSection?.invoke()
             AppVersionFooter(version = appVersion)
         }
     }
@@ -188,6 +194,8 @@ private fun AppVersionFooter(version: String) {
 }
 
 private fun Context.appName(): String = applicationInfo.loadLabel(packageManager).toString()
+
+private fun Context.isDebuggable(): Boolean = applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
 
 private fun Context.versionName(): String = packageManager.getPackageInfo(packageName, 0).versionName.orEmpty()
 

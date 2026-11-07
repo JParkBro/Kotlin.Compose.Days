@@ -33,6 +33,7 @@ class SettingsDataStore(
             NotificationSettings(
                 anniversaryEnabled = prefs[REMINDER_ANNIVERSARY_ENABLED] ?: default.anniversaryEnabled,
                 planEnabled = prefs[REMINDER_PLAN_ENABLED] ?: default.planEnabled,
+                activityEnabled = prefs[ACTIVITY_NOTIFICATION_ENABLED] ?: default.activityEnabled,
                 sendHour =
                     prefs[REMINDER_SEND_HOUR]?.takeIf { it in NotificationSettings.SendHours } ?: default.sendHour,
             )
@@ -43,6 +44,7 @@ class SettingsDataStore(
         dataStore.edit { prefs ->
             prefs[REMINDER_ANNIVERSARY_ENABLED] = settings.anniversaryEnabled
             prefs[REMINDER_PLAN_ENABLED] = settings.planEnabled
+            prefs[ACTIVITY_NOTIFICATION_ENABLED] = settings.activityEnabled
             prefs[REMINDER_SEND_HOUR] = settings.sendHour
         }
     }
@@ -95,6 +97,7 @@ class SettingsDataStore(
         val REMINDER_ANNIVERSARY_ENABLED = booleanPreferencesKey("reminder_anniversary_enabled")
         val REMINDER_PLAN_ENABLED = booleanPreferencesKey("reminder_plan_enabled")
         val REMINDER_SEND_HOUR = intPreferencesKey("reminder_send_hour")
+        val ACTIVITY_NOTIFICATION_ENABLED = booleanPreferencesKey("activity_notification_enabled")
     }
 }
 

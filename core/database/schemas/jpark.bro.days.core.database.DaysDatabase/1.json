@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "d732b0283df359446b8b651ce9483dca",
+    "identityHash": "55302fb7aef877306798d6fb0b551f83",
     "entities": [
       {
         "tableName": "item",
@@ -628,11 +628,95 @@
             "id"
           ]
         }
+      },
+      {
+        "tableName": "activity_log",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `user_id` TEXT NOT NULL, `type` TEXT NOT NULL, `item_id` TEXT, `item_type` TEXT, `item_title` TEXT, `actor_user_id` TEXT, `offset_days` INTEGER, `rule_key` TEXT, `created_at` INTEGER NOT NULL, `is_read` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userId",
+            "columnName": "user_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "itemId",
+            "columnName": "item_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "itemType",
+            "columnName": "item_type",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "itemTitle",
+            "columnName": "item_title",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "actorUserId",
+            "columnName": "actor_user_id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "offsetDays",
+            "columnName": "offset_days",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "ruleKey",
+            "columnName": "rule_key",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isRead",
+            "columnName": "is_read",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_activity_log_user_id_created_at",
+            "unique": false,
+            "columnNames": [
+              "user_id",
+              "created_at"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_activity_log_user_id_created_at` ON `${TABLE_NAME}` (`user_id`, `created_at`)"
+          }
+        ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd732b0283df359446b8b651ce9483dca')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '55302fb7aef877306798d6fb0b551f83')"
     ]
   }
 }

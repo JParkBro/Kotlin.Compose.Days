@@ -22,4 +22,5 @@ val databaseModule =
         single { get<DaysDatabase>().coupleItemDao() }
         single { get<DaysDatabase>().imageDao() }
         single { get<DaysDatabase>().imageSyncDao() }
+        single { get<DaysDatabase>().activityLogDao() }
     }

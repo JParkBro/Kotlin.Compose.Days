@@ -13,7 +13,7 @@ val syncModule =
     module {
         single { ProfileSync(get(), get(), get()) }
         single { ImageSync(get(), get(), get(), get(), get<RemoteFlags>().uploadEnabled) }
-        single { CoupleDataSync(get(), get(), get(), get(), get()) }
+        single { CoupleDataSync(get(), get(), get(), get(), get(), get()) }
         single { SyncEngine(get(), get(), get(), get(), get()) }
         single { SyncManager(androidContext(), get(), get(), get()) }
     }

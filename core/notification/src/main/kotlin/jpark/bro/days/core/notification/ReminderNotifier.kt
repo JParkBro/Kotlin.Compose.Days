@@ -11,6 +11,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import jpark.bro.days.core.domain.reminder.DueReminder
+import jpark.bro.days.core.model.ActivityContent
+import jpark.bro.days.core.model.ActivityType
 import jpark.bro.days.core.model.AutoAnniversary
 import jpark.bro.days.core.model.ItemType
 import jpark.bro.days.core.navigation.AppIntents
@@ -25,7 +27,7 @@ class ReminderNotifier(
 ) {
     private val manager = NotificationManagerCompat.from(context)
 
-    /** 채널: 기념일(디데이 · 자동 기념일) · 일정. 알림 설정 화면(7-3)이 채널별로 켜고 끈다 */
+    /** 채널: 기념일(디데이 · 자동 기념일) · 일정 · 상대 활동 */
     fun createChannels() {
         manager.createNotificationChannelsCompat(
             listOf(
@@ -35,6 +37,11 @@ class ReminderNotifier(
                     R.string.notification_channel_anniversary_desc,
                 ),
                 channel(PLAN_CHANNEL, R.string.notification_channel_plan_name, R.string.notification_channel_plan_desc),
+                channel(
+                    ACTIVITY_CHANNEL,
+                    R.string.notification_channel_activity_name,
+                    R.string.notification_channel_activity_desc,
+                ),
             ),
         )
     }
@@ -42,6 +49,40 @@ class ReminderNotifier(
     fun notifyAll(reminders: TodayReminders) {
         reminders.items.forEach(::notifyItem)
         reminders.anniversaries.forEach { notifyAnniversary(it, reminders.nicknames, reminders.myUserId) }
+    }
+
+    /**
+     * 상대 활동 한 건: "{이름} 님이 일정을 추가했어요" + 항목 제목. 같은 항목의 변경은 하나로 바뀐다.
+     * 누르면 그 항목으로, 지운 항목이면 앱만 연다
+     */
+    fun notifyPartnerActivity(
+        activity: ActivityContent,
+        partnerName: String,
+    ) {
+        val itemId = activity.itemId
+        val itemType = activity.itemType
+        val action = activity.type.partnerActionText()
+        if (itemId == null || itemType == null || action == null) return
+        val kind =
+            when (itemType) {
+                ItemType.PLAN -> context.getString(R.string.notification_activity_plan)
+                ItemType.DDAY -> context.getString(R.string.notification_activity_dday)
+            }
+        val intent =
+            if (activity.type == ActivityType.ITEM_DELETED) {
+                openAppIntent()
+            } else {
+                openAppIntent()
+                    .putExtra(AppIntents.EXTRA_OPEN_ITEM_ID, itemId)
+                    .putExtra(AppIntents.EXTRA_OPEN_ITEM_TYPE, itemType.name)
+            }
+        post(
+            tag = "activity:$itemId",
+            channel = ACTIVITY_CHANNEL,
+            title = context.getString(action, partnerName, kind),
+            text = activity.itemTitle.orEmpty(),
+            intent = intent,
+        )
     }
 
     /** 제목 = 항목 제목. 누르면 디데이는 상세, 일정은 수정 화면 (MainActivity) */
@@ -151,8 +192,18 @@ class ReminderNotifier(
     private companion object {
         const val ANNIVERSARY_CHANNEL = "anniversary"
         const val PLAN_CHANNEL = "plan"
+        const val ACTIVITY_CHANNEL = "activity"
 
         /** 알림은 태그로 구분한다 */
         const val NOTIFICATION_ID = 1
     }
 }
+
+/** 상대 활동 알림 제목. 보낸 알림 기록(REMINDER · ANNIVERSARY)은 null */
+private fun ActivityType.partnerActionText(): Int? =
+    when (this) {
+        ActivityType.ITEM_ADDED -> R.string.notification_activity_added
+        ActivityType.ITEM_UPDATED -> R.string.notification_activity_updated
+        ActivityType.ITEM_DELETED -> R.string.notification_activity_deleted
+        ActivityType.REMINDER, ActivityType.ANNIVERSARY -> null
+    }

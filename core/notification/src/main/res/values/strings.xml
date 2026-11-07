@@ -5,6 +5,8 @@
     <string name="notification_channel_anniversary_desc">디데이와 100일 · 주년 · 생일 알림</string>
     <string name="notification_channel_plan_name">일정 알림</string>
     <string name="notification_channel_plan_desc">일정 당일 · 미리 알림</string>
+    <string name="notification_channel_activity_name">상대 활동 알림</string>
+    <string name="notification_channel_activity_desc">상대가 디데이나 일정을 추가 · 수정 · 삭제했을 때</string>
 
     <!-- 디데이 · 일정 알림 본문 (제목은 항목 제목, product-spec 4-5) -->
     <string name="notification_reminder_today">오늘이에요</string>
@@ -17,4 +19,12 @@
     <string name="notification_anniversary_birthday">오늘은 %1$s 님 생일이에요</string>
     <string name="notification_anniversary_my_birthday">오늘은 내 생일이에요</string>
     <string name="notification_anniversary_text">축하해요! 오늘을 함께 기억해요</string>
+
+    <!-- 상대 활동 알림 (제목 %1$s = 상대 이름, %2$s = "디데이를" · "일정을") -->
+    <string name="notification_activity_added">%1$s 님이 %2$s 추가했어요</string>
+    <string name="notification_activity_updated">%1$s 님이 %2$s 수정했어요</string>
+    <string name="notification_activity_deleted">%1$s 님이 %2$s 삭제했어요</string>
+    <string name="notification_activity_dday">디데이를</string>
+    <string name="notification_activity_plan">일정을</string>
+    <string name="notification_activity_partner_unknown">상대</string>
 </resources>

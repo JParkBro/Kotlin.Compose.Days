@@ -6,11 +6,13 @@ import java.time.LocalTime
  * 알림 설정 (product-spec 6장). 기기에만 저장하고 서버로 보내지 않는다.
  * - 기념일 알림: 디데이 알림 + 자동 기념일 당일 알림
  * - 일정 알림: 일정 알림
- * - [sendHour]: 모든 알림을 보내는 시각 (정각)
+ * - 상대 활동 알림: 상대가 공유 항목을 추가 · 수정 · 삭제했을 때 (끄면 시스템 알림만 끄고 알림 목록에는 남긴다)
+ * - [sendHour]: 기념일 · 일정 알림을 보내는 시각 (정각)
  */
 data class NotificationSettings(
     val anniversaryEnabled: Boolean = true,
     val planEnabled: Boolean = true,
+    val activityEnabled: Boolean = true,
     val sendHour: Int = DEFAULT_SEND_HOUR,
 ) {
     val sendTime: LocalTime get() = LocalTime.of(sendHour, 0)

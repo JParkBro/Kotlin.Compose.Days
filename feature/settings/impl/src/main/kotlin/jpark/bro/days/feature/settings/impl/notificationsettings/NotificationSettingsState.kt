@@ -9,6 +9,8 @@ internal data class NotificationSettingsState(
     /** 기기에서 이 앱 알림이 켜져 있는지 (Android 13 이상은 권한 포함). 화면이 다시 보일 때마다 확인 */
     val notificationsEnabled: Boolean = true,
     val settings: NotificationSettings = NotificationSettings(),
+    /** 연결된 커플의 상대 이름. 솔로면 null이고 상대 활동 알림 행을 숨긴다 (이름이 없으면 빈 문자열) */
+    val partnerName: String? = null,
     val isHourSheetVisible: Boolean = false,
     val marketing: MarketingRow = MarketingRow.Loading,
 )

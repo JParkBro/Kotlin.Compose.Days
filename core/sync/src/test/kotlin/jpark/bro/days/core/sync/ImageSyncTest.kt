@@ -10,6 +10,7 @@ import jpark.bro.days.core.database.DaysDatabase
 import jpark.bro.days.core.database.entity.ImageEntity
 import jpark.bro.days.core.database.entity.UserEntity
 import jpark.bro.days.core.firebase.sync.ProfileDto
+import jpark.bro.days.core.testing.FakeActivityRepository
 import jpark.bro.days.core.testing.FakeCoupleRemoteDataSource
 import jpark.bro.days.core.testing.FakeImageRemoteDataSource
 import jpark.bro.days.core.testing.testSettingsDataStore
@@ -34,6 +35,7 @@ class ImageSyncTest {
     private val remote = FakeSyncRemoteDataSource()
     private val profileRemote = FakeProfileRemoteDataSource()
     private val imageRemote = FakeImageRemoteDataSource()
+    private val activities = FakeActivityRepository()
     private val uploadEnabled = MutableStateFlow(true)
     private val store = ImageStore(ApplicationProvider.getApplicationContext(), Dispatchers.Unconfined)
     private val couples by lazy {
@@ -47,7 +49,14 @@ class ImageSyncTest {
         )
     }
     private val coupleData by lazy {
-        CoupleDataSync(remote, db.itemSyncDao(), db.anniversaryHideDao(), db.syncCursorDao(), db.imageSyncDao())
+        CoupleDataSync(
+            remote,
+            db.itemSyncDao(),
+            db.anniversaryHideDao(),
+            db.syncCursorDao(),
+            db.imageSyncDao(),
+            activities,
+        )
     }
     private val engine by lazy {
         SyncEngine(
@@ -222,7 +231,7 @@ class ImageSyncTest {
     fun `받은 항목 · 상대 프로필의 사진은 받을 수 있게 알아 둠`() =
         runTest {
             connectCouple()
-            coupleData.applyItems(COUPLE, listOf(itemDto("a").copy(backgroundImageId = "partner-bg")))
+            coupleData.applyItems(COUPLE, listOf(itemDto("a").copy(backgroundImageId = "partner-bg")), ME)
             profileRemote.profiles[PARTNER] =
                 ProfileDto(PARTNER, "지민", null, NOW, profileImageId = "partner-face", coupleId = COUPLE)
             remote.remoteCouples = listOf(coupleDto())

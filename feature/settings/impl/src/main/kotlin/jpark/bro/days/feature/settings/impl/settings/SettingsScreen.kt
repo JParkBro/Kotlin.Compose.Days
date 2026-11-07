@@ -54,10 +54,10 @@ import jpark.bro.days.core.model.AppThemeType
 import jpark.bro.days.core.ui.ObserveEvents
 import jpark.bro.days.feature.couple.api.CoupleManageKey
 import jpark.bro.days.feature.couple.api.PairingKey
+import jpark.bro.days.feature.settings.api.NotificationSettingsKey
 import jpark.bro.days.feature.settings.api.ProfileEditKey
 import jpark.bro.days.feature.settings.impl.AccountKey
 import jpark.bro.days.feature.settings.impl.MoreAppsKey
-import jpark.bro.days.feature.settings.impl.NotificationSettingsKey
 import jpark.bro.days.feature.settings.impl.PolicyListKey
 import jpark.bro.days.feature.settings.impl.R
 import jpark.bro.days.feature.settings.impl.WidgetSettingsKey

@@ -54,7 +54,7 @@ class SyncEngine internal constructor(
             couples.apply(userId, remote.getCouples(userId))
             val couple = couples.getActiveCouple(userId) ?: return@suspendRunCatching
             profileSync.pullPartner(couple.partnerOf(userId))
-            coupleData.pull(couple.id)
+            coupleData.pull(couple.id, userId)
         }.isSuccess
 
     /**
@@ -78,7 +78,7 @@ class SyncEngine internal constructor(
                     val (coupleId, partnerId) = active ?: return@collectLatest
                     coroutineScope {
                         launch { profileSync.listenPartner(partnerId) }
-                        launch { coupleData.listen(coupleId) }
+                        launch { coupleData.listen(coupleId, userId) }
                     }
                 }
         }

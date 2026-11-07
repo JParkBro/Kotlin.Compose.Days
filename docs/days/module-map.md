@@ -75,6 +75,7 @@ days/
 | | `ItemEditKey` | `itemId: String?`, `type: ItemType`, `presetDate: String?`, `presetCategory: Category?`, `presetTitle: String?` (빠른 시작) |
 | `notifications:api` | `NotificationsKey` | – |
 | `settings:api` | `SettingsKey`, `ProfileEditKey` (커플 코드 발급에 이름이 필요해 커플 연결에서도 연다) | – |
+| | `NotificationSettingsKey` (알림 목록의 "알림 설정 바로가기"에서도 연다) | – |
 | | `PolicyDocKey` (온보딩 약관 동의의 "보기"에서도 연다) | `type: PolicyType` |
 
 ### 4-2. impl 내부 키 (internal)
@@ -83,7 +84,7 @@ days/
 |---|---|
 | `onboarding:impl` | `LoginKey`, `TermsKey`, `StartModeKey` |
 | `couple:impl` | `PairCodeConfirmKey`, `AnniversaryListKey` |
-| `settings:impl` | `NotificationSettingsKey`, `WidgetSettingsKey`, `AccountKey`, `WithdrawKey`, `PolicyListKey`, `MoreAppsKey` |
+| `settings:impl` | `WidgetSettingsKey`, `AccountKey`, `WithdrawKey`, `PolicyListKey`, `MoreAppsKey` |
 
 ### 4-3. app에서 결정하는 목적지
 
@@ -102,7 +103,7 @@ days/
 | `home:impl` | `item`, `couple`, `notifications` |
 | `calendar:impl` | `item` |
 | `item:impl` | – |
-| `notifications:impl` | `item` |
+| `notifications:impl` | `item`, `settings` (알림 설정 바로가기) |
 | `settings:impl` | `couple` (커플 관리 · 연결) |
 | `widget` | – (탭하면 `core:navigation`의 `AppIntents.EXTRA_OPEN_ITEM_ID`로 앱을 열고, app이 상세 백스택을 만든다) |
 
@@ -178,6 +179,7 @@ days/
 7. `feature:onboarding`(소개 · 약관 · 시작 방식, 로그인은 6단계에서), `feature:settings`, `feature:notifications`, `core:notification`
    - 7-2 디데이 · 일정 · 자동 기념일 알림 (#37): `core:notification` `ReminderScheduler`(매일 오전 9시 WorkManager 1회 작업, 실행 · 시각 변경 때 다음 9시로 다시 예약, 앱 시작은 KEEP) · `ReminderWorker` · `TodayRemindersCollector`(로그인한 계정의 알림 + 연결된 커플의 숨기지 않은 자동 기념일 당일) · `ReminderNotifier`(채널 `anniversary` · `plan`, 태그로 중복 방지, 권한 없으면 건너뜀). `core:domain` `dueReminders`, `ItemRepository.observeAllReminders`, 발송 시각 9시(7-3에서 설정으로). 알림 탭은 `AppIntents.EXTRA_OPEN_ITEM_TYPE`로 일정이면 수정 화면. 디데이 · 일정 수정에서 알림을 켜면 `POST_NOTIFICATIONS` 요청(`core:ui` `rememberNotificationPermissionRequest`). 알림 설정 화면은 7-3, 알림 목록 · 상대 활동 알림(`activity_log`)은 7-4
    - 7-3 알림 설정 (#38): 기기 알림 상태 카드(`core:ui` `ObserveNotificationsEnabled` · `openAppNotificationSettings`), 기념일 · 일정 알림 토글 · 알림 시간(오전 8시 ~ 정오 12시)은 `core:model` `NotificationSettings` → `SettingsDataStore` · `SettingsRepository`(기기에만). `ReminderScheduler`가 알림 시각을 구독해 바뀌면 다시 예약(앱 범위 `CoroutineScope`), `TodayRemindersCollector`가 끈 종류를 뺌. 마케팅 수신 동의는 `OnboardingRepository.marketingConsent` · `setMarketingConsent`(`TermsRemoteDataSource`: 화면을 열 때 읽기 1회, 바꿀 때 `marketing` · `marketingUpdatedAt` merge 쓰기 1회, 보안 규칙 변경 없음). 항목 알림에 저장하는 시각은 `ItemReminder.DefaultTime`(쓰지 않음)
+   - 7-4 알림 목록 · 상대 활동 알림 (#39): Room `activity_log`(계정별, 30일 보관) · `core:data` `ActivityRepository`(기록하면 상대 활동은 `ActivityNotifier`로 시스템 알림) · `ActivityNotifier` 구현은 `core:notification` `PartnerActivityNotifier`(알림 설정 · 포그라운드면 건너뜀, 채널 `activity`). `core:sync` `CoupleDataSync.applyItems`가 실제로 반영한 상대 변경을 추가 · 수정 · 삭제로 남김(`ItemSyncDao.upsertRemoteItems`가 `AppliedRemoteItem` 반환, 처음 받기는 제외). `ReminderWorker`가 보낸 알림도 기록. 알림 설정에 상대 활동 알림 토글(커플일 때만, `NotificationSettings.activityEnabled`). 알림 목록 화면(`feature:notifications`), `NotificationSettingsKey`를 `settings:api`로, `AutoAnniversary.ruleOf`
    - 7-1 온보딩 (#36): 소개(3장, 기기마다 한 번: DataStore `intro_seen`, 본 뒤로는 로그인부터) → 로그인 → 약관 동의(필수 3 + 마케팅 선택, `users/{uid}`에 `termsVersion` · `privacyVersion` · `ageOver14` · `marketing` · `agreedAt` merge, `core:firebase` `TermsRemoteDataSource`) → 시작 방식(커플 추천 기본). `core:data` `OnboardingRepository`: 동의한 계정을 DataStore `terms_agreed_users`에 남기고, 기록이 없으면 로그인 직후 서버 동의 기록을 한 번 읽어(다시 설치 · 다른 기기) 이미 동의했으면 약관 · 시작 방식 없이 홈으로. 앱 시작은 로그인 + 이 기기 동의 기록이 있을 때만 홈. `PolicyDocKey` · `PolicyType`을 `settings:api`로 옮김 (정책 문서 화면은 9단계)
 8. `core:ads`, 광고 제거 구매
 9. `policy-site/`(Firebase Hosting), 출시 체크리스트 (`infra-and-billing-protection.md`)

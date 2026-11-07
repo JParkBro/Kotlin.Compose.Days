@@ -178,7 +178,7 @@ erDiagram
 | image | `local_path` (filesDir 기준, 받기 전이면 null), `upload_state` (`NONE` · `REJECTED` 한도 초과) |
 | item | `copied_from_item_id` (커플 해제 때 만든 나만 보기 사본의 원본 id. 30일 안 재연결 때 고치지 않은 사본 정리) |
 | `sync_cursor` | `key` (예: `items:{coupleId}`, `hiddenAnniversaries:{coupleId}`), `last_pulled_at_micros` (Firestore 서버 시각이 마이크로초라 이 컬럼만 마이크로초. 밀리초로 자르면 같은 문서를 매번 다시 읽는다) |
-| `activity_log` | 상대 활동 알림 목록 (id, type, item_id, actor_user_id, created_at, is_read) |
+| `activity_log` | 알림 목록 (id, user_id(보는 계정), type(`ITEM_ADDED` · `ITEM_UPDATED` · `ITEM_DELETED` · `REMINDER` · `ANNIVERSARY`), item_id, item_type, item_title(기록 당시 제목), actor_user_id, offset_days(REMINDER), rule_key(ANNIVERSARY), created_at, is_read). 기기에만, 30일 보관 |
 | `widget_config` | widget_id, item_id, size, background_type, show_profile. widget_id는 시스템이 주는 appWidgetId(정수)라 UUID 원칙의 예외 (기기 밖으로 나가지 않음) |
 
 ## 4. Firestore · Storage 저장 구조

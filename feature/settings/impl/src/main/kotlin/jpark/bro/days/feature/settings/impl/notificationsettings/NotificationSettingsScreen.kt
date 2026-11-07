@@ -139,7 +139,7 @@ private fun NotificationSettingsScreen(
             verticalArrangement = Arrangement.spacedBy(AppSpacing.lg),
         ) {
             DeviceNotificationCard(enabled = state.notificationsEnabled, onAction = onAction)
-            ReminderSection(settings = state.settings, onAction = onAction)
+            ReminderSection(settings = state.settings, partnerName = state.partnerName, onAction = onAction)
             MarketingSection(row = state.marketing, onAction = onAction)
             DaysInfoBox(text = stringResource(R.string.settings_notification_info))
         }
@@ -186,6 +186,7 @@ private fun DeviceNotificationCard(
 @Composable
 private fun ReminderSection(
     settings: NotificationSettings,
+    partnerName: String?,
     onAction: (NotificationSettingsAction) -> Unit,
 ) {
     DaysSection(title = stringResource(R.string.settings_notification_section_reminder)) {
@@ -205,6 +206,18 @@ private fun ReminderSection(
             testTag = "notification_plan_switch",
         )
         DaysDivider(inset = AppSpacing.marginMobile)
+        // 커플일 때만: 상대가 공유 항목을 바꾸면 알림 (끄면 시스템 알림만 끄고 알림 목록에는 남는다)
+        if (partnerName != null) {
+            val name = partnerName.ifEmpty { stringResource(R.string.settings_notification_partner_unknown) }
+            SwitchRow(
+                title = stringResource(R.string.settings_notification_activity),
+                subtitle = stringResource(R.string.settings_notification_activity_desc, name),
+                checked = settings.activityEnabled,
+                onCheckedChange = { onAction(NotificationSettingsAction.ActivityToggled(it)) },
+                testTag = "notification_activity_switch",
+            )
+            DaysDivider(inset = AppSpacing.marginMobile)
+        }
         DaysListItem(
             title = stringResource(R.string.settings_notification_send_time),
             subtitle = stringResource(R.string.settings_notification_send_time_desc),
@@ -349,6 +362,7 @@ private fun NotificationSettingsScreenPreview() {
             state =
                 NotificationSettingsState(
                     isLoading = false,
+                    partnerName = "지민",
                     marketing = MarketingRow.Loaded(agreed = true, agreedOn = LocalDate.of(2026, 11, 5)),
                 ),
             onAction = {},

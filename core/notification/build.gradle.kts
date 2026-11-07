@@ -17,4 +17,6 @@ dependencies {
     implementation(projects.core.navigation)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.work.runtime)
+    // 앱이 화면에 떠 있으면 상대 활동 시스템 알림을 띄우지 않는다
+    implementation(libs.androidx.lifecycle.process)
 }

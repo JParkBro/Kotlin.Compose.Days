@@ -1,9 +1,13 @@
 package jpark.bro.days.feature.settings.impl.notificationsettings
 
 import app.cash.turbine.test
+import jpark.bro.days.core.model.Couple
 import jpark.bro.days.core.model.MarketingConsent
 import jpark.bro.days.core.model.NotificationSettings
+import jpark.bro.days.core.model.UserProfile
+import jpark.bro.days.core.testing.FakeCoupleRepository
 import jpark.bro.days.core.testing.FakeOnboardingRepository
+import jpark.bro.days.core.testing.FakeProfileRepository
 import jpark.bro.days.core.testing.FakeSettingsRepository
 import jpark.bro.days.core.testing.MainDispatcherRule
 import kotlinx.coroutines.flow.first
@@ -42,7 +46,17 @@ class NotificationSettingsViewModelTest {
                 )
             now = clock.millis()
         }
-    private val viewModel by lazy { NotificationSettingsViewModel(settingsRepository, onboardingRepository, clock) }
+    private val coupleRepository = FakeCoupleRepository()
+    private val profileRepository = FakeProfileRepository()
+    private val viewModel by lazy {
+        NotificationSettingsViewModel(
+            settingsRepository,
+            onboardingRepository,
+            coupleRepository,
+            profileRepository,
+            clock,
+        )
+    }
 
     @Test
     fun `처음에는 저장된 알림 설정과 마케팅 동의 일자를 보여줌`() {
@@ -140,5 +154,19 @@ class NotificationSettingsViewModelTest {
                 viewModel.onAction(NotificationSettingsAction.DeviceSettingsClicked)
                 assertEquals(NotificationSettingsEvent.OpenDeviceSettings, awaitItem())
             }
+        }
+
+    @Test
+    fun `커플이면 상대 이름과 함께 상대 활동 알림을 보여주고 끌 수 있음`() =
+        runTest {
+            assertEquals(null, viewModel.state.value.partnerName)
+
+            coupleRepository.couple.value =
+                Couple("couple-1", "user-partner", LocalDate.of(2025, 3, 15), countFirstDayAsOne = true)
+            profileRepository.partnerProfile.value = UserProfile("user-partner", "지민", birthDate = null)
+            assertEquals("지민", viewModel.state.value.partnerName)
+
+            viewModel.onAction(NotificationSettingsAction.ActivityToggled(false))
+            assertFalse(settingsRepository.observeNotificationSettings().first().activityEnabled)
         }
 }

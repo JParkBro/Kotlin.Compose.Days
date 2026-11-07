@@ -1,6 +1,7 @@
 package jpark.bro.days.feature.settings.impl.di
 
 import jpark.bro.days.core.navigation.Navigator
+import jpark.bro.days.feature.settings.api.NotificationSettingsKey
 import jpark.bro.days.feature.settings.api.PolicyDocKey
 import jpark.bro.days.feature.settings.api.ProfileEditKey
 import jpark.bro.days.feature.settings.api.SessionEnded
@@ -8,7 +9,6 @@ import jpark.bro.days.feature.settings.api.SessionEndedHandler
 import jpark.bro.days.feature.settings.api.SettingsKey
 import jpark.bro.days.feature.settings.impl.AccountKey
 import jpark.bro.days.feature.settings.impl.MoreAppsKey
-import jpark.bro.days.feature.settings.impl.NotificationSettingsKey
 import jpark.bro.days.feature.settings.impl.PolicyListKey
 import jpark.bro.days.feature.settings.impl.WidgetSettingsKey
 import jpark.bro.days.feature.settings.impl.WithdrawKey

@@ -9,6 +9,8 @@ import jpark.bro.days.core.data.image.ImageStore
 import jpark.bro.days.core.database.DaysDatabase
 import jpark.bro.days.core.database.entity.UserEntity
 import jpark.bro.days.core.firebase.sync.ProfileDto
+import jpark.bro.days.core.model.ActivityType
+import jpark.bro.days.core.testing.FakeActivityRepository
 import jpark.bro.days.core.testing.FakeCoupleRemoteDataSource
 import jpark.bro.days.core.testing.FakeImageRemoteDataSource
 import jpark.bro.days.core.testing.testSettingsDataStore
@@ -47,10 +49,18 @@ class SyncEngineTest {
     }
     private var nextCopyId = 1
     private val imageRemote = FakeImageRemoteDataSource()
+    private val activities = FakeActivityRepository()
     private val uploadEnabled = MutableStateFlow(true)
     private val store = ImageStore(ApplicationProvider.getApplicationContext(), Dispatchers.Unconfined)
     private val coupleData by lazy {
-        CoupleDataSync(remote, db.itemSyncDao(), db.anniversaryHideDao(), db.syncCursorDao(), db.imageSyncDao())
+        CoupleDataSync(
+            remote,
+            db.itemSyncDao(),
+            db.anniversaryHideDao(),
+            db.syncCursorDao(),
+            db.imageSyncDao(),
+            activities,
+        )
     }
     private val engine by lazy {
         SyncEngine(
@@ -154,8 +164,8 @@ class SyncEngineTest {
         runTest {
             connectCouple()
 
-            coupleData.applyItems(COUPLE, listOf(itemDto("a", serverMicros = 30), itemDto("b", serverMicros = 50)))
-            coupleData.applyItems(COUPLE, listOf(itemDto("c", serverMicros = 40)))
+            coupleData.applyItems(COUPLE, listOf(itemDto("a", serverMicros = 30), itemDto("b", serverMicros = 50)), ME)
+            coupleData.applyItems(COUPLE, listOf(itemDto("c", serverMicros = 40)), ME)
 
             assertEquals(
                 listOf("a", "b", "c"),
@@ -175,9 +185,39 @@ class SyncEngineTest {
             connectCouple()
             db.itemDao().upsertItem(mySharedItem("a").copy(title = "내 수정"))
 
-            coupleData.applyItems(COUPLE, listOf(itemDto("a", title = "상대 수정")))
+            coupleData.applyItems(COUPLE, listOf(itemDto("a", title = "상대 수정")), ME)
 
             assertEquals("내 수정", db.itemDao().getItem("a")?.title)
+        }
+
+    @Test
+    fun `상대가 추가 수정 삭제한 항목은 알림 목록에 남기고 내 변경 처음 받기 다시 받은 변경은 남기지 않음`() =
+        runTest {
+            connectCouple()
+            // 처음 받기(커서 없음): 이미 있던 항목은 남기지 않는다
+            coupleData.applyItems(COUPLE, listOf(itemDto("old", serverMicros = 10)), ME)
+            assertTrue(activities.observeActivities().first().isEmpty())
+
+            val added = itemDto("dinner", title = "성수 저녁", serverMicros = 20)
+            coupleData.applyItems(COUPLE, listOf(added), ME)
+            val updated = added.copy(title = "성수 저녁 7시", updatedAt = NOW + 1, serverUpdatedAtMicros = 30)
+            coupleData.applyItems(COUPLE, listOf(updated), ME)
+            // 같은 변경을 다시 받음
+            coupleData.applyItems(COUPLE, listOf(updated.copy(serverUpdatedAtMicros = 31)), ME)
+            val deleted = updated.copy(deletedAt = NOW + 2, updatedAt = NOW + 2, serverUpdatedAtMicros = 40)
+            coupleData.applyItems(COUPLE, listOf(deleted), ME)
+            // 내 Push가 되돌아옴
+            coupleData.applyItems(COUPLE, listOf(itemDto("mine", serverMicros = 50).copy(updatedBy = ME)), ME)
+
+            assertEquals(
+                listOf(
+                    ActivityType.ITEM_DELETED to "성수 저녁 7시",
+                    ActivityType.ITEM_UPDATED to "성수 저녁 7시",
+                    ActivityType.ITEM_ADDED to "성수 저녁",
+                ),
+                activities.observeActivities().first().map { it.content.type to it.content.itemTitle },
+            )
+            assertTrue(activities.observeActivities().first().all { it.content.actorUserId == PARTNER })
         }
 
     @Test
@@ -185,7 +225,7 @@ class SyncEngineTest {
         runTest {
             connectCouple()
 
-            coupleData.applyItems(COUPLE, listOf(itemDto("x", coupleId = "couple-other")))
+            coupleData.applyItems(COUPLE, listOf(itemDto("x", coupleId = "couple-other")), ME)
 
             assertNull(db.itemDao().getItem("x"))
         }

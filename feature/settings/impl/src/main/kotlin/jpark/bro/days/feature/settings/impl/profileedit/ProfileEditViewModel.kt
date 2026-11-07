@@ -1,9 +1,13 @@
 package jpark.bro.days.feature.settings.impl.profileedit
 
 import androidx.lifecycle.viewModelScope
+import jpark.bro.days.core.ads.RewardedAdRequest
+import jpark.bro.days.core.ads.RewardedAdResult
 import jpark.bro.days.core.data.image.ImageDraft
+import jpark.bro.days.core.data.repository.ImageQuotaRepository
 import jpark.bro.days.core.data.repository.ImageRepository
 import jpark.bro.days.core.data.repository.ProfileRepository
+import jpark.bro.days.core.data.repository.exhaustedQuotaOrNull
 import jpark.bro.days.core.data.repository.observeImageFileOrNull
 import jpark.bro.days.core.model.UserProfile
 import jpark.bro.days.core.ui.MviViewModel
@@ -21,6 +25,7 @@ import java.time.LocalDate
 internal class ProfileEditViewModel(
     private val profileRepository: ProfileRepository,
     private val imageRepository: ImageRepository,
+    private val imageQuotaRepository: ImageQuotaRepository,
     clock: Clock,
 ) : MviViewModel<ProfileEditState, ProfileEditAction, ProfileEditEvent>(
         ProfileEditState(today = LocalDate.now(clock)),
@@ -72,16 +77,8 @@ internal class ProfileEditViewModel(
                 setState { copy(birthDate = null) }
             }
 
-            ProfileEditAction.PhotoClicked -> {
-                sendEvent(ProfileEditEvent.OpenPhotoPicker)
-            }
-
-            is ProfileEditAction.PhotoPicked -> {
-                editPhoto { replace(action.uri).onFailure { sendEvent(ProfileEditEvent.PhotoFailed) } }
-            }
-
-            ProfileEditAction.PhotoRemoved -> {
-                editPhoto { remove() }
+            is ProfileEditAction.PhotoInput -> {
+                onPhotoInput(action)
             }
 
             ProfileEditAction.SaveClicked -> {
@@ -94,6 +91,68 @@ internal class ProfileEditViewModel(
                     sendEvent(ProfileEditEvent.NavigateBack)
                 }
             }
+        }
+    }
+
+    private fun onPhotoInput(action: ProfileEditAction.PhotoInput) {
+        when (action) {
+            ProfileEditAction.PhotoClicked -> {
+                checkImageLimit()
+            }
+
+            is ProfileEditAction.PhotoPicked -> {
+                editPhoto { replace(action.uri).onFailure { sendEvent(ProfileEditEvent.PhotoFailed) } }
+            }
+
+            ProfileEditAction.PhotoRemoved -> {
+                editPhoto { remove() }
+            }
+
+            ProfileEditAction.WatchAdClicked -> {
+                val quota = currentState.imageLimit ?: return
+                setState { copy(isRewardWorking = true) }
+                sendEvent(ProfileEditEvent.ShowRewardedAd(RewardedAdRequest(quota.userId, quota.coupleId)))
+            }
+
+            is ProfileEditAction.RewardedAdFinished -> {
+                onRewardedAdFinished(action.result)
+            }
+
+            ProfileEditAction.ImageLimitDismissed -> {
+                // 광고를 보는 중에는 닫지 않는다 (보상을 기다림)
+                if (!currentState.isRewardWorking) setState { copy(imageLimit = null) }
+            }
+        }
+    }
+
+    /** 프로필 사진은 커플이면 커플 저장소에 올라간다. 한도를 다 썼으면 고르기 전에 보상형 광고를 권한다 */
+    private fun checkImageLimit() {
+        if (currentState.isPhotoWorking) return
+        setState { copy(isPhotoWorking = true) }
+        viewModelScope.launch {
+            val exhausted = imageQuotaRepository.exhaustedQuotaOrNull()
+            setState { copy(isPhotoWorking = false, imageLimit = exhausted) }
+            if (exhausted == null) sendEvent(ProfileEditEvent.OpenPhotoPicker)
+        }
+    }
+
+    private fun onRewardedAdFinished(result: RewardedAdResult) {
+        val quota = currentState.imageLimit
+        if (quota == null || result != RewardedAdResult.Earned) {
+            setState { copy(isRewardWorking = false) }
+            if (result == RewardedAdResult.Failed) sendEvent(ProfileEditEvent.RewardedAdFailed)
+            return
+        }
+        viewModelScope.launch {
+            imageQuotaRepository
+                .awaitRewardedQuota(quota)
+                .onSuccess {
+                    setState { copy(isRewardWorking = false, imageLimit = null) }
+                    sendEvent(ProfileEditEvent.OpenPhotoPicker)
+                }.onFailure {
+                    setState { copy(isRewardWorking = false, imageLimit = null) }
+                    sendEvent(ProfileEditEvent.RewardPending)
+                }
         }
     }
 

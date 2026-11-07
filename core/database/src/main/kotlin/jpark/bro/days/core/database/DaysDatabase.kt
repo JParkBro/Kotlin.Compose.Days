@@ -2,6 +2,7 @@ package jpark.bro.days.core.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import jpark.bro.days.core.database.dao.ActivityLogDao
 import jpark.bro.days.core.database.dao.AnniversaryHideDao
 import jpark.bro.days.core.database.dao.CoupleDao
 import jpark.bro.days.core.database.dao.CoupleItemDao
@@ -14,6 +15,7 @@ import jpark.bro.days.core.database.dao.SyncCursorDao
 import jpark.bro.days.core.database.dao.UserDao
 import jpark.bro.days.core.database.dao.UserItemPrefDao
 import jpark.bro.days.core.database.dao.WidgetConfigDao
+import jpark.bro.days.core.database.entity.ActivityLogEntity
 import jpark.bro.days.core.database.entity.AnniversaryHideEntity
 import jpark.bro.days.core.database.entity.CoupleEntity
 import jpark.bro.days.core.database.entity.ImageEntity
@@ -39,6 +41,7 @@ import jpark.bro.days.core.database.entity.WidgetConfigEntity
         SyncCursorEntity::class,
         UserEntity::class,
         ImageEntity::class,
+        ActivityLogEntity::class,
     ],
     version = 1,
     exportSchema = true,
@@ -67,4 +70,6 @@ abstract class DaysDatabase : RoomDatabase() {
     abstract fun imageDao(): ImageDao
 
     abstract fun imageSyncDao(): ImageSyncDao
+
+    abstract fun activityLogDao(): ActivityLogDao
 }

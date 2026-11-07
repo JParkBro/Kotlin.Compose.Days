@@ -71,6 +71,33 @@ describe('사진 업로드 카운터', () => {
     await assertFails(deleteDoc(doc(db(A), 'couples/c1/usage/images')));
   });
 
+  test('bonus만큼 30번을 넘길 수 있고, 앱은 bonus를 바꿀 수 없다', async () => {
+    await seed('couples/c1', { members: [A, B], status: 'ACTIVE', pairCode: 'K7Q2MX', startDate: '2025-06-14' });
+    await seed('couples/c1/usage/images', { count: 30, lastImageId: IMG1, bonus: 1 });
+    await assertFails(setDoc(doc(db(A), 'couples/c1/usage/images'), { count: 31, lastImageId: IMG2, bonus: 2 }));
+    await assertFails(setDoc(doc(db(A), 'couples/c1/usage/images'), { count: 31, lastImageId: IMG2 }));
+    await assertSucceeds(setDoc(doc(db(A), 'couples/c1/usage/images'), { count: 31, lastImageId: IMG2, bonus: 1 }));
+    await assertFails(setDoc(doc(db(B), 'couples/c1/usage/images'), { count: 32, lastImageId: IMG1, bonus: 1 }));
+  });
+
+  test('함수가 bonus만 적어 만든 문서에서도 1부터 센다', async () => {
+    await seed('couples/c1', { members: [A, B], status: 'ACTIVE', pairCode: 'K7Q2MX', startDate: '2025-06-14' });
+    await seed('couples/c1/usage/images', { bonus: 1 });
+    await assertFails(setDoc(doc(db(A), 'couples/c1/usage/images'), { count: 2, lastImageId: IMG1, bonus: 1 }));
+    await assertSucceeds(setDoc(doc(db(A), 'couples/c1/usage/images'), { count: 1, lastImageId: IMG1, bonus: 1 }));
+  });
+
+  test('앱은 처음 만들 때 bonus를 적을 수 없다', async () => {
+    await seedCouple();
+    await assertFails(setDoc(doc(db(A), 'couples/c1/usage/images'), { count: 1, lastImageId: IMG1, bonus: 5 }));
+  });
+
+  test('보상 기록(adRewards)은 앱이 읽거나 쓸 수 없다', async () => {
+    await seedCouple();
+    await assertFails(setDoc(doc(db(A), 'couples/c1/adRewards/t1'), { uid: A }));
+    await assertFails(getDoc(doc(db(A), 'couples/c1/adRewards/t1')));
+  });
+
   test('비멤버 · 해제된 커플 · 형식이 틀린 id · 다른 필드는 거부된다', async () => {
     await seedCouple();
     await assertFails(setDoc(doc(db(C), 'couples/c1/usage/images'), { count: 1, lastImageId: IMG1 }));

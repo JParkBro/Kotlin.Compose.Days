@@ -35,14 +35,17 @@ interface ItemSyncDao {
      * 단, 아직 올리지 않은 내 변경(SYNCED가 아닌 행)은 덮지 않는다: Push가 끝나면 서버 값이 내 것이 된다 (sync-and-pairing.md 2장)
      */
     @Transaction
-    suspend fun upsertRemoteItems(items: List<ItemEntity>) {
-        items.forEach { remote ->
+    suspend fun upsertRemoteItems(items: List<ItemEntity>): List<AppliedRemoteItem> =
+        items.mapNotNull { remote ->
             val local = getItem(remote.id)
             if (local == null || local.syncState == SyncState.SYNCED.name) {
-                upsertItem(remote.copy(syncState = SyncState.SYNCED.name))
+                val applied = remote.copy(syncState = SyncState.SYNCED.name)
+                upsertItem(applied)
+                AppliedRemoteItem(previous = local, current = applied)
+            } else {
+                null
             }
         }
-    }
 
     @Query("SELECT * FROM item WHERE id = :id")
     suspend fun getItem(id: String): ItemEntity?
@@ -67,3 +70,9 @@ private const val UNSYNCED_BY_USER = """
         AND i.upload_state != 'REJECTED' AND (i.remote_couple_id IS NULL OR i.remote_couple_id != item.couple_id)
     )
 """
+
+/** 받은 항목 중 실제로 반영한 것. [previous]는 반영 전 기기 행 (없었으면 null). 상대 활동 기록에 쓴다 */
+data class AppliedRemoteItem(
+    val previous: ItemEntity?,
+    val current: ItemEntity,
+)

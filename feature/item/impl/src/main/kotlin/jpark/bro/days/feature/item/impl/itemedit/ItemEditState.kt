@@ -5,6 +5,7 @@ import jpark.bro.days.core.model.AppThemeType
 import jpark.bro.days.core.model.Category
 import jpark.bro.days.core.model.CountMode
 import jpark.bro.days.core.model.DdayCount
+import jpark.bro.days.core.model.ImageUploadQuota
 import jpark.bro.days.core.model.ItemContent
 import jpark.bro.days.core.model.ItemIcon
 import jpark.bro.days.core.model.ItemType
@@ -19,13 +20,9 @@ import java.time.LocalTime
 private const val SAME_DAY = 0
 private const val ONE_DAY_BEFORE = 1
 private const val ONE_WEEK_BEFORE = 7
-private const val REMINDER_HOUR = 9
 
 /** 알림 선택지 (product-spec 4-5): 당일 · 1일 전 · 7일 전 */
 internal val ReminderOffsets: List<Int> = listOf(SAME_DAY, ONE_DAY_BEFORE, ONE_WEEK_BEFORE)
-
-/** 알림 발송 시각: 오전 9시 (product-spec 4-5) */
-internal val ReminderTime: LocalTime = LocalTime.of(REMINDER_HOUR, 0)
 
 internal enum class ItemEditDialog {
     DATE,
@@ -65,8 +62,12 @@ internal data class ItemEditState(
     /** 배경 사진 id와 파일 (디데이만, product-spec 4-5) */
     val backgroundImageId: String? = null,
     val backgroundFile: File? = null,
-    /** 고른 사진을 줄이는 중 */
+    /** 사진 한도를 확인하거나 고른 사진을 줄이는 중 */
     val isPhotoWorking: Boolean = false,
+    /** 커플 사진 한도를 다 써서 보여주는 시트 (null이면 닫힘) */
+    val imageLimit: ImageUploadQuota? = null,
+    /** 광고를 보는 중이거나 보상 반영을 기다리는 중 */
+    val isRewardWorking: Boolean = false,
     val dialog: ItemEditDialog? = null,
 ) {
     val showVisibility: Boolean get() = coupleId != null

@@ -42,4 +42,14 @@ internal class ItemReminderDaoTest : DatabaseTest() {
 
             assertEquals(listOf(0, 1, 7), dao.observeReminders(ME, "a").first().map { it.offsetDays })
         }
+
+    @Test
+    fun `내 알림 전체는 다른 사용자 알림을 빼고 항목별로 나옴`() =
+        runTest {
+            dao.replaceReminders(ME, "b", listOf(testReminder("b7", "b", 7), testReminder("b0", "b", 0)))
+            dao.replaceReminders(ME, "a", listOf(testReminder("a1", "a", 1)))
+            dao.replaceReminders("partner", "a", listOf(testReminder("p0", "a", 0, userId = "partner")))
+
+            assertEquals(listOf("a1", "b0", "b7"), dao.observeAllReminders(ME).first().map { it.id })
+        }
 }

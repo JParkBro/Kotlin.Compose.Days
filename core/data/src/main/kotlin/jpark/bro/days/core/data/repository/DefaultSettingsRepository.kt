@@ -2,6 +2,7 @@ package jpark.bro.days.core.data.repository
 
 import jpark.bro.days.core.common.suspendRunCatching
 import jpark.bro.days.core.datastore.SettingsDataStore
+import jpark.bro.days.core.model.NotificationSettings
 import jpark.bro.days.core.model.ThemeSetting
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +25,11 @@ internal class DefaultSettingsRepository(
     override fun setThemePreview(setting: ThemeSetting?) {
         themePreview.value = setting
     }
+
+    override fun observeNotificationSettings(): Flow<NotificationSettings> = settingsDataStore.notificationSettings
+
+    override suspend fun setNotificationSettings(settings: NotificationSettings): Result<Unit> =
+        suspendRunCatching { settingsDataStore.setNotificationSettings(settings) }
 
     override fun observeCoupleBannerDismissed(): Flow<Boolean> = settingsDataStore.coupleBannerDismissed
 

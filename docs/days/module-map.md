@@ -39,13 +39,13 @@ days/
 │  ├─ designsystem/   AppColors(27 토큰) · 8 팔레트, 공통 컴포넌트
 │  ├─ ui/             MviViewModel, ObserveEvents, DdayRow · 뱃지 등 공유 UI
 │  ├─ database/       Room (user, item, couple, user_item_pref, item_reminder, image, anniversary_hide, activity_log, widget_config, sync_cursor)
-│  ├─ datastore/      테마 · 모드, 광고 노출 기록, 온보딩 완료 여부
+│  ├─ datastore/      테마 · 모드, 온보딩 완료 여부
 │  ├─ firebase/       Auth, Firestore 원격 데이터 소스, Remote Config, App Check
 │  ├─ network/        Ktor: 외부 HTTP가 필요할 때 (카카오 토큰 발급은 Functions callable이라 core:firebase)
 │  ├─ data/           Repository: Item, Couple, User, Image, Settings
 │  ├─ sync/           SyncManager, 동기화 · 재시도 Worker
 │  ├─ notification/   기념일 · 일정 로컬 알림, 상대 활동 알림
-│  ├─ ads/            AdMob 래퍼, 노출 빈도 규칙
+│  ├─ ads/            AdMob 보상형 광고 (`RewardedAds` · `rememberRewardedAdLauncher`), 맞춤 광고 동의(UMP)
 │  └─ testing/        Fake, MainDispatcherRule, 테스트 데이터
 ├─ feature/
 │  ├─ onboarding/  api/ impl/
@@ -75,6 +75,7 @@ days/
 | | `ItemEditKey` | `itemId: String?`, `type: ItemType`, `presetDate: String?`, `presetCategory: Category?`, `presetTitle: String?` (빠른 시작) |
 | `notifications:api` | `NotificationsKey` | – |
 | `settings:api` | `SettingsKey`, `ProfileEditKey` (커플 코드 발급에 이름이 필요해 커플 연결에서도 연다) | – |
+| | `NotificationSettingsKey` (알림 목록의 "알림 설정 바로가기"에서도 연다) | – |
 | | `PolicyDocKey` (온보딩 약관 동의의 "보기"에서도 연다) | `type: PolicyType` |
 
 ### 4-2. impl 내부 키 (internal)
@@ -83,7 +84,7 @@ days/
 |---|---|
 | `onboarding:impl` | `LoginKey`, `TermsKey`, `StartModeKey` |
 | `couple:impl` | `PairCodeConfirmKey`, `AnniversaryListKey` |
-| `settings:impl` | `NotificationSettingsKey`, `WidgetSettingsKey`, `AccountKey`, `WithdrawKey`, `PolicyListKey`, `MoreAppsKey` |
+| `settings:impl` | `WidgetSettingsKey`, `AccountKey`, `WithdrawKey`, `PolicyListKey`, `MoreAppsKey` |
 
 ### 4-3. app에서 결정하는 목적지
 
@@ -102,7 +103,7 @@ days/
 | `home:impl` | `item`, `couple`, `notifications` |
 | `calendar:impl` | `item` |
 | `item:impl` | – |
-| `notifications:impl` | `item` |
+| `notifications:impl` | `item`, `settings` (알림 설정 바로가기) |
 | `settings:impl` | `couple` (커플 관리 · 연결) |
 | `widget` | – (탭하면 `core:navigation`의 `AppIntents.EXTRA_OPEN_ITEM_ID`로 앱을 열고, app이 상세 백스택을 만든다) |
 
@@ -146,10 +147,10 @@ days/
 
 ## 8. 빌드 변형
 
-| flavor | Firebase 프로젝트 | 카카오 네이티브 앱 키 | 앱 ID |
-|---|---|---|---|
-| `dev` | `days-61328` (에뮬레이터 연결 옵션) | `KAKAO_NATIVE_APP_KEY_DEV` (`local.properties`) | `jpark.bro.days.dev` |
-| `prod` | `days-61328` | `KAKAO_NATIVE_APP_KEY_PROD` (`local.properties`) | `jpark.bro.days` |
+| flavor | Firebase 프로젝트 | 카카오 네이티브 앱 키 | AdMob | 앱 ID |
+|---|---|---|---|---|
+| `dev` | `days-61328` (에뮬레이터 연결 옵션) | `KAKAO_NATIVE_APP_KEY_DEV` (`local.properties`) | Google 샘플 (테스트 광고) | `jpark.bro.days.dev` |
+| `prod` | `days-61328` | `KAKAO_NATIVE_APP_KEY_PROD` (`local.properties`) | `admob.appId` · `admob.rewardedAdUnitId` (`local.properties`, 없으면 샘플) | `jpark.bro.days` |
 
 > 처음에는 dev · prod Firebase 프로젝트를 나누기로 했지만, 지금은 **한 프로젝트를 함께 씁니다** (2026-11). 개발 중 사용량 · 데이터가 운영과 섞이므로 디버그 빌드는 에뮬레이터 연결을 우선하고, 출시 전에 분리를 다시 검토합니다 (`infra-and-billing-protection.md` 출시 전 체크리스트). 카카오는 앱 하나에 네이티브 앱 키를 패키지별로 2개 둡니다 (회원번호는 같음).
 
@@ -176,8 +177,13 @@ days/
    - 6-8a 사진 저장 · 업로드 기반 (#34): `firebase/storage.rules`(커플 멤버만 · webp · 300KB · 덮어쓰기 금지 · 방금 등록한 `lastImageId`만) + Firestore `usage/images` 카운터(+1씩 · 누적 30), Storage 에뮬레이터 9199. Room `image` · `user.profile_image_id`, `core:firebase` `ImageRemoteDataSource`, `core:data` `ImageStore`(WebP 1080px · 280KB 이하) · `ImageRepository`(가져오기 · 받아서 영구 저장 · 버리기), `core:sync` `ImageSync`(사진 → 프로필 → 공유 항목 순, 사진 올리기 전 항목은 기다림, `upload_enabled`) · `CoupleDataSync`(공유 항목 · 숨긴 기념일을 `SyncEngine`에서 분리). 썸네일 없음, 문서에는 사진 id만
    - 6-8b 사진 화면 (#35): Coil 3(`coil-compose`, 기기 파일만) · `core:ui` `DaysPhoto` · `ProfileAvatar` · `rememberPhotoPicker`(PickVisualMedia), `core:data` `ImageDraft`(고르는 중인 사진: 저장 뒤 이전 사진 · 취소 시 새 사진 버리기). 디데이 커버 사진 선택 · 상세 배경(image-scrim + on-image), 프로필 사진(수정 · 설정 카드 · 커플 관리 · 커플 홈 히어로, 홈은 `HomeCoupleSource`로 묶음), 위젯 사진 배경(`WidgetBackground.PHOTO` = 보여주는 디데이의 커버 사진) · 프로필 원(커플 두 사람 · 솔로 나), 위젯 설정 ViewModel 키는 `WidgetTarget`
 7. `feature:onboarding`(소개 · 약관 · 시작 방식, 로그인은 6단계에서), `feature:settings`, `feature:notifications`, `core:notification`
+   - 7-2 디데이 · 일정 · 자동 기념일 알림 (#37): `core:notification` `ReminderScheduler`(매일 오전 9시 WorkManager 1회 작업, 실행 · 시각 변경 때 다음 9시로 다시 예약, 앱 시작은 KEEP) · `ReminderWorker` · `TodayRemindersCollector`(로그인한 계정의 알림 + 연결된 커플의 숨기지 않은 자동 기념일 당일) · `ReminderNotifier`(채널 `anniversary` · `plan`, 태그로 중복 방지, 권한 없으면 건너뜀). `core:domain` `dueReminders`, `ItemRepository.observeAllReminders`, 발송 시각 9시(7-3에서 설정으로). 알림 탭은 `AppIntents.EXTRA_OPEN_ITEM_TYPE`로 일정이면 수정 화면. 디데이 · 일정 수정에서 알림을 켜면 `POST_NOTIFICATIONS` 요청(`core:ui` `rememberNotificationPermissionRequest`). 알림 설정 화면은 7-3, 알림 목록 · 상대 활동 알림(`activity_log`)은 7-4
+   - 7-3 알림 설정 (#38): 기기 알림 상태 카드(`core:ui` `ObserveNotificationsEnabled` · `openAppNotificationSettings`), 기념일 · 일정 알림 토글 · 알림 시간(오전 8시 ~ 정오 12시)은 `core:model` `NotificationSettings` → `SettingsDataStore` · `SettingsRepository`(기기에만). `ReminderScheduler`가 알림 시각을 구독해 바뀌면 다시 예약(앱 범위 `CoroutineScope`), `TodayRemindersCollector`가 끈 종류를 뺌. 마케팅 수신 동의는 `OnboardingRepository.marketingConsent` · `setMarketingConsent`(`TermsRemoteDataSource`: 화면을 열 때 읽기 1회, 바꿀 때 `marketing` · `marketingUpdatedAt` merge 쓰기 1회, 보안 규칙 변경 없음). 항목 알림에 저장하는 시각은 `ItemReminder.DefaultTime`(쓰지 않음)
+   - 7-4 알림 목록 · 상대 활동 알림 (#39): Room `activity_log`(계정별, 30일 보관) · `core:data` `ActivityRepository`(기록하면 상대 활동은 `ActivityNotifier`로 시스템 알림) · `ActivityNotifier` 구현은 `core:notification` `PartnerActivityNotifier`(알림 설정 · 포그라운드면 건너뜀, 채널 `activity`). `core:sync` `CoupleDataSync.applyItems`가 실제로 반영한 상대 변경을 추가 · 수정 · 삭제로 남김(`ItemSyncDao.upsertRemoteItems`가 `AppliedRemoteItem` 반환, 처음 받기는 제외). `ReminderWorker`가 보낸 알림도 기록. 알림 설정에 상대 활동 알림 토글(커플일 때만, `NotificationSettings.activityEnabled`). 알림 목록 화면(`feature:notifications`), `NotificationSettingsKey`를 `settings:api`로, `AutoAnniversary.ruleOf`
    - 7-1 온보딩 (#36): 소개(3장, 기기마다 한 번: DataStore `intro_seen`, 본 뒤로는 로그인부터) → 로그인 → 약관 동의(필수 3 + 마케팅 선택, `users/{uid}`에 `termsVersion` · `privacyVersion` · `ageOver14` · `marketing` · `agreedAt` merge, `core:firebase` `TermsRemoteDataSource`) → 시작 방식(커플 추천 기본). `core:data` `OnboardingRepository`: 동의한 계정을 DataStore `terms_agreed_users`에 남기고, 기록이 없으면 로그인 직후 서버 동의 기록을 한 번 읽어(다시 설치 · 다른 기기) 이미 동의했으면 약관 · 시작 방식 없이 홈으로. 앱 시작은 로그인 + 이 기기 동의 기록이 있을 때만 홈. `PolicyDocKey` · `PolicyType`을 `settings:api`로 옮김 (정책 문서 화면은 9단계)
-8. `core:ads`, 광고 제거 구매
+8. `core:ads`, 후원 결제 (2026-11 결정: 전면광고 · 광고 제거 구매 없음)
+   - 8-1 보상형 광고 사진 +1장 (#40): `core:ads` `RewardedAds`(UMP 동의 → 불러와 바로 보여주기, SSV 옵션 user_id = uid · custom_data = coupleId) · `rememberRewardedAdLauncher`(Root가 Event로 띄우고 결과를 Action으로), `AdsConfig`는 app이 flavor 값으로(dev = Google 샘플, prod = `local.properties` `admob.appId` · `admob.rewardedAdUnitId`). `firebase/functions/` `admobReward`(AdMob SSV 서명 확인 → `usage/images.bonus` +1, App Check 예외), 규칙 `count <= 30 + bonus`. `core:data` `ImageRepository.uploadQuota` · `awaitRewardedQuota`(`core:model` `ImageUploadQuota`), `core:ui` `ImageLimitSheet`. 커플 프로필 사진 · 공유 항목 커버를 고를 때 한도를 다 썼으면 시트 → 광고 → 사진 선택기. feature impl은 광고 표시 때문에 `core:ads`를 참조한다
+   - 8-2 개발자 응원하기: 혜택 없는 소모형 인앱 상품 3종(Play Billing, 서버 없음), 설정 → 지원
 9. `policy-site/`(Firebase Hosting), 출시 체크리스트 (`infra-and-billing-protection.md`)
 
 ## 10. widget 모듈 (Glance)

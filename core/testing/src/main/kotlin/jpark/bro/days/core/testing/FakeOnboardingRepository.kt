@@ -1,6 +1,7 @@
 package jpark.bro.days.core.testing
 
 import jpark.bro.days.core.data.repository.OnboardingRepository
+import jpark.bro.days.core.model.MarketingConsent
 
 class FakeOnboardingRepository(
     var introSeen: Boolean = false,
@@ -29,6 +30,21 @@ class FakeOnboardingRepository(
         marketingAgreements += marketing
         termsAgreed = true
         return Result.success(Unit)
+    }
+
+    /** 서버에 있는 마케팅 수신 동의 */
+    var marketingConsent: MarketingConsent = MarketingConsent(agreed = false, updatedAt = null)
+
+    /** setMarketingConsent가 남기는 시각 */
+    var now: Long = 0L
+
+    override suspend fun marketingConsent(): Result<MarketingConsent> =
+        if (consumeFailure()) Result.failure(IllegalStateException("조회 실패 (테스트)")) else Result.success(marketingConsent)
+
+    override suspend fun setMarketingConsent(agreed: Boolean): Result<MarketingConsent> {
+        if (consumeFailure()) return Result.failure(IllegalStateException("저장 실패 (테스트)"))
+        marketingConsent = MarketingConsent(agreed = agreed, updatedAt = now)
+        return Result.success(marketingConsent)
     }
 
     private fun consumeFailure(): Boolean = failNext.also { failNext = false }

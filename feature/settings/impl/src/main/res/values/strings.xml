@@ -114,4 +114,40 @@
     <string name="settings_profile_photo_hint">커플로 연결되면 상대에게도 보여요. 혼자 쓸 때는 이 기기에만 저장돼요.</string>
     <string name="settings_profile_save">저장하기</string>
     <string name="settings_profile_save_failed">저장하지 못했어요. 다시 시도해 주세요.</string>
+
+    <!-- 알림 설정 (product-spec 6장, 시안 settings-notification) -->
+    <string name="settings_notification_title">알림 설정</string>
+    <string name="settings_notification_back">뒤로</string>
+    <string name="settings_notification_device_on">기기 푸시 알림이 켜져 있어요</string>
+    <string name="settings_notification_device_off">기기 푸시 알림이 꺼져 있어요</string>
+    <string name="settings_notification_device_on_desc">언제든지 스마트폰 설정에서 변경할 수 있어요</string>
+    <string name="settings_notification_device_off_desc">눌러서 스마트폰 설정에서 알림을 켜 주세요</string>
+    <string name="settings_notification_device_allowed">허용됨</string>
+    <string name="settings_notification_device_blocked">꺼짐</string>
+    <string name="settings_notification_section_reminder">활동 및 기념일 알림</string>
+    <string name="settings_notification_anniversary">기념일 알림</string>
+    <string name="settings_notification_anniversary_desc">100일 단위, 주년, 생일과 등록한 디데이 당일 · 사전 알림</string>
+    <string name="settings_notification_plan">일정 알림</string>
+    <string name="settings_notification_plan_desc">등록한 일정 당일 · 사전 알림</string>
+    <string name="settings_notification_activity">상대 활동 알림</string>
+    <string name="settings_notification_activity_desc">%1$s 님이 디데이나 일정을 추가 · 수정 · 삭제했을 때 알림</string>
+    <string name="settings_notification_partner_unknown">상대</string>
+    <string name="settings_notification_send_time">알림 시간</string>
+    <string name="settings_notification_send_time_desc">기념일 · 일정 알림이 이 시각에 발송돼요</string>
+    <string name="settings_notification_hour_am">오전 %1$d시</string>
+    <string name="settings_notification_hour_noon">정오 12시</string>
+    <string name="settings_notification_hour_sheet_title">알림 시간</string>
+    <string name="settings_notification_hour_sheet_desc">기념일 · 일정 알림을 받을 시각을 골라 주세요</string>
+    <string name="settings_notification_hour_selected">선택됨</string>
+    <string name="settings_notification_section_marketing">마케팅 및 혜택 정보</string>
+    <string name="settings_notification_marketing">마케팅 정보 수신 동의</string>
+    <string name="settings_notification_marketing_desc">커플 이벤트, 맞춤 선물 추천 및 혜택 안내</string>
+    <string name="settings_notification_marketing_agreed_on">동의 일자: %1$s</string>
+    <string name="settings_notification_marketing_loading">불러오는 중이에요</string>
+    <string name="settings_notification_marketing_failed">불러오지 못했어요. 눌러서 다시 시도해 주세요</string>
+    <string name="settings_notification_marketing_agreed_toast">%1$s 마케팅 정보 수신에 동의했어요</string>
+    <string name="settings_notification_marketing_withdrawn_toast">%1$s 마케팅 정보 수신 동의를 철회했어요</string>
+    <string name="settings_notification_marketing_save_failed">변경하지 못했어요. 연결을 확인하고 다시 시도해 주세요</string>
+    <string name="settings_notification_save_failed">알림 설정을 저장하지 못했어요. 다시 시도해 주세요</string>
+    <string name="settings_notification_info">알림은 이 기기에서 만들어져요. 기념일 · 일정 알림은 휴대폰 절전 상태에 따라 몇 분, 상대 활동 알림은 앱을 닫아 두면 최대 6시간 늦게 올 수 있어요.</string>
 </resources>

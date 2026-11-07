@@ -15,6 +15,10 @@ interface ItemReminderDao {
         itemId: String,
     ): Flow<List<ItemReminderEntity>>
 
+    /** 내 알림 전체 (알림 발송). 항목이 보이는지는 거르지 않는다 */
+    @Query("SELECT * FROM item_reminder WHERE user_id = :userId ORDER BY item_id, offset_days")
+    fun observeAllReminders(userId: String): Flow<List<ItemReminderEntity>>
+
     /** 항목의 내 알림을 [reminders]로 통째로 바꾼다 */
     @Transaction
     suspend fun replaceReminders(

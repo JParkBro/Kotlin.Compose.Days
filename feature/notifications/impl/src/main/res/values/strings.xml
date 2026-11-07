@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 알림 목록 (시안 notifications) -->
+    <string name="notifications_list_title">알림 목록</string>
+    <string name="notifications_list_back">뒤로</string>
+    <string name="notifications_list_mark_all_read">모두 읽음</string>
+    <string name="notifications_list_group_today">오늘</string>
+    <string name="notifications_list_group_this_week">이번 주</string>
+    <string name="notifications_list_group_this_week_desc">지난 7일</string>
+    <string name="notifications_list_group_earlier">이전</string>
+    <string name="notifications_list_unread">읽지 않음</string>
+    <string name="notifications_list_empty_title">아직 알림이 없어요</string>
+    <string name="notifications_list_empty_desc">기념일 · 일정 알림과 상대의 새 소식이 여기에 모여요</string>
+    <string name="notifications_list_settings">알림 설정 바로가기</string>
+    <string name="notifications_list_retention">알림은 최대 30일간 보관돼요</string>
+    <string name="notifications_list_mark_failed">읽음 처리하지 못했어요. 다시 시도해 주세요</string>
+
+    <!-- 상대 활동 (%1$s = 상대 이름, %2$s = "디데이를" · "일정을") -->
+    <string name="notifications_list_activity_added">%1$s 님이 %2$s 추가했어요</string>
+    <string name="notifications_list_activity_updated">%1$s 님이 %2$s 수정했어요</string>
+    <string name="notifications_list_activity_deleted">%1$s 님이 %2$s 삭제했어요</string>
+    <string name="notifications_list_kind_dday">디데이를</string>
+    <string name="notifications_list_kind_plan">일정을</string>
+    <string name="notifications_list_partner_unknown">상대</string>
+
+    <!-- 보낸 알림 -->
+    <string name="notifications_list_reminder_today">%1$s 당일이에요</string>
+    <string name="notifications_list_reminder_tomorrow">%1$s까지 하루 남았어요</string>
+    <string name="notifications_list_reminder_days_left">%1$s까지 %2$d일 남았어요</string>
+    <string name="notifications_list_anniversary_days">함께한 지 %1$d일이 되었어요</string>
+    <string name="notifications_list_anniversary_years">함께한 지 %1$d주년이 되었어요</string>
+    <string name="notifications_list_anniversary_birthday">%1$s 님의 생일이에요</string>
+    <string name="notifications_list_anniversary_my_birthday">내 생일이에요</string>
+    <string name="notifications_list_anniversary_desc">자동 기념일</string>
+
+    <!-- 지난 시간 -->
+    <string name="notifications_list_elapsed_just_now">방금 전</string>
+    <string name="notifications_list_elapsed_minutes">%1$d분 전</string>
+    <string name="notifications_list_elapsed_hours">%1$d시간 전</string>
+    <string name="notifications_list_elapsed_yesterday">어제</string>
+    <string name="notifications_list_elapsed_days">%1$d일 전</string>
+</resources>

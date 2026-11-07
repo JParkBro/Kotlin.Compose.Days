@@ -1,10 +1,13 @@
 package jpark.bro.days.feature.item.impl.itemedit
 
 import app.cash.turbine.test
+import jpark.bro.days.core.ads.RewardedAdRequest
+import jpark.bro.days.core.ads.RewardedAdResult
 import jpark.bro.days.core.model.AppThemeType
 import jpark.bro.days.core.model.Category
 import jpark.bro.days.core.model.CountMode
 import jpark.bro.days.core.model.Couple
+import jpark.bro.days.core.model.ImageUploadQuota
 import jpark.bro.days.core.model.Item
 import jpark.bro.days.core.model.ItemContent
 import jpark.bro.days.core.model.ItemIcon
@@ -14,6 +17,7 @@ import jpark.bro.days.core.model.RepeatRule
 import jpark.bro.days.core.model.TimeSlot
 import jpark.bro.days.core.model.Visibility
 import jpark.bro.days.core.testing.FakeCoupleRepository
+import jpark.bro.days.core.testing.FakeImageQuotaRepository
 import jpark.bro.days.core.testing.FakeImageRepository
 import jpark.bro.days.core.testing.FakeItemRepository
 import jpark.bro.days.core.testing.MainDispatcherRule
@@ -64,12 +68,13 @@ class ItemEditViewModelTest {
     private val repository = FakeItemRepository(initial = listOf(quitSmoking))
     private val coupleRepository = FakeCoupleRepository()
     private val images = FakeImageRepository()
+    private val quotas = FakeImageQuotaRepository()
 
     private fun viewModel(
         itemId: String? = null,
         type: ItemType = ItemType.DDAY,
         presetDate: String? = null,
-    ) = ItemEditViewModel(ItemEditKey(itemId, type, presetDate), repository, coupleRepository, images, clock)
+    ) = ItemEditViewModel(ItemEditKey(itemId, type, presetDate), repository, coupleRepository, images, quotas, clock)
 
     private fun connect() {
         coupleRepository.couple.value = Couple("couple-1", "user-jimin", LocalDate.of(2025, 6, 14), true)
@@ -99,6 +104,7 @@ class ItemEditViewModelTest {
                 repository,
                 coupleRepository,
                 images,
+                quotas,
                 clock,
             ).state.value
 
@@ -124,11 +130,14 @@ class ItemEditViewModelTest {
         runTest {
             val viewModel = viewModel(presetDate = "2027-03-19")
             viewModel.onAction(ItemEditAction.TitleChanged(" 전역일 "))
-            viewModel.onAction(ItemEditAction.ReminderToggled(7))
-            viewModel.onAction(ItemEditAction.ReminderToggled(0))
             viewModel.onAction(ItemEditAction.PinnedChanged(true))
 
             viewModel.event.test {
+                viewModel.onAction(ItemEditAction.ReminderToggled(7))
+                viewModel.onAction(ItemEditAction.ReminderToggled(0))
+                assertEquals(ItemEditEvent.RequestNotificationPermission, awaitItem())
+                assertEquals(ItemEditEvent.RequestNotificationPermission, awaitItem())
+
                 viewModel.onAction(ItemEditAction.SaveClicked)
                 assertEquals(ItemEditEvent.NavigateBack, awaitItem())
             }
@@ -138,10 +147,25 @@ class ItemEditViewModelTest {
             assertEquals(LocalDate.of(2027, 3, 19), saved.content.date)
             assertEquals(CountMode.DDAY, saved.content.countMode)
             assertEquals(
-                listOf(ItemReminder(0, ReminderTime), ItemReminder(7, ReminderTime)),
+                listOf(ItemReminder(0, ItemReminder.DefaultTime), ItemReminder(7, ItemReminder.DefaultTime)),
                 repository.observeReminders(saved.id).first(),
             )
             assertEquals(saved.id, repository.observePinnedItemId().first())
+        }
+
+    @Test
+    fun `알림을 켜면 알림 권한을 요청하고 끄면 요청하지 않음`() =
+        runTest {
+            val viewModel = viewModel(presetDate = "2027-03-19")
+
+            viewModel.event.test {
+                viewModel.onAction(ItemEditAction.ReminderToggled(1))
+                assertEquals(ItemEditEvent.RequestNotificationPermission, awaitItem())
+
+                viewModel.onAction(ItemEditAction.ReminderToggled(1))
+                expectNoEvents()
+            }
+            assertEquals(emptySet<Int>(), viewModel.state.value.reminderOffsets)
         }
 
     @Test
@@ -163,7 +187,7 @@ class ItemEditViewModelTest {
     @Test
     fun `수정으로 들어오면 저장된 값과 알림 대표 고정을 불러옴`() =
         runTest {
-            repository.setReminders(quitSmoking.id, listOf(ItemReminder(1, ReminderTime)))
+            repository.setReminders(quitSmoking.id, listOf(ItemReminder(1, ItemReminder.DefaultTime)))
             repository.setPinned(quitSmoking.id, pinned = true)
 
             val state = viewModel(itemId = quitSmoking.id).state.value
@@ -451,5 +475,57 @@ class ItemEditViewModelTest {
                 assertEquals(ItemEditEvent.PhotoFailed, awaitItem())
             }
             assertNull(viewModel.state.value.backgroundImageId)
+        }
+
+    private val fullQuota = ImageUploadQuota("user-me", "couple-1", used = 30, bonus = 0)
+
+    @Test
+    fun `나만 보기 항목은 사진 한도를 묻지 않고 사진 선택기를 엶`() =
+        runTest {
+            connect()
+            quotas.quota = fullQuota
+            val viewModel = viewModel()
+            viewModel.onAction(ItemEditAction.VisibilitySelected(Visibility.PRIVATE))
+            viewModel.event.test {
+                viewModel.onAction(ItemEditAction.PhotoClicked)
+                assertEquals(ItemEditEvent.OpenPhotoPicker, awaitItem())
+            }
+            assertNull(viewModel.state.value.imageLimit)
+        }
+
+    @Test
+    fun `공유 항목인데 커플 사진 한도를 다 썼으면 시트를 띄우고 광고를 보면 사진 선택기를 엶`() =
+        runTest {
+            connect()
+            quotas.quota = fullQuota
+            val viewModel = viewModel()
+            viewModel.event.test {
+                viewModel.onAction(ItemEditAction.PhotoClicked)
+                assertEquals(fullQuota, viewModel.state.value.imageLimit)
+
+                viewModel.onAction(ItemEditAction.WatchAdClicked)
+                assertEquals(ItemEditEvent.ShowRewardedAd(RewardedAdRequest("user-me", "couple-1")), awaitItem())
+
+                viewModel.onAction(ItemEditAction.RewardedAdFinished(RewardedAdResult.Earned))
+                assertEquals(ItemEditEvent.OpenPhotoPicker, awaitItem())
+            }
+            assertNull(viewModel.state.value.imageLimit)
+            assertFalse(viewModel.state.value.isRewardWorking)
+        }
+
+    @Test
+    fun `광고를 불러오지 못하면 알리고 시트에 남음`() =
+        runTest {
+            connect()
+            quotas.quota = fullQuota
+            val viewModel = viewModel()
+            viewModel.event.test {
+                viewModel.onAction(ItemEditAction.PhotoClicked)
+                viewModel.onAction(ItemEditAction.WatchAdClicked)
+                awaitItem()
+                viewModel.onAction(ItemEditAction.RewardedAdFinished(RewardedAdResult.Failed))
+                assertEquals(ItemEditEvent.RewardedAdFailed, awaitItem())
+            }
+            assertEquals(fullQuota, viewModel.state.value.imageLimit)
         }
 }

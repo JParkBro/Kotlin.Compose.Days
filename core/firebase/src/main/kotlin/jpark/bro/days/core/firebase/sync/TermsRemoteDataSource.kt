@@ -17,7 +17,22 @@ interface TermsRemoteDataSource {
 
     /** 동의한 서비스 이용약관 버전. 문서나 동의 기록이 없으면 null */
     suspend fun agreedTermsVersion(uid: String): String?
+
+    /** 마케팅 수신 동의. 동의 기록이 없으면 null */
+    suspend fun marketingConsent(uid: String): MarketingConsentDto?
+
+    /** 알림 설정에서 동의 · 철회 (`marketing` · `marketingUpdatedAt` merge) */
+    suspend fun pushMarketingConsent(
+        uid: String,
+        consent: MarketingConsentDto,
+    )
 }
+
+data class MarketingConsentDto(
+    val agreed: Boolean,
+    /** epoch millis. 알림 설정에서 바꾼 적이 없으면 약관 동의 시각 */
+    val updatedAt: Long?,
+)
 
 data class TermsAgreementDto(
     val termsVersion: String,
@@ -50,6 +65,41 @@ internal class FirestoreTermsDataSource(
                 .await()
         return snapshot.data?.string(TERMS_VERSION)
     }
+
+    override suspend fun marketingConsent(uid: String): MarketingConsentDto? {
+        val data =
+            firestore
+                .collection(USERS)
+                .document(uid)
+                .get()
+                .await()
+                .data
+        return data?.let { fields ->
+            (fields[MARKETING] as? Boolean)?.let { agreed ->
+                MarketingConsentDto(
+                    agreed = agreed,
+                    updatedAt = (fields[MARKETING_UPDATED_AT] ?: fields[AGREED_AT]) as? Long,
+                )
+            }
+        }
+    }
+
+    override suspend fun pushMarketingConsent(
+        uid: String,
+        consent: MarketingConsentDto,
+    ) {
+        firestore
+            .collection(USERS)
+            .document(uid)
+            .set(
+                mapOf(
+                    MARKETING to consent.agreed,
+                    MARKETING_UPDATED_AT to checkNotNull(consent.updatedAt),
+                    SERVER_UPDATED_AT to FieldValue.serverTimestamp(),
+                ),
+                SetOptions.merge(),
+            ).await()
+    }
 }
 
 /** 규칙이 `users/{uid}`의 모든 쓰기에 서버 시각을 요구한다 */
@@ -58,10 +108,13 @@ internal fun TermsAgreementDto.toFirestoreMap(): Map<String, Any> =
         TERMS_VERSION to termsVersion,
         "privacyVersion" to privacyVersion,
         "ageOver14" to ageOver14,
-        "marketing" to marketing,
-        "agreedAt" to agreedAt,
+        MARKETING to marketing,
+        AGREED_AT to agreedAt,
         SERVER_UPDATED_AT to FieldValue.serverTimestamp(),
     )
 
 private const val USERS = "users"
 private const val TERMS_VERSION = "termsVersion"
+private const val MARKETING = "marketing"
+private const val MARKETING_UPDATED_AT = "marketingUpdatedAt"
+private const val AGREED_AT = "agreedAt"

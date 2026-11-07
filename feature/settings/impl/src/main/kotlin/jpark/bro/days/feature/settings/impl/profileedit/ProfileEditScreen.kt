@@ -27,6 +27,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import jpark.bro.days.core.ads.rememberRewardedAdLauncher
 import jpark.bro.days.core.designsystem.AppSpacing
 import jpark.bro.days.core.designsystem.AppTheme
 import jpark.bro.days.core.designsystem.AppThemeTokens
@@ -44,6 +45,7 @@ import jpark.bro.days.core.designsystem.component.DaysTopBar
 import jpark.bro.days.core.designsystem.preview.ScreenPreviews
 import jpark.bro.days.core.model.UserProfile
 import jpark.bro.days.core.ui.DaysDatePickerDialog
+import jpark.bro.days.core.ui.ImageLimitSheet
 import jpark.bro.days.core.ui.ObserveEvents
 import jpark.bro.days.core.ui.ProfileAvatar
 import jpark.bro.days.core.ui.rememberPhotoPicker
@@ -52,6 +54,7 @@ import jpark.bro.days.feature.settings.impl.R
 import org.koin.compose.viewmodel.koinViewModel
 import java.time.LocalDate
 import jpark.bro.days.core.designsystem.R as DesignR
+import jpark.bro.days.core.ui.R as UiR
 
 @Composable
 internal fun ProfileEditRoot(
@@ -62,7 +65,10 @@ internal fun ProfileEditRoot(
     val toastHostState = remember { SnackbarHostState() }
     val saveFailed = stringResource(R.string.settings_profile_save_failed)
     val photoFailed = stringResource(R.string.settings_profile_photo_failed)
+    val adFailed = stringResource(UiR.string.common_image_limit_ad_failed)
+    val rewardPending = stringResource(UiR.string.common_image_limit_reward_pending)
     val openPhotoPicker = rememberPhotoPicker { viewModel.onAction(ProfileEditAction.PhotoPicked(it)) }
+    val showRewardedAd = rememberRewardedAdLauncher { viewModel.onAction(ProfileEditAction.RewardedAdFinished(it)) }
 
     ObserveEvents(viewModel.event) { event ->
         when (event) {
@@ -71,6 +77,9 @@ internal fun ProfileEditRoot(
             ProfileEditEvent.NavigateBack -> onBack()
             ProfileEditEvent.OpenPhotoPicker -> openPhotoPicker()
             ProfileEditEvent.PhotoFailed -> toastHostState.showSnackbar(photoFailed)
+            is ProfileEditEvent.ShowRewardedAd -> showRewardedAd(event.request)
+            ProfileEditEvent.RewardedAdFailed -> toastHostState.showSnackbar(adFailed)
+            ProfileEditEvent.RewardPending -> toastHostState.showSnackbar(rewardPending)
         }
     }
 
@@ -170,6 +179,14 @@ private fun ProfileEditScreen(
             maxDate = state.today,
             onConfirm = { onAction(ProfileEditAction.BirthDateSelected(it)) },
             onDismiss = { onAction(ProfileEditAction.BirthDateDismissed) },
+        )
+    }
+    state.imageLimit?.let { quota ->
+        ImageLimitSheet(
+            quota = quota,
+            isWorking = state.isRewardWorking,
+            onWatchAd = { onAction(ProfileEditAction.WatchAdClicked) },
+            onDismiss = { onAction(ProfileEditAction.ImageLimitDismissed) },
         )
     }
 }

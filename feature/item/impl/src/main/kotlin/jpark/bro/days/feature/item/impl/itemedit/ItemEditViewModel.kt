@@ -1,10 +1,14 @@
 package jpark.bro.days.feature.item.impl.itemedit
 
 import androidx.lifecycle.viewModelScope
+import jpark.bro.days.core.ads.RewardedAdRequest
+import jpark.bro.days.core.ads.RewardedAdResult
 import jpark.bro.days.core.data.image.ImageDraft
 import jpark.bro.days.core.data.repository.CoupleRepository
+import jpark.bro.days.core.data.repository.ImageQuotaRepository
 import jpark.bro.days.core.data.repository.ImageRepository
 import jpark.bro.days.core.data.repository.ItemRepository
+import jpark.bro.days.core.data.repository.exhaustedQuotaOrNull
 import jpark.bro.days.core.data.repository.observeImageFileOrNull
 import jpark.bro.days.core.model.Category
 import jpark.bro.days.core.model.CountMode
@@ -36,6 +40,7 @@ internal class ItemEditViewModel(
     private val itemRepository: ItemRepository,
     coupleRepository: CoupleRepository,
     imageRepository: ImageRepository,
+    private val imageQuotaRepository: ImageQuotaRepository,
     clock: Clock,
 ) : MviViewModel<ItemEditState, ItemEditAction, ItemEditEvent>(initialState(key, LocalDate.now(clock))) {
     /** 수정 중인 원본. 화면에 없는 값(완료)을 저장할 때 유지한다 */
@@ -66,7 +71,7 @@ internal class ItemEditViewModel(
 
     override fun onAction(action: ItemEditAction) {
         when (action) {
-            is ItemEditAction.CommonInput -> setState { reduce(action) }
+            is ItemEditAction.CommonInput -> onCommonInput(action)
             is ItemEditAction.DdayInput -> setState { reduce(action) }
             is ItemEditAction.PlanInput -> setState { reduce(action) }
             ItemEditAction.DateClicked -> setState { copy(dialog = ItemEditDialog.DATE) }
@@ -74,11 +79,77 @@ internal class ItemEditViewModel(
             ItemEditAction.DialogDismissed -> setState { copy(dialog = null) }
             ItemEditAction.SaveClicked -> save()
             ItemEditAction.CancelClicked -> cancel()
-            ItemEditAction.PhotoClicked -> sendEvent(ItemEditEvent.OpenPhotoPicker)
-            is ItemEditAction.PhotoPicked -> editPhoto { replace(action.uri).onFailure { photoFailed() } }
-            ItemEditAction.PhotoRemoved -> editPhoto { remove() }
+            is ItemEditAction.PhotoInput -> onPhotoInput(action)
             ItemEditAction.DeleteClicked -> setState { copy(dialog = ItemEditDialog.DELETE_CONFIRM) }
             ItemEditAction.DeleteConfirmed -> delete()
+        }
+    }
+
+    private fun onPhotoInput(action: ItemEditAction.PhotoInput) {
+        when (action) {
+            ItemEditAction.PhotoClicked -> {
+                openPhotoPicker()
+            }
+
+            is ItemEditAction.PhotoPicked -> {
+                editPhoto { replace(action.uri).onFailure { sendEvent(ItemEditEvent.PhotoFailed) } }
+            }
+
+            ItemEditAction.PhotoRemoved -> {
+                editPhoto { remove() }
+            }
+
+            ItemEditAction.WatchAdClicked -> {
+                val quota = currentState.imageLimit ?: return
+                setState { copy(isRewardWorking = true) }
+                sendEvent(ItemEditEvent.ShowRewardedAd(RewardedAdRequest(quota.userId, quota.coupleId)))
+            }
+
+            is ItemEditAction.RewardedAdFinished -> {
+                val quota = currentState.imageLimit
+                if (quota == null || action.result != RewardedAdResult.Earned) {
+                    setState { copy(isRewardWorking = false) }
+                    if (action.result == RewardedAdResult.Failed) sendEvent(ItemEditEvent.RewardedAdFailed)
+                    return
+                }
+                viewModelScope.launch {
+                    val rewarded = imageQuotaRepository.awaitRewardedQuota(quota)
+                    setState { copy(isRewardWorking = false, imageLimit = null) }
+                    sendEvent(if (rewarded.isSuccess) ItemEditEvent.OpenPhotoPicker else ItemEditEvent.RewardPending)
+                }
+            }
+
+            ItemEditAction.ImageLimitDismissed -> {
+                // 광고를 보는 중에는 닫지 않는다 (보상을 기다림)
+                if (!currentState.isRewardWorking) setState { copy(imageLimit = null) }
+            }
+        }
+    }
+
+    /**
+     * 커버 사진은 커플 공유 항목일 때만 커플 저장소에 올라간다. 그때 한도를 다 썼으면 고르기 전에 보상형 광고를 권한다.
+     * 나만 보기 항목은 서버로 보내지 않으니 묻지 않는다
+     */
+    private fun openPhotoPicker() {
+        val state = currentState
+        if (state.isPhotoWorking) return
+        if (state.coupleId == null || state.visibility != Visibility.SHARED) {
+            sendEvent(ItemEditEvent.OpenPhotoPicker)
+            return
+        }
+        setState { copy(isPhotoWorking = true) }
+        viewModelScope.launch {
+            val exhausted = imageQuotaRepository.exhaustedQuotaOrNull()
+            setState { copy(isPhotoWorking = false, imageLimit = exhausted) }
+            if (exhausted == null) sendEvent(ItemEditEvent.OpenPhotoPicker)
+        }
+    }
+
+    private fun onCommonInput(action: ItemEditAction.CommonInput) {
+        setState { reduce(action) }
+        // 알림을 켰을 때만 권한을 묻는다 (끌 때는 묻지 않음)
+        if (action is ItemEditAction.ReminderToggled && action.offsetDays in currentState.reminderOffsets) {
+            sendEvent(ItemEditEvent.RequestNotificationPermission)
         }
     }
 
@@ -110,8 +181,6 @@ internal class ItemEditViewModel(
         }
     }
 
-    private fun photoFailed() = sendEvent(ItemEditEvent.PhotoFailed)
-
     /** 저장하지 않고 닫으면 새로 고른 사진을 버린다 */
     private fun cancel() {
         viewModelScope.launch {
@@ -129,7 +198,7 @@ internal class ItemEditViewModel(
                 itemRepository
                     .saveItem(id = state.itemId, content = state.toContent(original?.content))
                     .getOrElse { return@launch saveFailed() }
-            val reminders = state.reminderOffsets.map { ItemReminder(offsetDays = it, timeOfDay = ReminderTime) }
+            val reminders = state.reminderOffsets.map { ItemReminder(it, ItemReminder.DefaultTime) }
             itemRepository.setReminders(saved.id, reminders).getOrElse { return@launch saveFailed() }
             // 대표 고정은 디데이만 (product-spec 4-5)
             if (state.type == ItemType.DDAY && state.isPinned != originalPinned) {

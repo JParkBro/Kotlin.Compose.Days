@@ -1,7 +1,11 @@
 package jpark.bro.days.feature.settings.impl.profileedit
 
 import app.cash.turbine.test
+import jpark.bro.days.core.ads.RewardedAdRequest
+import jpark.bro.days.core.ads.RewardedAdResult
+import jpark.bro.days.core.model.ImageUploadQuota
 import jpark.bro.days.core.model.UserProfile
+import jpark.bro.days.core.testing.FakeImageQuotaRepository
 import jpark.bro.days.core.testing.FakeImageRepository
 import jpark.bro.days.core.testing.FakeProfileRepository
 import jpark.bro.days.core.testing.MainDispatcherRule
@@ -26,7 +30,8 @@ class ProfileEditViewModelTest {
     private val saved = UserProfile("user-me", "현우", LocalDate.of(1998, 4, 12))
     private val repository = FakeProfileRepository(me = saved)
     private val images = FakeImageRepository()
-    private val viewModel by lazy { ProfileEditViewModel(repository, images, clock) }
+    private val quotas = FakeImageQuotaRepository()
+    private val viewModel by lazy { ProfileEditViewModel(repository, images, quotas, clock) }
 
     @Test
     fun `저장된 프로필로 채우고 바뀐 것이 없으면 저장할 수 없음`() {
@@ -88,7 +93,7 @@ class ProfileEditViewModelTest {
 
     @Test
     fun `처음 설정할 때는 비어 있음`() {
-        val empty = ProfileEditViewModel(FakeProfileRepository(), images, clock)
+        val empty = ProfileEditViewModel(FakeProfileRepository(), images, quotas, clock)
 
         assertEquals("", empty.state.value.nickname)
         assertFalse(empty.state.value.canSave)
@@ -169,5 +174,86 @@ class ProfileEditViewModelTest {
 
             assertNull(repository.myProfile.value?.profileImageId)
             assertEquals(listOf("old"), images.discarded)
+        }
+
+    private val fullQuota = ImageUploadQuota("user-me", "couple-1", used = 30, bonus = 0)
+
+    @Test
+    fun `커플 사진 한도가 남아 있으면 바로 사진 선택기를 엶`() =
+        runTest {
+            quotas.quota = fullQuota.copy(used = 29)
+            viewModel.event.test {
+                viewModel.onAction(ProfileEditAction.PhotoClicked)
+                assertEquals(ProfileEditEvent.OpenPhotoPicker, awaitItem())
+            }
+            assertNull(viewModel.state.value.imageLimit)
+        }
+
+    @Test
+    fun `한도를 읽지 못하면 사진 선택기를 엶 (올릴 때 서버가 다시 막음)`() =
+        runTest {
+            quotas.failQuota = true
+            viewModel.event.test {
+                viewModel.onAction(ProfileEditAction.PhotoClicked)
+                assertEquals(ProfileEditEvent.OpenPhotoPicker, awaitItem())
+            }
+        }
+
+    @Test
+    fun `한도를 다 썼으면 시트를 띄우고 광고를 끝까지 보면 늘어난 한도로 사진 선택기를 엶`() =
+        runTest {
+            quotas.quota = fullQuota
+            viewModel.event.test {
+                viewModel.onAction(ProfileEditAction.PhotoClicked)
+                assertEquals(fullQuota, viewModel.state.value.imageLimit)
+
+                viewModel.onAction(ProfileEditAction.WatchAdClicked)
+                assertEquals(ProfileEditEvent.ShowRewardedAd(RewardedAdRequest("user-me", "couple-1")), awaitItem())
+                assertTrue(viewModel.state.value.isRewardWorking)
+
+                viewModel.onAction(ProfileEditAction.RewardedAdFinished(RewardedAdResult.Earned))
+                assertEquals(ProfileEditEvent.OpenPhotoPicker, awaitItem())
+            }
+            val state = viewModel.state.value
+            assertNull(state.imageLimit)
+            assertFalse(state.isRewardWorking)
+            assertEquals(1, quotas.quota?.bonus)
+        }
+
+    @Test
+    fun `보상이 제때 반영되지 않으면 시트를 닫고 알림`() =
+        runTest {
+            quotas.quota = fullQuota
+            quotas.grantReward = false
+            viewModel.event.test {
+                viewModel.onAction(ProfileEditAction.PhotoClicked)
+                viewModel.onAction(ProfileEditAction.WatchAdClicked)
+                awaitItem()
+                viewModel.onAction(ProfileEditAction.RewardedAdFinished(RewardedAdResult.Earned))
+                assertEquals(ProfileEditEvent.RewardPending, awaitItem())
+            }
+            assertNull(viewModel.state.value.imageLimit)
+        }
+
+    @Test
+    fun `광고를 중간에 닫으면 시트에 남고, 불러오지 못하면 알림`() =
+        runTest {
+            quotas.quota = fullQuota
+            viewModel.event.test {
+                viewModel.onAction(ProfileEditAction.PhotoClicked)
+                viewModel.onAction(ProfileEditAction.WatchAdClicked)
+                awaitItem()
+                viewModel.onAction(ProfileEditAction.RewardedAdFinished(RewardedAdResult.Dismissed))
+                expectNoEvents()
+                assertEquals(fullQuota, viewModel.state.value.imageLimit)
+                assertFalse(viewModel.state.value.isRewardWorking)
+
+                viewModel.onAction(ProfileEditAction.WatchAdClicked)
+                awaitItem()
+                viewModel.onAction(ProfileEditAction.RewardedAdFinished(RewardedAdResult.Failed))
+                assertEquals(ProfileEditEvent.RewardedAdFailed, awaitItem())
+            }
+            viewModel.onAction(ProfileEditAction.ImageLimitDismissed)
+            assertNull(viewModel.state.value.imageLimit)
         }
 }

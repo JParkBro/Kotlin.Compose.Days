@@ -91,21 +91,24 @@ service cloud.firestore {
         allow delete: if false;
       }
 
-      // 사진 업로드 한도 (infra-and-billing-protection.md 2-3): 커플당 누적 30번.
+      // 사진 업로드 한도 (infra-and-billing-protection.md 2-3): 커플당 누적 30번 + 보상형 광고로 받은 bonus.
       // count는 1씩만 늘고 줄지 않는다. lastImageId는 방금 등록한 사진 id로, Storage 규칙이 그 id의 파일만 새로 만들게 한다
       // (+1 한 번에 파일 1개. Storage 규칙의 firestore.get이 이 문서를 읽는다)
+      // bonus는 admobReward 함수(AdMob 서버 측 확인)만 올린다. 앱은 바꿀 수 없다. 함수가 먼저 만든 문서에는 count가 없을 수 있다
       match /usage/{usageId} {
-        function validImageClaim(next) {
+        function validImageClaim(next, bonus) {
           return usageId == 'images'
-            && request.resource.data.keys().hasOnly(['count', 'lastImageId'])
+            && request.resource.data.keys().hasOnly(['count', 'lastImageId', 'bonus'])
+            && request.resource.data.get('bonus', 0) == bonus
             && request.resource.data.count == next
-            && request.resource.data.count <= 30
+            && request.resource.data.count <= 30 + bonus
             && request.resource.data.lastImageId is string
             && request.resource.data.lastImageId.matches('^[0-9a-f-]{36}$');
         }
         allow read: if isMember(coupleId);
-        allow create: if isMember(coupleId) && isActive(coupleId) && validImageClaim(1);
-        allow update: if isMember(coupleId) && isActive(coupleId) && validImageClaim(resource.data.count + 1);
+        allow create: if isMember(coupleId) && isActive(coupleId) && validImageClaim(1, 0);
+        allow update: if isMember(coupleId) && isActive(coupleId)
+          && validImageClaim(resource.data.get('count', 0) + 1, resource.data.get('bonus', 0));
         allow delete: if false;
       }
 

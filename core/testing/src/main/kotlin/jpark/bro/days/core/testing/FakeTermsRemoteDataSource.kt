@@ -1,5 +1,6 @@
 package jpark.bro.days.core.testing
 
+import jpark.bro.days.core.firebase.sync.MarketingConsentDto
 import jpark.bro.days.core.firebase.sync.TermsAgreementDto
 import jpark.bro.days.core.firebase.sync.TermsRemoteDataSource
 
@@ -21,5 +22,21 @@ class FakeTermsRemoteDataSource : TermsRemoteDataSource {
     override suspend fun agreedTermsVersion(uid: String): String? {
         check(!offline) { "오프라인 (테스트)" }
         return agreements[uid]?.termsVersion
+    }
+
+    /** 알림 설정에서 바꾼 마케팅 동의. 없으면 약관 동의 기록의 값 */
+    val marketingConsents = mutableMapOf<String, MarketingConsentDto>()
+
+    override suspend fun marketingConsent(uid: String): MarketingConsentDto? {
+        check(!offline) { "오프라인 (테스트)" }
+        return marketingConsents[uid] ?: agreements[uid]?.let { MarketingConsentDto(it.marketing, it.agreedAt) }
+    }
+
+    override suspend fun pushMarketingConsent(
+        uid: String,
+        consent: MarketingConsentDto,
+    ) {
+        check(!offline) { "오프라인 (테스트)" }
+        marketingConsents[uid] = consent
     }
 }

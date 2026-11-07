@@ -187,6 +187,7 @@ erDiagram
 users/{uid}
   nickname (1~10자), birthDate (yyyy-MM-dd, 없으면 null), profileImageId (지금 커플에 올린 사진만), authProvider, coupleId, serverUpdatedAt,
   termsVersion, privacyVersion, ageOver14, marketing, agreedAt,
+  marketingUpdatedAt (알림 설정에서 마케팅 수신을 바꾼 시각, epoch millis. 없으면 agreedAt),
   updatedAt
 
 pairCodes/{code}

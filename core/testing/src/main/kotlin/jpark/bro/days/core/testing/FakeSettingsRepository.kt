@@ -1,6 +1,7 @@
 package jpark.bro.days.core.testing
 
 import jpark.bro.days.core.data.repository.SettingsRepository
+import jpark.bro.days.core.model.NotificationSettings
 import jpark.bro.days.core.model.ThemeSetting
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,6 +13,7 @@ class FakeSettingsRepository(
     private val theme = MutableStateFlow(initial)
     private val preview = MutableStateFlow<ThemeSetting?>(null)
     private val coupleBannerDismissed = MutableStateFlow(false)
+    private val notificationSettings = MutableStateFlow(NotificationSettings())
 
     /** 현재 미리보기 값 (null이면 미리보기 아님) */
     val themePreview: ThemeSetting? get() = preview.value
@@ -34,6 +36,18 @@ class FakeSettingsRepository(
 
     override fun setThemePreview(setting: ThemeSetting?) {
         preview.value = setting
+    }
+
+    override fun observeNotificationSettings(): Flow<NotificationSettings> = notificationSettings
+
+    override suspend fun setNotificationSettings(settings: NotificationSettings): Result<Unit> {
+        if (failNextSave) {
+            failNextSave = false
+            return Result.failure(IllegalStateException("저장 실패 (테스트)"))
+        }
+        require(settings.sendHour in NotificationSettings.SendHours)
+        notificationSettings.value = settings
+        return Result.success(Unit)
     }
 
     override fun observeCoupleBannerDismissed(): Flow<Boolean> = coupleBannerDismissed

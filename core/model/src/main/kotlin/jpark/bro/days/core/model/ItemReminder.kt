@@ -8,9 +8,10 @@ data class ItemReminder(
     val timeOfDay: LocalTime,
 ) {
     companion object {
-        private const val SEND_HOUR = 9
-
-        /** 알림 발송 시각: 오전 9시 고정 (product-spec 4-5). 저장 · 예약 모두 이 값을 쓴다 */
-        val SendTime: LocalTime = LocalTime.of(SEND_HOUR, 0)
+        /**
+         * 항목 알림에 저장하는 시각. 실제 발송 시각은 알림 설정의 [NotificationSettings.sendHour]라
+         * 이 값은 저장만 하고 쓰지 않는다 (2026-11, 7-3)
+         */
+        val DefaultTime: LocalTime = LocalTime.of(NotificationSettings.DEFAULT_SEND_HOUR, 0)
     }
 }

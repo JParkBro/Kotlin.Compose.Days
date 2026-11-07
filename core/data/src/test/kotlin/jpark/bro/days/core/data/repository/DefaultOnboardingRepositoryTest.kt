@@ -4,6 +4,7 @@ import jpark.bro.days.core.data.ME
 import jpark.bro.days.core.data.PARTNER
 import jpark.bro.days.core.data.Today
 import jpark.bro.days.core.firebase.sync.TermsAgreementDto
+import jpark.bro.days.core.model.MarketingConsent
 import jpark.bro.days.core.testing.FakeTermsRemoteDataSource
 import jpark.bro.days.core.testing.testSettingsDataStore
 import kotlinx.coroutines.test.runTest
@@ -15,8 +16,8 @@ import org.junit.Test
 class DefaultOnboardingRepositoryTest {
     private val session = SwitchableUserSession(ME)
     private val remote = FakeTermsRemoteDataSource()
-    private val repository =
-        DefaultOnboardingRepository(testSettingsDataStore(), session, remote, MutableClock(Today))
+    private val clock = MutableClock(Today)
+    private val repository = DefaultOnboardingRepository(testSettingsDataStore(), session, remote, clock)
 
     @Test
     fun `소개는 한 번 보면 기기에 남음`() =
@@ -75,5 +76,44 @@ class DefaultOnboardingRepositoryTest {
 
             session.userId.value = null
             assertFalse(repository.isOnboarded())
+        }
+
+    @Test
+    fun `알림 설정에서 바꾼 적이 없으면 약관 동의 때 값과 시각`() =
+        runTest {
+            repository.agreeTerms(marketing = true).getOrThrow()
+
+            assertEquals(
+                MarketingConsent(agreed = true, updatedAt = Today.toEpochMilli()),
+                repository.marketingConsent().getOrThrow(),
+            )
+        }
+
+    @Test
+    fun `동의 기록이 없으면 미동의`() =
+        runTest {
+            assertEquals(MarketingConsent(agreed = false, updatedAt = null), repository.marketingConsent().getOrThrow())
+        }
+
+    @Test
+    fun `마케팅 동의를 철회하면 바꾼 시각과 함께 서버에 남음`() =
+        runTest {
+            repository.agreeTerms(marketing = true).getOrThrow()
+            clock.now = Today.plusSeconds(60)
+
+            val saved = repository.setMarketingConsent(agreed = false).getOrThrow()
+
+            val expected = MarketingConsent(agreed = false, updatedAt = clock.now.toEpochMilli())
+            assertEquals(expected, saved)
+            assertEquals(expected, repository.marketingConsent().getOrThrow())
+        }
+
+    @Test
+    fun `오프라인이면 마케팅 동의 조회 · 변경이 실패함`() =
+        runTest {
+            remote.offline = true
+
+            assertTrue(repository.marketingConsent().isFailure)
+            assertTrue(repository.setMarketingConsent(agreed = true).isFailure)
         }
 }

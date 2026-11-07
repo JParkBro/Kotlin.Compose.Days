@@ -137,7 +137,7 @@ internal class ItemEditViewModel(
                 itemRepository
                     .saveItem(id = state.itemId, content = state.toContent(original?.content))
                     .getOrElse { return@launch saveFailed() }
-            val reminders = state.reminderOffsets.map { ItemReminder(it, ItemReminder.SendTime) }
+            val reminders = state.reminderOffsets.map { ItemReminder(it, ItemReminder.DefaultTime) }
             itemRepository.setReminders(saved.id, reminders).getOrElse { return@launch saveFailed() }
             // 대표 고정은 디데이만 (product-spec 4-5)
             if (state.type == ItemType.DDAY && state.isPinned != originalPinned) {

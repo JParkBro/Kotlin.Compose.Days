@@ -3,8 +3,10 @@ package jpark.bro.days.core.data.repository
 import jpark.bro.days.core.common.suspendRunCatching
 import jpark.bro.days.core.data.session.UserSession
 import jpark.bro.days.core.datastore.SettingsDataStore
+import jpark.bro.days.core.firebase.sync.MarketingConsentDto
 import jpark.bro.days.core.firebase.sync.TermsAgreementDto
 import jpark.bro.days.core.firebase.sync.TermsRemoteDataSource
+import jpark.bro.days.core.model.MarketingConsent
 import kotlinx.coroutines.withTimeoutOrNull
 import java.time.Clock
 
@@ -47,6 +49,21 @@ internal class DefaultOnboardingRepository(
                 )
             remoteCall { remote.pushAgreement(userId, agreement) }
             settingsDataStore.setTermsAgreed(userId)
+        }
+
+    override suspend fun marketingConsent(): Result<MarketingConsent> =
+        suspendRunCatching {
+            val userId = userSession.currentUserId()
+            val consent = remoteCall { remote.marketingConsent(userId) }
+            MarketingConsent(agreed = consent?.agreed ?: false, updatedAt = consent?.updatedAt)
+        }
+
+    override suspend fun setMarketingConsent(agreed: Boolean): Result<MarketingConsent> =
+        suspendRunCatching {
+            val userId = userSession.currentUserId()
+            val consent = MarketingConsentDto(agreed = agreed, updatedAt = clock.millis())
+            remoteCall { remote.pushMarketingConsent(userId, consent) }
+            MarketingConsent(agreed = consent.agreed, updatedAt = consent.updatedAt)
         }
 
     /**

@@ -39,8 +39,13 @@ class ReminderNotifier(
         )
     }
 
+    fun notifyAll(reminders: TodayReminders) {
+        reminders.items.forEach(::notifyItem)
+        reminders.anniversaries.forEach { notifyAnniversary(it, reminders.nicknames, reminders.myUserId) }
+    }
+
     /** 제목 = 항목 제목. 누르면 디데이는 상세, 일정은 수정 화면 (MainActivity) */
-    fun notifyItem(reminder: DueReminder) {
+    private fun notifyItem(reminder: DueReminder) {
         val item = reminder.item
         val text =
             when (reminder.offsetDays) {
@@ -58,7 +63,7 @@ class ReminderNotifier(
     }
 
     /** [nicknames]: 생일 기념일의 사용자 id → 이름. [myUserId]의 생일은 "내 생일" */
-    fun notifyAnniversary(
+    private fun notifyAnniversary(
         anniversary: AutoAnniversary,
         nicknames: Map<String, String>,
         myUserId: String?,

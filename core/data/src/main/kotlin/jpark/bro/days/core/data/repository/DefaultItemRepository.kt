@@ -56,6 +56,13 @@ internal class DefaultItemRepository(
             itemReminderDao.observeReminders(userId, itemId).map { reminders -> reminders.map { it.toModel() } }
         }
 
+    override fun observeAllReminders(): Flow<Map<String, List<ItemReminder>>> =
+        perUser(emptyMap()) { userId ->
+            itemReminderDao.observeAllReminders(userId).map { reminders ->
+                reminders.groupBy(keySelector = { it.itemId }, valueTransform = { it.toModel() })
+            }
+        }
+
     override suspend fun saveItem(
         id: String?,
         content: ItemContent,

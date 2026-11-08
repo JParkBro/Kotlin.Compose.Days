@@ -80,6 +80,15 @@ class SettingsDataStore(
         dataStore.edit { prefs -> prefs[TERMS_AGREED_USERS] = prefs[TERMS_AGREED_USERS].orEmpty() + userId }
     }
 
+    /** 탈퇴: 이 계정의 약관 동의 기록과 발급한 커플 코드를 지운다. 테마 · 알림 설정은 기기 설정이라 둔다 */
+    suspend fun removeAccount(userId: String) {
+        dataStore.edit { prefs ->
+            prefs[TERMS_AGREED_USERS] = prefs[TERMS_AGREED_USERS].orEmpty() - userId
+            val issued = prefs[ISSUED_PAIR_CODE]?.let(IssuedPairCode::decode)
+            if (issued?.userId == userId) prefs.remove(ISSUED_PAIR_CODE)
+        }
+    }
+
     suspend fun setThemeSetting(setting: ThemeSetting) {
         dataStore.edit { prefs ->
             prefs[THEME_TYPE] = setting.type.name

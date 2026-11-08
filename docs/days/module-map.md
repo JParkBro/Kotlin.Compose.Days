@@ -187,6 +187,7 @@ days/
    - 8-1 디버그 빌드 전용 설정 "광고 테스트" 섹션 (#40): 사진 한도(count · bonus) 표시 · 한도와 상관없이 보상형 광고 보기 (`AdDebugViewModel`, debuggable일 때만 그림)
    - 8-2 개발자 응원하기 (#41): `core:billing` `PlaySupportStore`(Play Billing 9, 소모형 `support_small` · `support_medium` · `support_large`, 결제되면 바로 소모, 열 때 남은 구매 소모, 서버 없음) · `rememberSupportPurchaseLauncher`. 설정 → 지원 → 개발자 응원하기(`SupportDeveloperKey`, settings impl 내부). 상품이 Play에 없으면 "사용할 수 없어요"
 9. `policy-site/`(Firebase Hosting), 출시 체크리스트 (`infra-and-billing-protection.md`)
+   - 9-2 회원 탈퇴 (#43): `core:data` `AccountRepository`(`AccountAuth` 본인 확인 · 계정 삭제 · 카카오 unlink, `AccountServerData` 내 사진 · 발급 코드 · `users/{uid}`, `AccountLocalData` 이 계정 데이터만), `core:database` `AccountDataDao`, `core:model` `Reauthentication`. 탈퇴 화면: 안내(커플이면 해제 · 상대 사본 · 사진) · 확인 체크 · 같은 수단으로 다시 로그인 → 탈퇴. 공유 항목은 상대에게 사본으로 남긴다 (sync-and-pairing.md 7장)
    - 9-1 정책 문서 (#42): `policy-site/public`(개인정보 처리방침 · 이용약관 초안, 목록, `app-ads.txt`, 테마 토큰 색 · `?theme=`), `firebase.json` `hosting`. 정책 문서 화면(`PolicyDocRoot`)을 `https://days-61328.web.app/{privacy|terms}` 웹뷰로 (로딩 · 실패 · 다시 시도, 설정 · 온보딩 공용)
 10. **직접 확인 · 등록 (마지막 단계, 사람이 콘솔에서)**: 코드로 할 수 없는 일. 항목별 원문 · 완료 표시는 `infra-and-billing-protection.md` 6장 출시 전 체크리스트
     - 정책 문서: `policy-site/` 초안의 노란 표시(운영자 이름 · 문의 이메일 등) 채우기 → Hosting 배포 → Play 개인정보 처리방침 URL · 개발자 웹사이트(`https://days-61328.web.app`) 등록

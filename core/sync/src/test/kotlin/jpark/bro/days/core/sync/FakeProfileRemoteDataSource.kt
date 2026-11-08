@@ -31,4 +31,8 @@ internal class FakeProfileRemoteDataSource : ProfileRemoteDataSource {
         observed += uid
         return changes.filter { it.uid == uid }
     }
+
+    override suspend fun deleteProfile(uid: String) {
+        profiles.remove(uid)
+    }
 }

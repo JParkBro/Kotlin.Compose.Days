@@ -81,6 +81,10 @@ interface ImageSyncDao {
         imageId: String,
         userId: String,
     ): Boolean
+
+    /** 내가 커플 저장소에 올린 사진 (회원 탈퇴 때 서버 파일을 지운다) */
+    @Query("SELECT * FROM image WHERE owner_user_id = :userId AND remote_couple_id IS NOT NULL")
+    suspend fun getUploadedImages(userId: String): List<ImageEntity>
 }
 
 /** `c`가 [userId]의 연결된 커플 (`:userId` 필요) */

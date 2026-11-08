@@ -2,6 +2,7 @@ package jpark.bro.days.core.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import jpark.bro.days.core.database.dao.AccountDataDao
 import jpark.bro.days.core.database.dao.ActivityLogDao
 import jpark.bro.days.core.database.dao.AnniversaryHideDao
 import jpark.bro.days.core.database.dao.CoupleDao
@@ -72,4 +73,6 @@ abstract class DaysDatabase : RoomDatabase() {
     abstract fun imageSyncDao(): ImageSyncDao
 
     abstract fun activityLogDao(): ActivityLogDao
+
+    abstract fun accountDataDao(): AccountDataDao
 }

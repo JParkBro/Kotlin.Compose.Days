@@ -15,6 +15,9 @@ internal enum class SettingsDestination {
 
     /** 다른 앱 둘러보기 */
     MORE_APPS,
+
+    /** 개발자 응원하기 */
+    SUPPORT_DEVELOPER,
     ACCOUNT,
 }
 

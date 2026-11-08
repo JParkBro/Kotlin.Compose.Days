@@ -46,6 +46,7 @@ days/
 │  ├─ sync/           SyncManager, 동기화 · 재시도 Worker
 │  ├─ notification/   기념일 · 일정 로컬 알림, 상대 활동 알림
 │  ├─ ads/            AdMob 보상형 광고 (`RewardedAds` · `rememberRewardedAdLauncher`), 맞춤 광고 동의(UMP)
+│  ├─ billing/        Play Billing 후원 상품 (`SupportStore` · `rememberSupportPurchaseLauncher`)
 │  └─ testing/        Fake, MainDispatcherRule, 테스트 데이터
 ├─ feature/
 │  ├─ onboarding/  api/ impl/
@@ -58,7 +59,7 @@ days/
 └─ widget/           Glance 위젯, 위젯 설정 Activity
 ```
 
-공통 구조에 추가된 데이즈 전용 모듈: `core:firebase`, `core:sync`, `core:notification`, `core:ads`, `widget`.
+공통 구조에 추가된 데이즈 전용 모듈: `core:firebase`, `core:sync`, `core:notification`, `core:ads`, `core:billing`, `widget`. `core:ads` · `core:billing`은 Activity가 필요한 광고 · 결제 창이라 feature impl이 직접 참조한다 (창은 Root가 Event로 띄우고 결과를 Action으로 넘김. 데이터 접근은 그대로 `core:data`).
 
 ## 4. 내비게이션 키
 
@@ -141,7 +142,7 @@ days/
 | `networkModule` | core:network — HttpClient (외부 HTTP가 생기면) |
 | `dataModule`, `domainModule` | core |
 | `syncModule` | core:sync — `SyncEngine` · `SyncManager`. Worker(`SyncPushWorker` · `SyncPullWorker`)는 Android 진입점이라 `KoinComponent`로 꺼낸다 (`WidgetMidnightWorker`와 같은 방식) |
-| `notificationModule`, `adsModule` | core |
+| `notificationModule`, `adsModule`, `billingModule` | core |
 | `{feature}Module` × 7 | 각 impl |
 | `widgetModule` | widget |
 
@@ -182,9 +183,16 @@ days/
    - 7-4 알림 목록 · 상대 활동 알림 (#39): Room `activity_log`(계정별, 30일 보관) · `core:data` `ActivityRepository`(기록하면 상대 활동은 `ActivityNotifier`로 시스템 알림) · `ActivityNotifier` 구현은 `core:notification` `PartnerActivityNotifier`(알림 설정 · 포그라운드면 건너뜀, 채널 `activity`). `core:sync` `CoupleDataSync.applyItems`가 실제로 반영한 상대 변경을 추가 · 수정 · 삭제로 남김(`ItemSyncDao.upsertRemoteItems`가 `AppliedRemoteItem` 반환, 처음 받기는 제외). `ReminderWorker`가 보낸 알림도 기록. 알림 설정에 상대 활동 알림 토글(커플일 때만, `NotificationSettings.activityEnabled`). 알림 목록 화면(`feature:notifications`), `NotificationSettingsKey`를 `settings:api`로, `AutoAnniversary.ruleOf`
    - 7-1 온보딩 (#36): 소개(3장, 기기마다 한 번: DataStore `intro_seen`, 본 뒤로는 로그인부터) → 로그인 → 약관 동의(필수 3 + 마케팅 선택, `users/{uid}`에 `termsVersion` · `privacyVersion` · `ageOver14` · `marketing` · `agreedAt` merge, `core:firebase` `TermsRemoteDataSource`) → 시작 방식(커플 추천 기본). `core:data` `OnboardingRepository`: 동의한 계정을 DataStore `terms_agreed_users`에 남기고, 기록이 없으면 로그인 직후 서버 동의 기록을 한 번 읽어(다시 설치 · 다른 기기) 이미 동의했으면 약관 · 시작 방식 없이 홈으로. 앱 시작은 로그인 + 이 기기 동의 기록이 있을 때만 홈. `PolicyDocKey` · `PolicyType`을 `settings:api`로 옮김 (정책 문서 화면은 9단계)
 8. `core:ads`, 후원 결제 (2026-11 결정: 전면광고 · 광고 제거 구매 없음)
-   - 8-1 보상형 광고 사진 +1장 (#40): `core:ads` `RewardedAds`(UMP 동의 → 불러와 바로 보여주기, SSV 옵션 user_id = uid · custom_data = coupleId) · `rememberRewardedAdLauncher`(Root가 Event로 띄우고 결과를 Action으로), `AdsConfig`는 app이 flavor 값으로(dev = Google 샘플, prod = `local.properties` `admob.appId` · `admob.rewardedAdUnitId`). `firebase/functions/` `admobReward`(AdMob SSV 서명 확인 → `usage/images.bonus` +1, App Check 예외), 규칙 `count <= 30 + bonus`. `core:data` `ImageRepository.uploadQuota` · `awaitRewardedQuota`(`core:model` `ImageUploadQuota`), `core:ui` `ImageLimitSheet`. 커플 프로필 사진 · 공유 항목 커버를 고를 때 한도를 다 썼으면 시트 → 광고 → 사진 선택기. feature impl은 광고 표시 때문에 `core:ads`를 참조한다
-   - 8-2 개발자 응원하기: 혜택 없는 소모형 인앱 상품 3종(Play Billing, 서버 없음), 설정 → 지원
+   - 8-1 보상형 광고 사진 +1장 (#40): `core:ads` `RewardedAds`(UMP 동의 → 불러와 바로 보여주기, SSV 옵션 user_id = uid · custom_data = coupleId) · `rememberRewardedAdLauncher`(Root가 Event로 띄우고 결과를 Action으로), `AdsConfig`는 app이 flavor 값으로(dev = Google 샘플, prod = `local.properties` `admob.appId` · `admob.rewardedAdUnitId`). `firebase/functions/` `admobReward`(AdMob SSV 서명 확인 → `usage/images.bonus` +1, App Check 예외), 규칙 `count <= 30 + bonus`. `core:data` `ImageQuotaRepository.uploadQuota` · `awaitRewardedQuota`(`core:model` `ImageUploadQuota`), `core:ui` `ImageLimitSheet`. 커플 프로필 사진 · 공유 항목 커버를 고를 때 한도를 다 썼으면 시트 → 광고 → 사진 선택기. feature impl은 광고 표시 때문에 `core:ads`를 참조한다
+   - 8-1 디버그 빌드 전용 설정 "광고 테스트" 섹션 (#40): 사진 한도(count · bonus) 표시 · 한도와 상관없이 보상형 광고 보기 (`AdDebugViewModel`, debuggable일 때만 그림)
+   - 8-2 개발자 응원하기 (#41): `core:billing` `PlaySupportStore`(Play Billing 9, 소모형 `support_small` · `support_medium` · `support_large`, 결제되면 바로 소모, 열 때 남은 구매 소모, 서버 없음) · `rememberSupportPurchaseLauncher`. 설정 → 지원 → 개발자 응원하기(`SupportDeveloperKey`, settings impl 내부). 상품이 Play에 없으면 "사용할 수 없어요"
 9. `policy-site/`(Firebase Hosting), 출시 체크리스트 (`infra-and-billing-protection.md`)
+10. **직접 확인 · 등록 (마지막 단계, 사람이 콘솔에서)**: 코드로 할 수 없는 일. 항목별 원문 · 완료 표시는 `infra-and-billing-protection.md` 6장 출시 전 체크리스트
+    - Firebase · Google Cloud: 예산 알림(월 1,000원) · Pub/Sub 연결, App Check(Play Integrity) 등록 · Firestore · Storage · Functions 강제, Storage 버킷(`us-central1`) · `storage.rules` 배포, Remote Config 차단 스위치 4종, 계정 2단계 인증, Identity Platform 미사용 확인, dev · prod 프로젝트 분리 재검토
+    - 키 · 지문: 출시 키 · Play 앱 서명 키의 SHA-1 · SHA-256(Firebase 운영 앱), 카카오 키 해시(운영 네이티브 앱 키)
+    - AdMob: SSV 콜백 끝까지 확인(실기기 테스트 기기 · 출시 후, 함수 로그 `granted`), app-ads.txt(개발자 웹사이트 루트에 `google.com, pub-1183376058550628, DIRECT, f08c47fec0942fa0`), 결제 · 세금 정보, GDPR 메시지(또는 배포 국가 한국으로 제한), 출시 후 앱을 Play 등록정보에 연결
+    - Play Console: 인앱 상품 `support_small` · `support_medium` · `support_large`(소모형 ₩1,200 / ₩3,300 / ₩6,600) 등록 · 활성화, 내부 테스트 트랙 + 라이선스 테스터로 결제 확인, 앱 콘텐츠 "광고 포함", 데이터 보안(광고 ID · 기기 식별자 · 계정 정보), 개인정보 처리방침 URL
+    - 실기기 확인: 구글 · 카카오 로그인, 커플 연결 · 동기화(두 기기), 사진 업로드 · 한도 · 광고 보상, 알림(9시 · 상대 활동), 위젯, 후원 결제
 
 ## 10. widget 모듈 (Glance)
 

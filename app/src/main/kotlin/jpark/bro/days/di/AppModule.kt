@@ -4,6 +4,7 @@ import jpark.bro.days.BuildConfig
 import jpark.bro.days.MainViewModel
 import jpark.bro.days.core.ads.AdsConfig
 import jpark.bro.days.core.ads.di.adsModule
+import jpark.bro.days.core.billing.di.billingModule
 import jpark.bro.days.core.data.di.dataModule
 import jpark.bro.days.core.data.repository.OnboardingRepository
 import jpark.bro.days.core.database.di.databaseModule
@@ -58,6 +59,7 @@ val appModule =
             syncModule,
             notificationModule,
             adsModule,
+            billingModule,
             widgetModule,
             // feature
             onboardingModule,

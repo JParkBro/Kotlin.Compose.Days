@@ -201,8 +201,10 @@ Cloud Billing 예산 (월 1달러 = 결제 계정 통화 기준 1,000원, 알림
 - [ ] App Check(Play Integrity) 등록 및 Firestore · Storage · Functions 강제 설정
 - [ ] 보안 규칙(Firestore · Storage) 배포 및 에뮬레이터 테스트 (연결 · 공유 · 해제 · 비멤버 접근 거부 · 업로드 크기 · 개수)
 - [x] `kakaoAuth` 함수: 카카오 앱 ID 환경 변수, `maxInstances`, App Check 강제 확인 (2026-11 배포 · 실기기 카카오 로그인으로 확인, 실행 계정 `kakao-auth@`)
-- [ ] `admobReward` 함수: 실행 계정 `admob-reward@`(`roles/datastore.user`만) 만들기, `.env.days-61328`에 `ADMOB_REWARD_AD_UNITS`, 배포 후 AdMob 광고 단위의 서버 측 확인 콜백 URL 등록 · "URL 확인"(→ 200 `ignored`)
-- [ ] AdMob 앱 · 보상형 광고 단위 만들기, `local.properties`에 `admob.appId` · `admob.rewardedAdUnitId` (없으면 prod도 Google 샘플 광고), 테스트 기기로 사진 +1장 끝까지 확인
+- [x] `admobReward` 함수: 실행 계정 `admob-reward@`(`roles/datastore.user`만) 만들기, `.env.days-61328`에 `ADMOB_REWARD_AD_UNITS`, 배포 후 AdMob 광고 단위의 서버 측 확인 콜백 URL 등록 · "URL 확인"(→ 200 `ignored`) (2026-11-07)
+- [ ] Play Console 인앱 상품 `support_small` · `support_medium` · `support_large`(소모형, ₩1,200 / ₩3,300 / ₩6,600) 등록 · 활성화, 내부 테스트 트랙 + 라이선스 테스터로 결제 확인 (`ads-strategy.md` 6장)
+- [x] AdMob 앱 · 보상형 광고 단위 만들기, `local.properties`에 `admob.appId` · `admob.rewardedAdUnitId` (없으면 prod도 Google 샘플 광고) (2026-11-07)
+- [ ] 사진 +1장 끝까지 확인: 에뮬레이터(자동 테스트 기기) prod 디버그 빌드에서 광고는 나오지만 SSV 콜백이 아직 오지 않음 (2026-11-08). 실기기 테스트 기기 · 출시 후 다시 확인
 - [ ] Storage 기본 버킷을 `us-central1`로 만들기(2026-11 결정, 무료 사용량), 공개 URL · 공개 읽기 없음 확인, `storage.rules` 배포
 - [ ] Remote Config 차단 스위치 4종 등록 및 앱 동작 확인
 - [ ] Firebase(Google) 계정 2단계 인증 설정

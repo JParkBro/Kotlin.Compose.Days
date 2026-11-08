@@ -1,11 +1,14 @@
 package jpark.bro.days.feature.settings.impl.notificationsettings
 
 import androidx.lifecycle.viewModelScope
+import jpark.bro.days.core.data.repository.CoupleRepository
 import jpark.bro.days.core.data.repository.OnboardingRepository
+import jpark.bro.days.core.data.repository.ProfileRepository
 import jpark.bro.days.core.data.repository.SettingsRepository
 import jpark.bro.days.core.model.MarketingConsent
 import jpark.bro.days.core.model.NotificationSettings
 import jpark.bro.days.core.ui.MviViewModel
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -15,11 +18,13 @@ import java.time.LocalDate
 
 /**
  * 알림 설정 (product-spec 6장).
- * 기념일 · 일정 알림과 알림 시각은 기기에 저장하고, 마케팅 수신 동의는 서버(`users/{uid}`)에서 한 번 읽고 바꿀 때 쓴다.
+ * 기념일 · 일정 · 상대 활동 알림과 알림 시각은 기기에 저장하고, 마케팅 수신 동의는 서버(`users/{uid}`)에서 한 번 읽고 바꿀 때 쓴다.
  */
 internal class NotificationSettingsViewModel(
     private val settingsRepository: SettingsRepository,
     private val onboardingRepository: OnboardingRepository,
+    coupleRepository: CoupleRepository,
+    profileRepository: ProfileRepository,
     private val clock: Clock,
 ) : MviViewModel<NotificationSettingsState, NotificationSettingsAction, NotificationSettingsEvent>(
         NotificationSettingsState(),
@@ -28,6 +33,10 @@ internal class NotificationSettingsViewModel(
         settingsRepository
             .observeNotificationSettings()
             .onEach { settings -> setState { copy(isLoading = false, settings = settings) } }
+            .launchIn(viewModelScope)
+        combine(coupleRepository.observeCouple(), profileRepository.observePartnerProfile()) { couple, partner ->
+            couple?.let { partner?.nickname.orEmpty() }
+        }.onEach { name -> setState { copy(partnerName = name) } }
             .launchIn(viewModelScope)
         loadMarketing()
     }
@@ -56,6 +65,10 @@ internal class NotificationSettingsViewModel(
 
             is NotificationSettingsAction.PlanToggled -> {
                 save { copy(planEnabled = action.enabled) }
+            }
+
+            is NotificationSettingsAction.ActivityToggled -> {
+                save { copy(activityEnabled = action.enabled) }
             }
 
             NotificationSettingsAction.SendHourClicked -> {

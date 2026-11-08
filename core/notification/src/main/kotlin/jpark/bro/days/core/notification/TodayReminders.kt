@@ -8,6 +8,8 @@ import jpark.bro.days.core.data.repository.SettingsRepository
 import jpark.bro.days.core.domain.anniversary.autoAnniversaries
 import jpark.bro.days.core.domain.reminder.DueReminder
 import jpark.bro.days.core.domain.reminder.dueReminders
+import jpark.bro.days.core.model.ActivityContent
+import jpark.bro.days.core.model.ActivityType
 import jpark.bro.days.core.model.AutoAnniversary
 import jpark.bro.days.core.model.ItemType
 import jpark.bro.days.core.model.NotificationSettings
@@ -23,7 +25,19 @@ data class TodayReminders(
     /** 생일 기념일의 사용자 id → 이름 */
     val nicknames: Map<String, String> = emptyMap(),
     val myUserId: String? = null,
-)
+) {
+    /** 알림 목록에 남길 내용 */
+    fun toActivityContents(): List<ActivityContent> =
+        items.map {
+            ActivityContent(
+                type = ActivityType.REMINDER,
+                itemId = it.item.id,
+                itemType = it.item.content.type,
+                itemTitle = it.item.content.title,
+                offsetDays = it.offsetDays,
+            )
+        } + anniversaries.map { ActivityContent(type = ActivityType.ANNIVERSARY, ruleKey = it.ruleKey) }
+}
 
 /**
  * 오늘 보낼 알림을 모은다. 로그인한 계정의 데이터만 본다 (로그아웃이면 보낼 것이 없다).

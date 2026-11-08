@@ -33,7 +33,7 @@ interface SyncRemoteDataSource {
 2. 조건: `serverUpdatedAt > lastPulledAt` 정렬 `serverUpdatedAt`
 3. 받은 항목을 Room에 upsert합니다. `deletedAt`이 있으면 로컬에서도 숨김 처리합니다.
 4. 받은 항목 중 최대 `serverUpdatedAt`을 `sync_cursor.last_pulled_at`에 저장합니다.
-5. 받은 항목의 `updatedBy`가 상대라면 로컬 활동 알림을 생성합니다 ("지민 님이 일정을 추가했어요").
+5. 받은 항목의 `updatedBy`가 상대이고 실제로 반영했으면 `activity_log`에 남기고 로컬 활동 알림을 띄웁니다 ("지민 님이 일정을 추가했어요"). 기기에 없었으면 추가, 이번에 `deletedAt`이 생겼으면 삭제, 나머지는 수정입니다. 처음 받을 때(커서 없음)와 이미 반영한 변경(`updatedAt`이 같거나 이전)은 남기지 않습니다. 앱이 화면에 떠 있거나 알림 설정에서 껐으면 시스템 알림 없이 목록에만 남깁니다 (`CoupleDataSync` → `ActivityRepository` → `core:notification` `PartnerActivityNotifier`).
 6. 백그라운드에서는 WorkManager가 하루 몇 회 1회성 조회(get)로 같은 작업을 하고 위젯을 갱신합니다.
 
 ### 구현 (6-5)

@@ -19,6 +19,10 @@ internal sealed interface NotificationSettingsAction {
         val enabled: Boolean,
     ) : NotificationSettingsAction
 
+    data class ActivityToggled(
+        val enabled: Boolean,
+    ) : NotificationSettingsAction
+
     data object SendHourClicked : NotificationSettingsAction
 
     data class SendHourSelected(

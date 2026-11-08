@@ -10,9 +10,11 @@ import jpark.bro.days.core.data.auth.KakaoSdkSignIn
 import jpark.bro.days.core.data.auth.KakaoSignInClient
 import jpark.bro.days.core.data.couple.CoupleTransitions
 import jpark.bro.days.core.data.image.ImageStore
+import jpark.bro.days.core.data.repository.ActivityRepository
 import jpark.bro.days.core.data.repository.AnniversaryRepository
 import jpark.bro.days.core.data.repository.AuthRepository
 import jpark.bro.days.core.data.repository.CoupleRepository
+import jpark.bro.days.core.data.repository.DefaultActivityRepository
 import jpark.bro.days.core.data.repository.DefaultAnniversaryRepository
 import jpark.bro.days.core.data.repository.DefaultAuthRepository
 import jpark.bro.days.core.data.repository.DefaultCoupleRepository
@@ -59,6 +61,8 @@ val dataModule =
         singleOf(::DefaultImageRepository) bind ImageRepository::class
         singleOf(::DefaultOnboardingRepository) bind OnboardingRepository::class
         singleOf(::DefaultWidgetConfigRepository) bind WidgetConfigRepository::class
+        // ActivityNotifier 구현은 core:notification (notificationModule)
+        singleOf(::DefaultActivityRepository) bind ActivityRepository::class
     }
 
 /** google-services 플러그인이 app 리소스에 만드는 웹 클라이언트 ID. core:data는 app R을 볼 수 없어 이름으로 찾는다 */

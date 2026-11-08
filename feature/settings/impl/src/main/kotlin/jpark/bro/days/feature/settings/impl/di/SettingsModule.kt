@@ -10,6 +10,7 @@ import jpark.bro.days.feature.settings.api.SettingsKey
 import jpark.bro.days.feature.settings.impl.AccountKey
 import jpark.bro.days.feature.settings.impl.MoreAppsKey
 import jpark.bro.days.feature.settings.impl.PolicyListKey
+import jpark.bro.days.feature.settings.impl.SupportDeveloperKey
 import jpark.bro.days.feature.settings.impl.WidgetSettingsKey
 import jpark.bro.days.feature.settings.impl.WithdrawKey
 import jpark.bro.days.feature.settings.impl.account.AccountRoot
@@ -27,6 +28,8 @@ import jpark.bro.days.feature.settings.impl.profileedit.ProfileEditRoot
 import jpark.bro.days.feature.settings.impl.profileedit.ProfileEditViewModel
 import jpark.bro.days.feature.settings.impl.settings.SettingsRoot
 import jpark.bro.days.feature.settings.impl.settings.SettingsViewModel
+import jpark.bro.days.feature.settings.impl.supportdeveloper.SupportDeveloperRoot
+import jpark.bro.days.feature.settings.impl.supportdeveloper.SupportDeveloperViewModel
 import jpark.bro.days.feature.settings.impl.widgetsettings.WidgetSettingsRoot
 import jpark.bro.days.feature.settings.impl.widgetsettings.WidgetSettingsViewModel
 import jpark.bro.days.feature.settings.impl.withdraw.WithdrawRoot
@@ -43,6 +46,7 @@ val settingsModule =
         viewModelOf(::SettingsViewModel)
         viewModelOf(::ProfileEditViewModel)
         viewModelOf(::AdDebugViewModel)
+        viewModelOf(::SupportDeveloperViewModel)
         viewModelOf(::NotificationSettingsViewModel)
         viewModelOf(::WidgetSettingsViewModel)
         viewModelOf(::AccountViewModel)
@@ -86,6 +90,10 @@ val settingsModule =
         navigation<PolicyDocKey> { key ->
             val navigator = get<Navigator>()
             PolicyDocRoot(key = key, onBack = navigator::goBack)
+        }
+        navigation<SupportDeveloperKey> {
+            val navigator = get<Navigator>()
+            SupportDeveloperRoot(onBack = navigator::goBack)
         }
         navigation<MoreAppsKey> {
             val navigator = get<Navigator>()

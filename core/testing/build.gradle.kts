@@ -11,6 +11,7 @@ dependencies {
     // 원격 데이터 소스 Fake · 테스트용 DataStore
     api(projects.core.firebase)
     api(projects.core.datastore)
+    api(projects.core.billing)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.junit)
     implementation(libs.kotlinx.coroutines.test)

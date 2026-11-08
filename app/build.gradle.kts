@@ -83,6 +83,7 @@ dependencies {
     implementation(projects.core.sync)
     implementation(projects.core.notification)
     implementation(projects.core.ads)
+    implementation(projects.core.billing)
     implementation(projects.widget)
 
     // feature

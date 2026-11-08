@@ -61,6 +61,7 @@ import jpark.bro.days.feature.settings.impl.AccountKey
 import jpark.bro.days.feature.settings.impl.MoreAppsKey
 import jpark.bro.days.feature.settings.impl.PolicyListKey
 import jpark.bro.days.feature.settings.impl.R
+import jpark.bro.days.feature.settings.impl.SupportDeveloperKey
 import jpark.bro.days.feature.settings.impl.WidgetSettingsKey
 import jpark.bro.days.feature.settings.impl.addebug.AdDebugRoot
 import jpark.bro.days.feature.settings.impl.settings.components.SettingsMenu
@@ -93,6 +94,7 @@ internal fun SettingsRoot(
                         SettingsDestination.WIDGET -> WidgetSettingsKey
                         SettingsDestination.POLICY -> PolicyListKey
                         SettingsDestination.MORE_APPS -> MoreAppsKey
+                        SettingsDestination.SUPPORT_DEVELOPER -> SupportDeveloperKey
                         SettingsDestination.ACCOUNT -> AccountKey
                     },
                 )

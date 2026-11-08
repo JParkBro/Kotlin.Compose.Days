@@ -150,6 +150,21 @@
     <string name="settings_notification_marketing_save_failed">변경하지 못했어요. 연결을 확인하고 다시 시도해 주세요</string>
     <string name="settings_notification_save_failed">알림 설정을 저장하지 못했어요. 다시 시도해 주세요</string>
     <string name="settings_notification_info">알림은 이 기기에서 만들어져요. 기념일 · 일정 알림은 휴대폰 절전 상태에 따라 몇 분, 상대 활동 알림은 앱을 닫아 두면 최대 6시간 늦게 올 수 있어요.</string>
+    <string name="settings_main_support_developer">개발자 응원하기</string>
+    <string name="settings_support_title">개발자 응원하기</string>
+    <string name="settings_support_back">뒤로 가기</string>
+    <string name="settings_support_desc">데이즈는 혼자 만들고 있어요. 앱이 마음에 드셨다면 작은 응원을 보내 주세요. 서버 비용과 다음 업데이트에 쓰여요.</string>
+    <string name="settings_support_small">따뜻한 응원</string>
+    <string name="settings_support_medium">달콤한 응원</string>
+    <string name="settings_support_large">든든한 응원</string>
+    <string name="settings_support_loading">불러오는 중…</string>
+    <string name="settings_support_unavailable">지금은 응원하기를 사용할 수 없어요.</string>
+    <string name="settings_support_load_failed">Google Play에 연결하지 못했어요.</string>
+    <string name="settings_support_retry">다시 시도</string>
+    <string name="settings_support_note">응원은 기능이나 혜택을 주지 않아요. 결제는 Google Play로 처리돼요.</string>
+    <string name="settings_support_thanks">응원해 주셔서 고마워요!</string>
+    <string name="settings_support_pending">결제가 확인되면 응원이 전해져요.</string>
+    <string name="settings_support_failed">결제를 진행하지 못했어요. 잠시 후 다시 시도해 주세요.</string>
     <!-- 디버그 빌드 전용: 광고 테스트 (출시 빌드에는 보이지 않음) -->
     <string name="settings_debug_ad_section">광고 테스트 (디버그)</string>
     <string name="settings_debug_ad_loading">사진 한도를 읽는 중…</string>

@@ -6,4 +6,11 @@ import java.time.LocalTime
 data class ItemReminder(
     val offsetDays: Int,
     val timeOfDay: LocalTime,
-)
+) {
+    companion object {
+        private const val SEND_HOUR = 9
+
+        /** 알림 발송 시각: 오전 9시 고정 (product-spec 4-5). 저장 · 예약 모두 이 값을 쓴다 */
+        val SendTime: LocalTime = LocalTime.of(SEND_HOUR, 0)
+    }
+}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 알림 채널 (시스템 앱 설정에 보이는 이름) -->
+    <string name="notification_channel_anniversary_name">기념일 알림</string>
+    <string name="notification_channel_anniversary_desc">디데이와 100일 · 주년 · 생일 알림</string>
+    <string name="notification_channel_plan_name">일정 알림</string>
+    <string name="notification_channel_plan_desc">일정 당일 · 미리 알림</string>
+
+    <!-- 디데이 · 일정 알림 본문 (제목은 항목 제목, product-spec 4-5) -->
+    <string name="notification_reminder_today">오늘이에요</string>
+    <string name="notification_reminder_tomorrow">내일이에요</string>
+    <string name="notification_reminder_days_left">%1$d일 남았어요</string>
+
+    <!-- 자동 기념일 당일 알림 (product-spec 2-3) -->
+    <string name="notification_anniversary_days">오늘은 함께한 지 %1$d일이에요</string>
+    <string name="notification_anniversary_years">오늘은 %1$d주년이에요</string>
+    <string name="notification_anniversary_birthday">오늘은 %1$s 님 생일이에요</string>
+    <string name="notification_anniversary_my_birthday">오늘은 내 생일이에요</string>
+    <string name="notification_anniversary_text">축하해요! 오늘을 함께 기억해요</string>
+</resources>

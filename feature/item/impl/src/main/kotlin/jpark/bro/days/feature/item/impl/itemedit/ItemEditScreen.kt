@@ -44,6 +44,7 @@ import jpark.bro.days.core.model.Visibility
 import jpark.bro.days.core.ui.DaysDatePickerDialog
 import jpark.bro.days.core.ui.ObserveEvents
 import jpark.bro.days.core.ui.label
+import jpark.bro.days.core.ui.rememberNotificationPermissionRequest
 import jpark.bro.days.core.ui.rememberPhotoPicker
 import jpark.bro.days.core.ui.toDisplayText
 import jpark.bro.days.feature.item.api.ItemEditKey
@@ -77,6 +78,7 @@ internal fun ItemEditRoot(
     val deleteFailed = stringResource(R.string.item_edit_delete_failed)
     val photoFailed = stringResource(R.string.item_edit_photo_failed)
     val openPhotoPicker = rememberPhotoPicker { viewModel.onAction(ItemEditAction.PhotoPicked(it)) }
+    val requestNotificationPermission = rememberNotificationPermissionRequest()
 
     ObserveEvents(viewModel.event) { event ->
         when (event) {
@@ -85,6 +87,7 @@ internal fun ItemEditRoot(
             ItemEditEvent.DeleteFailed -> toastHostState.showSnackbar(deleteFailed)
             ItemEditEvent.OpenPhotoPicker -> openPhotoPicker()
             ItemEditEvent.PhotoFailed -> toastHostState.showSnackbar(photoFailed)
+            ItemEditEvent.RequestNotificationPermission -> requestNotificationPermission()
         }
     }
 

@@ -12,10 +12,12 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import jpark.bro.days.core.designsystem.AppTheme
 import jpark.bro.days.core.designsystem.isDarkTheme
+import jpark.bro.days.core.model.ItemType
 import jpark.bro.days.core.navigation.AppIntents
 import jpark.bro.days.core.navigation.Navigator
 import jpark.bro.days.feature.home.api.HomeKey
 import jpark.bro.days.feature.item.api.ItemDetailKey
+import jpark.bro.days.feature.item.api.ItemEditKey
 import jpark.bro.days.navigation.DaysApp
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -53,11 +55,14 @@ class MainActivity : ComponentActivity() {
         openItemFrom(intent)
     }
 
-    /** 위젯에서 열면 [홈, 항목 상세] 백스택으로 (module-map 10장) */
+    /** 위젯 · 알림에서 열면 [홈, 항목 상세] 백스택으로 (module-map 10장). 일정은 상세가 없어 수정 화면으로 (product-spec 4-5) */
     private fun openItemFrom(intent: Intent) {
         val itemId = intent.getStringExtra(AppIntents.EXTRA_OPEN_ITEM_ID) ?: return
+        val isPlan = intent.getStringExtra(AppIntents.EXTRA_OPEN_ITEM_TYPE) == ItemType.PLAN.name
         intent.removeExtra(AppIntents.EXTRA_OPEN_ITEM_ID)
+        intent.removeExtra(AppIntents.EXTRA_OPEN_ITEM_TYPE)
         navigator.replaceAll(HomeKey)
-        navigator.goTo(ItemDetailKey(itemId))
+        val target = if (isPlan) ItemEditKey(itemId, ItemType.PLAN, presetDate = null) else ItemDetailKey(itemId)
+        navigator.goTo(target)
     }
 }

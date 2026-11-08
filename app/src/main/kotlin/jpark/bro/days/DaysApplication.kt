@@ -3,6 +3,7 @@ package jpark.bro.days
 import android.app.Application
 import jpark.bro.days.core.data.auth.KakaoSetup
 import jpark.bro.days.core.firebase.FirebaseSetup
+import jpark.bro.days.core.notification.ReminderScheduler
 import jpark.bro.days.core.sync.SyncManager
 import jpark.bro.days.di.appModule
 import jpark.bro.days.widget.WidgetUpdater
@@ -30,5 +31,7 @@ class DaysApplication :
         get<WidgetUpdater>().start()
         // 공유 항목 · 커플 동기화 (로그인 + 포그라운드일 때 리스너, 변경이 생기면 Push 예약)
         get<SyncManager>().start()
+        // 디데이 · 일정 · 자동 기념일 알림: 매일 오전 9시 (product-spec 4-5)
+        get<ReminderScheduler>().start()
     }
 }

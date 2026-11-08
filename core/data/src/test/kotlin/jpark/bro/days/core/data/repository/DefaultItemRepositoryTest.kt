@@ -315,6 +315,22 @@ class DefaultItemRepositoryTest {
         }
 
     @Test
+    fun `내 알림 전체는 항목별로 묶이고 다른 계정 알림은 빠짐`() =
+        runTest {
+            val discharge = repository.saveItem(id = null, content = DischargeDday).getOrThrow()
+            val nine = LocalTime.of(9, 0)
+            repository.setReminders(discharge.id, listOf(ItemReminder(7, nine), ItemReminder(0, nine))).getOrThrow()
+            session.userId.value = "user-other"
+            repository.setReminders(discharge.id, listOf(ItemReminder(1, nine))).getOrThrow()
+            session.userId.value = ME
+
+            assertEquals(
+                mapOf(discharge.id to listOf(0, 7)),
+                repository.observeAllReminders().first().mapValues { (_, list) -> list.map { it.offsetDays } },
+            )
+        }
+
+    @Test
     fun `다른 계정으로 바꾸면 이전 계정의 항목이 보이지 않고 수정 삭제도 못함`() =
         runTest {
             val mine = repository.saveItem(id = null, content = DischargeDday).getOrThrow()

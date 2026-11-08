@@ -66,7 +66,7 @@ internal class ItemEditViewModel(
 
     override fun onAction(action: ItemEditAction) {
         when (action) {
-            is ItemEditAction.CommonInput -> setState { reduce(action) }
+            is ItemEditAction.CommonInput -> onCommonInput(action)
             is ItemEditAction.DdayInput -> setState { reduce(action) }
             is ItemEditAction.PlanInput -> setState { reduce(action) }
             ItemEditAction.DateClicked -> setState { copy(dialog = ItemEditDialog.DATE) }
@@ -79,6 +79,14 @@ internal class ItemEditViewModel(
             ItemEditAction.PhotoRemoved -> editPhoto { remove() }
             ItemEditAction.DeleteClicked -> setState { copy(dialog = ItemEditDialog.DELETE_CONFIRM) }
             ItemEditAction.DeleteConfirmed -> delete()
+        }
+    }
+
+    private fun onCommonInput(action: ItemEditAction.CommonInput) {
+        setState { reduce(action) }
+        // 알림을 켰을 때만 권한을 묻는다 (끌 때는 묻지 않음)
+        if (action is ItemEditAction.ReminderToggled && action.offsetDays in currentState.reminderOffsets) {
+            sendEvent(ItemEditEvent.RequestNotificationPermission)
         }
     }
 
@@ -129,7 +137,7 @@ internal class ItemEditViewModel(
                 itemRepository
                     .saveItem(id = state.itemId, content = state.toContent(original?.content))
                     .getOrElse { return@launch saveFailed() }
-            val reminders = state.reminderOffsets.map { ItemReminder(offsetDays = it, timeOfDay = ReminderTime) }
+            val reminders = state.reminderOffsets.map { ItemReminder(it, ItemReminder.SendTime) }
             itemRepository.setReminders(saved.id, reminders).getOrElse { return@launch saveFailed() }
             // 대표 고정은 디데이만 (product-spec 4-5)
             if (state.type == ItemType.DDAY && state.isPinned != originalPinned) {

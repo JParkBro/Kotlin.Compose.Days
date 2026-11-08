@@ -12,4 +12,7 @@ internal sealed interface ItemEditEvent {
 
     /** 고른 사진을 읽거나 줄이지 못함 */
     data object PhotoFailed : ItemEditEvent
+
+    /** 알림을 하나 켰을 때. 권한이 아직 없으면 요청한다 (Android 13 이상) */
+    data object RequestNotificationPermission : ItemEditEvent
 }

@@ -38,6 +38,21 @@ class FirebaseAuthDataSource(
     fun signOut() {
         auth.signOut()
     }
+
+    /**
+     * 탈퇴 전 본인 확인 (계정 삭제는 최근 로그인이 필요하다). 다른 구글 계정의 토큰이면
+     * Firebase가 거부한다 (FirebaseAuthInvalidUserException, 사용자 불일치)
+     */
+    suspend fun reauthenticateWithGoogle(idToken: String) {
+        val user = checkNotNull(auth.currentUser) { "로그인이 필요합니다." }
+        user.reauthenticate(GoogleAuthProvider.getCredential(idToken, null)).await()
+    }
+
+    /** 로그인 계정 삭제. 최근 로그인이 아니면 FirebaseAuthRecentLoginRequiredException */
+    suspend fun deleteCurrentUser() {
+        val user = checkNotNull(auth.currentUser) { "로그인이 필요합니다." }
+        user.delete().await()
+    }
 }
 
 /** 카카오는 커스텀 토큰이라 uid가 kakao:로 시작한다 (infra-and-billing-protection.md 2-1) */

@@ -33,4 +33,16 @@ interface ImageDao {
 
     @Query("DELETE FROM image WHERE id = :id")
     suspend fun deleteImage(id: String)
+
+    /** 회원 탈퇴 때 지울 사진의 기기 파일 경로: 내 사진 + 내 커플에서 받은 사진 */
+    @Query(
+        """
+        SELECT local_path FROM image
+        WHERE local_path IS NOT NULL AND (owner_user_id = :userId OR remote_couple_id IN (:coupleIds))
+        """,
+    )
+    suspend fun getAccountImagePaths(
+        userId: String,
+        coupleIds: List<String>,
+    ): List<String>
 }

@@ -44,6 +44,12 @@ interface KakaoSignInClient {
 
     /** 카카오 쪽 토큰도 끊는다. 카카오로 로그인하지 않았으면 아무 일도 하지 않는다 */
     suspend fun logout()
+
+    /** 방금 받은 토큰의 카카오 회원번호. 탈퇴 전 본인 확인에서 지금 로그인한 계정과 같은지 비교한다 */
+    suspend fun currentUserId(): Result<Long>
+
+    /** 탈퇴: 앱과 카카오 계정의 연결을 끊는다 (다음 로그인 때 다시 동의). 실패해도 무시한다 */
+    suspend fun unlink()
 }
 
 internal class KakaoSdkSignIn : KakaoSignInClient {
@@ -65,6 +71,29 @@ internal class KakaoSdkSignIn : KakaoSignInClient {
                 }
             token.accessToken
         }
+
+    override suspend fun currentUserId(): Result<Long> =
+        suspendRunCatching {
+            suspendCancellableCoroutine { continuation ->
+                UserApiClient.instance.me { user, error ->
+                    val id = user?.id
+                    if (id != null) {
+                        continuation.resume(id)
+                    } else {
+                        continuation.resumeWithException(error ?: IllegalStateException("카카오 사용자 정보 없음"))
+                    }
+                }
+            }
+        }
+
+    override suspend fun unlink() {
+        if (!KakaoSetup.isInitialized) return
+        suspendRunCatching {
+            suspendCancellableCoroutine { continuation ->
+                UserApiClient.instance.unlink { continuation.resume(Unit) }
+            }
+        }
+    }
 
     override suspend fun logout() {
         if (!KakaoSetup.isInitialized) return

@@ -23,4 +23,5 @@ val databaseModule =
         single { get<DaysDatabase>().imageDao() }
         single { get<DaysDatabase>().imageSyncDao() }
         single { get<DaysDatabase>().activityLogDao() }
+        single { get<DaysDatabase>().accountDataDao() }
     }

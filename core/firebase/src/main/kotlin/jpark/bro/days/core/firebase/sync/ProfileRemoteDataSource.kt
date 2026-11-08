@@ -20,6 +20,9 @@ interface ProfileRemoteDataSource {
 
     /** 연결된 상대 프로필. 앱이 화면에 떠 있을 때만 구독한다 */
     fun observeProfile(uid: String): Flow<ProfileDto>
+
+    /** 탈퇴: `users/{uid}` 문서(프로필 · 약관 동의 기록)를 지운다. 규칙상 본인만 */
+    suspend fun deleteProfile(uid: String)
 }
 
 /**
@@ -52,6 +55,14 @@ internal class FirestoreProfileDataSource(
             .collection(USERS)
             .document(profile.uid)
             .set(data, SetOptions.merge())
+            .await()
+    }
+
+    override suspend fun deleteProfile(uid: String) {
+        firestore
+            .collection(USERS)
+            .document(uid)
+            .delete()
             .await()
     }
 

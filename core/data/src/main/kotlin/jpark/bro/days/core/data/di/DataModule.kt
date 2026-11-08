@@ -4,16 +4,21 @@ import android.annotation.SuppressLint
 import android.content.Context
 import jpark.bro.days.core.common.IdGenerator
 import jpark.bro.days.core.common.UuidIdGenerator
+import jpark.bro.days.core.data.account.AccountAuth
+import jpark.bro.days.core.data.account.AccountLocalData
+import jpark.bro.days.core.data.account.AccountServerData
 import jpark.bro.days.core.data.auth.CredentialManagerGoogleSignIn
 import jpark.bro.days.core.data.auth.GoogleSignInClient
 import jpark.bro.days.core.data.auth.KakaoSdkSignIn
 import jpark.bro.days.core.data.auth.KakaoSignInClient
 import jpark.bro.days.core.data.couple.CoupleTransitions
 import jpark.bro.days.core.data.image.ImageStore
+import jpark.bro.days.core.data.repository.AccountRepository
 import jpark.bro.days.core.data.repository.ActivityRepository
 import jpark.bro.days.core.data.repository.AnniversaryRepository
 import jpark.bro.days.core.data.repository.AuthRepository
 import jpark.bro.days.core.data.repository.CoupleRepository
+import jpark.bro.days.core.data.repository.DefaultAccountRepository
 import jpark.bro.days.core.data.repository.DefaultActivityRepository
 import jpark.bro.days.core.data.repository.DefaultAnniversaryRepository
 import jpark.bro.days.core.data.repository.DefaultAuthRepository
@@ -47,6 +52,10 @@ val dataModule =
         single<IdGenerator> { UuidIdGenerator }
         singleOf(::FirebaseUserSession) bind UserSession::class
         singleOf(::DefaultAuthRepository) bind AuthRepository::class
+        singleOf(::AccountAuth)
+        singleOf(::AccountServerData)
+        singleOf(::AccountLocalData)
+        singleOf(::DefaultAccountRepository) bind AccountRepository::class
         single<GoogleSignInClient> {
             CredentialManagerGoogleSignIn(
                 webClientId = androidContext().defaultWebClientId(),

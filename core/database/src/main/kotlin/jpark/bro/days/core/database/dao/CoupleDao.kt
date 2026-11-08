@@ -32,4 +32,8 @@ interface CoupleDao {
 
     @Upsert
     suspend fun upsertCouple(couple: CoupleEntity)
+
+    /** [userId]가 멤버였던 모든 커플 (연결 · 해제 모두). 회원 탈퇴 때 지울 커플 */
+    @Query("SELECT id FROM couple WHERE member1_user_id = :userId OR member2_user_id = :userId")
+    suspend fun getCoupleIds(userId: String): List<String>
 }

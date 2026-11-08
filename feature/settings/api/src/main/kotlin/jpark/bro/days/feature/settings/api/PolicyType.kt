@@ -3,7 +3,7 @@ package jpark.bro.days.feature.settings.api
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
-/** 정책 문서 (Firebase Hosting 페이지를 웹뷰로 연다, 9단계에서 배포) */
+/** 정책 문서 (Firebase Hosting `policy-site/` 페이지를 웹뷰로 연다) */
 enum class PolicyType {
     PRIVACY,
     TERMS,

@@ -9,7 +9,7 @@
 | `firestore.rules` | 보안 규칙 |
 | `storage.rules` | Storage 보안 규칙 (사진) |
 | `firestore.indexes.json` | 복합 인덱스 |
-| `firebase.json` | 에뮬레이터 설정 |
+| `firebase.json` | 에뮬레이터 설정, Hosting(`../policy-site/public`, `cleanUrls`) |
 | `tests/rules.test.js` · `tests/storage.test.js` | 보안 규칙 테스트 (vitest + `@firebase/rules-unit-testing`, 파일은 차례로 실행) |
 | `functions/` | Cloud Functions (규칙 · 명령은 `functions/CLAUDE.md`) |
 | `package.json` · `.npmrc` | 테스트 도구 (버전 고정). `.npmrc`의 `legacy-peer-deps`는 npm 10 설치 오류 회피용 |
@@ -33,7 +33,8 @@
 | 에뮬레이터 실행 (앱 개발, dev 빌드가 기본으로 연결) | `npm --prefix functions run build && npx firebase emulators:start --only auth,firestore,functions,storage --project days-61328` |
 | 에뮬레이터 실행 (규칙만 볼 때) | `npx firebase emulators:start --project demo-days` |
 | 규칙 테스트 | `npm test` (Firestore · Storage 에뮬레이터를 띄워 vitest 실행, `demo-days` 가짜 프로젝트라 실제 Firebase에 닿지 않음. Java 21+ 필요) |
-| 배포 | 직접 실행하지 않는다. 사용자에게 확인 후 진행 |
+| Hosting 로컬 확인 | `npx firebase emulators:start --only hosting --project demo-days` → `http://127.0.0.1:5002/privacy` |
+| 배포 | 직접 실행하지 않는다. 사용자에게 확인 후 진행 (Hosting: `npx firebase deploy --only hosting --project days-61328`) |
 
 ## 규칙을 바꿀 때 반드시 테스트할 시나리오
 

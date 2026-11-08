@@ -89,6 +89,8 @@
     <string name="settings_policy_oss">오픈소스 라이선스</string>
     <string name="settings_policy_font">Pretendard 글꼴 라이선스</string>
     <string name="settings_policy_font_subtitle">SIL Open Font License 1.1</string>
+    <string name="settings_policy_doc_failed">문서를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.</string>
+    <string name="settings_policy_doc_retry">다시 시도</string>
 
     <!-- 다른 앱 둘러보기 -->
     <string name="settings_more_apps_title">다른 앱 둘러보기</string>

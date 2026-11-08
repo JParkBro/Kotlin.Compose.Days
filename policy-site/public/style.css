@@ -1,0 +1,52 @@
+/* 데이즈 정책 문서. 색은 docs/days/assets/theme-tokens.json pink 테마 값. 앱 웹뷰(?theme=light|dark)와 브라우저(시스템 설정)에서 함께 쓴다 */
+:root {
+  --bg: #FBF8F9;
+  --surface: #ffffff;
+  --text: #221A1E;
+  --text-secondary: #6E6268;
+  --border: #F0E6EA;
+  --primary: #D23C69;
+  --todo-bg: #fff3c4;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161114;
+    --surface: #1F181C;
+    --text: #F7EEF2;
+    --text-secondary: #B8A9B0;
+    --border: #33282E;
+    --primary: #F0709A;
+    --todo-bg: #5a4a10;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #161114;
+  --surface: #1F181C;
+  --text: #F7EEF2;
+  --text-secondary: #B8A9B0;
+  --border: #33282E;
+  --primary: #F0709A;
+  --todo-bg: #5a4a10;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Pretendard", -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  word-break: keep-all;
+}
+main { max-width: 720px; margin: 0 auto; padding: 24px 16px 48px; }
+h1 { font-size: 22px; margin: 0 0 4px; }
+h2 { font-size: 17px; margin: 32px 0 8px; }
+h3 { font-size: 15px; margin: 20px 0 4px; }
+p, li { color: var(--text); }
+.meta { color: var(--text-secondary); font-size: 13px; margin: 0 0 24px; }
+table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 14px; }
+th, td { border: 1px solid var(--border); padding: 8px; text-align: left; vertical-align: top; }
+th { background: var(--surface); }
+a { color: var(--primary); }
+.list a { display: block; padding: 14px 16px; margin: 8px 0; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; text-decoration: none; color: var(--text); }
+.todo { background: var(--todo-bg); padding: 0 4px; border-radius: 4px; }

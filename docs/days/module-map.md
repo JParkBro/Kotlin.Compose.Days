@@ -187,7 +187,9 @@ days/
    - 8-1 디버그 빌드 전용 설정 "광고 테스트" 섹션 (#40): 사진 한도(count · bonus) 표시 · 한도와 상관없이 보상형 광고 보기 (`AdDebugViewModel`, debuggable일 때만 그림)
    - 8-2 개발자 응원하기 (#41): `core:billing` `PlaySupportStore`(Play Billing 9, 소모형 `support_small` · `support_medium` · `support_large`, 결제되면 바로 소모, 열 때 남은 구매 소모, 서버 없음) · `rememberSupportPurchaseLauncher`. 설정 → 지원 → 개발자 응원하기(`SupportDeveloperKey`, settings impl 내부). 상품이 Play에 없으면 "사용할 수 없어요"
 9. `policy-site/`(Firebase Hosting), 출시 체크리스트 (`infra-and-billing-protection.md`)
+   - 9-1 정책 문서 (#42): `policy-site/public`(개인정보 처리방침 · 이용약관 초안, 목록, `app-ads.txt`, 테마 토큰 색 · `?theme=`), `firebase.json` `hosting`. 정책 문서 화면(`PolicyDocRoot`)을 `https://days-61328.web.app/{privacy|terms}` 웹뷰로 (로딩 · 실패 · 다시 시도, 설정 · 온보딩 공용)
 10. **직접 확인 · 등록 (마지막 단계, 사람이 콘솔에서)**: 코드로 할 수 없는 일. 항목별 원문 · 완료 표시는 `infra-and-billing-protection.md` 6장 출시 전 체크리스트
+    - 정책 문서: `policy-site/` 초안의 노란 표시(운영자 이름 · 문의 이메일 등) 채우기 → Hosting 배포 → Play 개인정보 처리방침 URL · 개발자 웹사이트(`https://days-61328.web.app`) 등록
     - Firebase · Google Cloud: 예산 알림(월 1,000원) · Pub/Sub 연결, App Check(Play Integrity) 등록 · Firestore · Storage · Functions 강제, Storage 버킷(`us-central1`) · `storage.rules` 배포, Remote Config 차단 스위치 4종, 계정 2단계 인증, Identity Platform 미사용 확인, dev · prod 프로젝트 분리 재검토
     - 키 · 지문: 출시 키 · Play 앱 서명 키의 SHA-1 · SHA-256(Firebase 운영 앱), 카카오 키 해시(운영 네이티브 앱 키)
     - AdMob: SSV 콜백 끝까지 확인(실기기 테스트 기기 · 출시 후, 함수 로그 `granted`), app-ads.txt(개발자 웹사이트 루트에 `google.com, pub-1183376058550628, DIRECT, f08c47fec0942fa0`), 결제 · 세금 정보, GDPR 메시지(또는 배포 국가 한국으로 제한), 출시 후 앱을 Play 등록정보에 연결

@@ -28,7 +28,7 @@
 | DB · 데이터 모델 | `docs/days/data-model-erd.md` |
 | 동기화 · 커플 연결 | `docs/days/sync-and-pairing.md` |
 | Firebase · Functions · 과금 | `docs/days/infra-and-billing-protection.md`, `docs/days/firebase-cost-strategy.md` |
-| 광고 | `docs/days/ads-strategy.md` |
+| 광고 · 후원 | `docs/days/ads-strategy.md` |
 | 브랜치 · 커밋 · PR | `docs/common/GIT_CONVENTIONS.md` |
 
 ## 절대 어기면 안 되는 결정
@@ -37,7 +37,7 @@
 - **Room이 원본.** 화면은 Room만 구독한다. Firestore는 `visibility = SHARED` 항목과 커플 정보만 오간다.
 - **"나만 보기"(PRIVATE) 데이터는 서버로 보내지 않는다.**
 - **이미지는 Cloud Storage + Storage 보안 규칙으로만 접근한다.** 공개 URL · 공개 읽기 · 장기 다운로드 토큰 공유를 만들지 않는다. 크기 · 형식 · 개수 한도는 규칙(서버)에서 막는다.
-- **함수는 App Check 강제 + `maxInstances` 제한.** 서비스 계정 비공개 키 파일을 만들거나 저장하지 않는다 (함수 실행 서비스 계정 권한으로 처리).
+- **함수는 App Check 강제 + `maxInstances` 제한.** (AdMob이 부르는 `admobReward`만 App Check 대신 AdMob 서명 확인) 서비스 계정 비공개 키 파일을 만들거나 저장하지 않는다 (함수 실행 서비스 계정 권한으로 처리).
 - **ID는 클라이언트 생성 UUID 문자열**, 날짜는 `yyyy-MM-dd`(LocalDate), 시각은 epoch millis. 자동 증가 ID 금지.
 - **자동 기념일(100일 단위 · 주년 · 생일)은 저장하지 않고 계산한다.** 숨긴 것만 저장.
 - **대표 고정 · 알림 설정은 사용자별 데이터**(`user_item_pref`, `item_reminder`)이며 공유하지 않는다.

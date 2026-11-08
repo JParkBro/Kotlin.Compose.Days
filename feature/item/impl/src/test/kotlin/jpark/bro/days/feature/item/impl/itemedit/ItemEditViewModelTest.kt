@@ -1,10 +1,13 @@
 package jpark.bro.days.feature.item.impl.itemedit
 
 import app.cash.turbine.test
+import jpark.bro.days.core.ads.RewardedAdRequest
+import jpark.bro.days.core.ads.RewardedAdResult
 import jpark.bro.days.core.model.AppThemeType
 import jpark.bro.days.core.model.Category
 import jpark.bro.days.core.model.CountMode
 import jpark.bro.days.core.model.Couple
+import jpark.bro.days.core.model.ImageUploadQuota
 import jpark.bro.days.core.model.Item
 import jpark.bro.days.core.model.ItemContent
 import jpark.bro.days.core.model.ItemIcon
@@ -14,6 +17,7 @@ import jpark.bro.days.core.model.RepeatRule
 import jpark.bro.days.core.model.TimeSlot
 import jpark.bro.days.core.model.Visibility
 import jpark.bro.days.core.testing.FakeCoupleRepository
+import jpark.bro.days.core.testing.FakeImageQuotaRepository
 import jpark.bro.days.core.testing.FakeImageRepository
 import jpark.bro.days.core.testing.FakeItemRepository
 import jpark.bro.days.core.testing.MainDispatcherRule
@@ -64,12 +68,13 @@ class ItemEditViewModelTest {
     private val repository = FakeItemRepository(initial = listOf(quitSmoking))
     private val coupleRepository = FakeCoupleRepository()
     private val images = FakeImageRepository()
+    private val quotas = FakeImageQuotaRepository()
 
     private fun viewModel(
         itemId: String? = null,
         type: ItemType = ItemType.DDAY,
         presetDate: String? = null,
-    ) = ItemEditViewModel(ItemEditKey(itemId, type, presetDate), repository, coupleRepository, images, clock)
+    ) = ItemEditViewModel(ItemEditKey(itemId, type, presetDate), repository, coupleRepository, images, quotas, clock)
 
     private fun connect() {
         coupleRepository.couple.value = Couple("couple-1", "user-jimin", LocalDate.of(2025, 6, 14), true)
@@ -99,6 +104,7 @@ class ItemEditViewModelTest {
                 repository,
                 coupleRepository,
                 images,
+                quotas,
                 clock,
             ).state.value
 
@@ -469,5 +475,57 @@ class ItemEditViewModelTest {
                 assertEquals(ItemEditEvent.PhotoFailed, awaitItem())
             }
             assertNull(viewModel.state.value.backgroundImageId)
+        }
+
+    private val fullQuota = ImageUploadQuota("user-me", "couple-1", used = 30, bonus = 0)
+
+    @Test
+    fun `나만 보기 항목은 사진 한도를 묻지 않고 사진 선택기를 엶`() =
+        runTest {
+            connect()
+            quotas.quota = fullQuota
+            val viewModel = viewModel()
+            viewModel.onAction(ItemEditAction.VisibilitySelected(Visibility.PRIVATE))
+            viewModel.event.test {
+                viewModel.onAction(ItemEditAction.PhotoClicked)
+                assertEquals(ItemEditEvent.OpenPhotoPicker, awaitItem())
+            }
+            assertNull(viewModel.state.value.imageLimit)
+        }
+
+    @Test
+    fun `공유 항목인데 커플 사진 한도를 다 썼으면 시트를 띄우고 광고를 보면 사진 선택기를 엶`() =
+        runTest {
+            connect()
+            quotas.quota = fullQuota
+            val viewModel = viewModel()
+            viewModel.event.test {
+                viewModel.onAction(ItemEditAction.PhotoClicked)
+                assertEquals(fullQuota, viewModel.state.value.imageLimit)
+
+                viewModel.onAction(ItemEditAction.WatchAdClicked)
+                assertEquals(ItemEditEvent.ShowRewardedAd(RewardedAdRequest("user-me", "couple-1")), awaitItem())
+
+                viewModel.onAction(ItemEditAction.RewardedAdFinished(RewardedAdResult.Earned))
+                assertEquals(ItemEditEvent.OpenPhotoPicker, awaitItem())
+            }
+            assertNull(viewModel.state.value.imageLimit)
+            assertFalse(viewModel.state.value.isRewardWorking)
+        }
+
+    @Test
+    fun `광고를 불러오지 못하면 알리고 시트에 남음`() =
+        runTest {
+            connect()
+            quotas.quota = fullQuota
+            val viewModel = viewModel()
+            viewModel.event.test {
+                viewModel.onAction(ItemEditAction.PhotoClicked)
+                viewModel.onAction(ItemEditAction.WatchAdClicked)
+                awaitItem()
+                viewModel.onAction(ItemEditAction.RewardedAdFinished(RewardedAdResult.Failed))
+                assertEquals(ItemEditEvent.RewardedAdFailed, awaitItem())
+            }
+            assertEquals(fullQuota, viewModel.state.value.imageLimit)
         }
 }

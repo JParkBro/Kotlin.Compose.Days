@@ -150,4 +150,18 @@
     <string name="settings_notification_marketing_save_failed">변경하지 못했어요. 연결을 확인하고 다시 시도해 주세요</string>
     <string name="settings_notification_save_failed">알림 설정을 저장하지 못했어요. 다시 시도해 주세요</string>
     <string name="settings_notification_info">알림은 이 기기에서 만들어져요. 기념일 · 일정 알림은 휴대폰 절전 상태에 따라 몇 분, 상대 활동 알림은 앱을 닫아 두면 최대 6시간 늦게 올 수 있어요.</string>
+    <!-- 디버그 빌드 전용: 광고 테스트 (출시 빌드에는 보이지 않음) -->
+    <string name="settings_debug_ad_section">광고 테스트 (디버그)</string>
+    <string name="settings_debug_ad_loading">사진 한도를 읽는 중…</string>
+    <string name="settings_debug_ad_no_quota">사진 한도 없음</string>
+    <string name="settings_debug_ad_quota">사진 %1$d / %2$d장 (bonus %3$d, 남음 %4$d)</string>
+    <string name="settings_debug_ad_refresh">새로고침</string>
+    <string name="settings_debug_ad_watch">보상형 광고 보기</string>
+    <string name="settings_debug_ad_watching">확인하는 중…</string>
+    <string name="settings_debug_ad_not_coupled">커플이 아니어서 한도가 없어요. 보상은 커플일 때만 받을 수 있어요.</string>
+    <string name="settings_debug_ad_load_failed">한도를 읽지 못했어요 (오프라인 · 권한 · 에뮬레이터 연결 확인).</string>
+    <string name="settings_debug_ad_dismissed">광고를 끝까지 보지 않아 보상이 없어요.</string>
+    <string name="settings_debug_ad_failed">광고를 불러오거나 보여주지 못했어요.</string>
+    <string name="settings_debug_ad_granted">보상이 반영됐어요 (bonus +1).</string>
+    <string name="settings_debug_ad_pending">20초 안에 보상이 반영되지 않았어요. 함수 로그를 확인하세요 (dev 빌드는 샘플 광고라 콜백이 오지 않음).</string>
 </resources>

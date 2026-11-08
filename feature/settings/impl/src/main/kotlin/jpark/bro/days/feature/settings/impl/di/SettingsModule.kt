@@ -14,6 +14,7 @@ import jpark.bro.days.feature.settings.impl.WidgetSettingsKey
 import jpark.bro.days.feature.settings.impl.WithdrawKey
 import jpark.bro.days.feature.settings.impl.account.AccountRoot
 import jpark.bro.days.feature.settings.impl.account.AccountViewModel
+import jpark.bro.days.feature.settings.impl.addebug.AdDebugViewModel
 import jpark.bro.days.feature.settings.impl.moreapps.MoreAppsRoot
 import jpark.bro.days.feature.settings.impl.moreapps.MoreAppsViewModel
 import jpark.bro.days.feature.settings.impl.notificationsettings.NotificationSettingsRoot
@@ -41,6 +42,7 @@ val settingsModule =
     module {
         viewModelOf(::SettingsViewModel)
         viewModelOf(::ProfileEditViewModel)
+        viewModelOf(::AdDebugViewModel)
         viewModelOf(::NotificationSettingsViewModel)
         viewModelOf(::WidgetSettingsViewModel)
         viewModelOf(::AccountViewModel)

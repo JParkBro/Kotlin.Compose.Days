@@ -15,6 +15,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Days"
         tools:targetApi="31">
+        <!-- AdMob 앱 ID. flavor별 (app/build.gradle.kts admob). 없으면 SDK가 앱 시작 때 멈춘다 -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="${admobAppId}" />
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

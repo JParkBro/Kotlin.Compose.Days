@@ -1,6 +1,8 @@
 package jpark.bro.days.di
 
+import jpark.bro.days.BuildConfig
 import jpark.bro.days.MainViewModel
+import jpark.bro.days.core.ads.AdsConfig
 import jpark.bro.days.core.ads.di.adsModule
 import jpark.bro.days.core.data.di.dataModule
 import jpark.bro.days.core.data.repository.OnboardingRepository
@@ -44,6 +46,7 @@ val appModule =
         singleOf(::AppOnboardingResultHandler) bind OnboardingResultHandler::class
         singleOf(::AppSessionEndedHandler) bind SessionEndedHandler::class
         viewModelOf(::MainViewModel)
+        single { AdsConfig(rewardedAdUnitId = BuildConfig.ADMOB_REWARDED_AD_UNIT_ID) }
 
         includes(
             // core

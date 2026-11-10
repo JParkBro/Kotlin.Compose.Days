@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    release 리소스 축소에서 지우지 않을 리소스.
+    default_web_client_id: core:data가 app R을 볼 수 없어 getIdentifier(이름)로 찾으므로
+    축소기가 참조를 찾지 못해 지운다 (DataModule.defaultWebClientId).
+-->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@string/default_web_client_id" />

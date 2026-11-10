@@ -15,8 +15,8 @@
 days/
 ├─ app/ core/ feature/ widget/ build-logic/   # Android 앱 (루트가 Gradle 프로젝트)
 ├─ firebase/functions/ # Cloud Functions (TypeScript): 카카오 토큰 발급, 결제 자동 해제
-├─ firebase/         # firestore.rules, firestore.indexes.json, firebase.json(에뮬레이터), 규칙 테스트
-├─ policy-site/      # Firebase Hosting: 약관, 개인정보 처리방침, 오픈소스 라이선스
+├─ firebase/         # firestore.rules, firestore.indexes.json, firebase.json(에뮬레이터 · Hosting), 규칙 테스트
+├─ firebase/policy-site/ # Firebase Hosting: 약관, 개인정보 처리방침, app-ads.txt
 ├─ e2e/              # Maestro 흐름
 └─ docs/
    ├─ common/        # 범용 문서
@@ -186,7 +186,7 @@ days/
    - 8-1 보상형 광고 사진 +1장 (#40): `core:ads` `RewardedAds`(UMP 동의 → 불러와 바로 보여주기, SSV 옵션 user_id = uid · custom_data = coupleId) · `rememberRewardedAdLauncher`(Root가 Event로 띄우고 결과를 Action으로), `AdsConfig`는 app이 flavor 값으로(dev = Google 샘플, prod = `local.properties` `admob.appId` · `admob.rewardedAdUnitId`). `firebase/functions/` `admobReward`(AdMob SSV 서명 확인 → `usage/images.bonus` +1, App Check 예외), 규칙 `count <= 30 + bonus`. `core:data` `ImageQuotaRepository.uploadQuota` · `awaitRewardedQuota`(`core:model` `ImageUploadQuota`), `core:ui` `ImageLimitSheet`. 커플 프로필 사진 · 공유 항목 커버를 고를 때 한도를 다 썼으면 시트 → 광고 → 사진 선택기. feature impl은 광고 표시 때문에 `core:ads`를 참조한다
    - 8-1 디버그 빌드 전용 설정 "광고 테스트" 섹션 (#40): 사진 한도(count · bonus) 표시 · 한도와 상관없이 보상형 광고 보기 (`AdDebugViewModel`, debuggable일 때만 그림)
    - 8-2 개발자 응원하기 (#41): `core:billing` `PlaySupportStore`(Play Billing 9, 소모형 `support_small` · `support_medium` · `support_large`, 결제되면 바로 소모, 열 때 남은 구매 소모, 서버 없음) · `rememberSupportPurchaseLauncher`. 설정 → 지원 → 개발자 응원하기(`SupportDeveloperKey`, settings impl 내부). 상품이 Play에 없으면 "사용할 수 없어요"
-9. `policy-site/`(Firebase Hosting), 출시 체크리스트 (`infra-and-billing-protection.md`)
+9. `firebase/policy-site/`(Firebase Hosting), 출시 체크리스트 (`infra-and-billing-protection.md`)
    - 9-2 회원 탈퇴 (#43): `core:data` `AccountRepository`(`AccountAuth` 본인 확인 · 계정 삭제 · 카카오 unlink, `AccountServerData` 내 사진 · 발급 코드 · `users/{uid}`, `AccountLocalData` 이 계정 데이터만), `core:database` `AccountDataDao`, `core:model` `Reauthentication`. 탈퇴 화면: 안내(커플이면 해제 · 상대 사본 · 사진) · 확인 체크 · 같은 수단으로 다시 로그인 → 탈퇴. 공유 항목은 상대에게 사본으로 남긴다 (sync-and-pairing.md 7장)
    - 9-1 정책 문서 (#42): `policy-site/public`(개인정보 처리방침 · 이용약관 초안, 목록, `app-ads.txt`, 테마 토큰 색 · `?theme=`), `firebase.json` `hosting`. 정책 문서 화면(`PolicyDocRoot`)을 `https://days-61328.web.app/{privacy|terms}` 웹뷰로 (로딩 · 실패 · 다시 시도, 설정 · 온보딩 공용)
 10. **직접 확인 · 등록 (마지막 단계, 사람이 콘솔에서)**: 코드로 할 수 없는 일. 항목별 원문 · 완료 표시는 `infra-and-billing-protection.md` 6장 출시 전 체크리스트

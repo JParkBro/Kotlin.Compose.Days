@@ -47,7 +47,7 @@
     "rules": "storage.rules"
   },
   "hosting": {
-    "public": "../policy-site/public",
+    "public": "policy-site/public",
     "cleanUrls": true,
     "trailingSlash": false,
     "headers": [

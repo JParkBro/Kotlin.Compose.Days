@@ -92,7 +92,7 @@ Storage 보안 규칙 (firebase/storage.rules):
 
 ### 2-4. 정책 문서 (Firebase Hosting)
 
-- `policy-site/public/`의 개인정보 처리방침(`/privacy`), 서비스 이용약관(`/terms`), 목록(`/`)을 같은 Firebase 프로젝트의 Hosting(`https://days-61328.web.app`)에 배포합니다. 설정은 `firebase/firebase.json` `hosting`(`public: ../policy-site/public`, `cleanUrls`). 오픈소스 라이선스는 앱의 oss-licenses 화면이라 사이트에 두지 않습니다.
+- `firebase/policy-site/public/`의 개인정보 처리방침(`/privacy`), 서비스 이용약관(`/terms`), 목록(`/`)을 같은 Firebase 프로젝트의 Hosting(`https://days-61328.web.app`)에 배포합니다. 설정은 `firebase/firebase.json` `hosting`(`public: policy-site/public`, `cleanUrls`). Firebase CLI가 프로젝트 폴더(`firebase/`) 밖 경로를 배포하지 못해 `firebase/` 안에 둡니다. 배포는 `cd firebase && npx firebase deploy --only hosting --project days-61328`. 오픈소스 라이선스는 앱의 oss-licenses 화면이라 사이트에 두지 않습니다.
 - Play 스토어 등록에 개인정보 처리방침 URL이 필요하므로 `https://days-61328.web.app/privacy`를 씁니다. 앱의 정책 문서 화면(설정 · 온보딩 약관 동의)은 이 페이지를 `?theme=light|dark`로 웹뷰에서 엽니다. 정적 파일만이라 함수 · Firestore를 쓰지 않습니다 (Hosting 무료 사용량 전송 360MB / 일).
 - `app-ads.txt`도 사이트 루트에 둡니다. Play 등록정보의 **개발자 웹사이트를 `https://days-61328.web.app`으로** 하면 AdMob이 이 파일을 찾습니다.
 - 문서는 초안입니다. 노란 표시(`.todo`: 운영자 이름 · 문의 이메일 · 해제된 커플 공유 데이터 삭제 시점 · 사진 버킷 리전)를 채운 뒤 배포합니다. 내용을 바꾸면 앱의 `TERMS_VERSION` · `PRIVACY_VERSION`(`DefaultOnboardingRepository`)과 시행일을 같이 올립니다.
@@ -213,7 +213,7 @@ Cloud Billing 예산 (월 1달러 = 결제 계정 통화 기준 1,000원, 알림
 - [ ] Firebase(Google) 계정 2단계 인증 설정
 - [x] `policy-site/` 초안의 `.todo`(운영자 이름 · 문의 이메일 · 해제된 커플 공유 데이터 삭제 시점 · 사진 버킷 리전) 채우기 → Hosting 배포 (2026-11-10). 해제 후 30일이 지난 공유 데이터는 자동 삭제 없이 요청 시 삭제로 적음
 - [ ] Play 서비스 약관 URL(`/terms`) · 개인정보 처리방침 URL(`/privacy`) · 개발자 웹사이트(`https://days-61328.web.app`, app-ads.txt) 등록
-- [ ] **Hosting 배포 경로 고치기:** `firebase.json`의 `public: ../policy-site/public`을 Firebase CLI가 "outside of project directory"로 거부함. 2026-11-10 배포는 사이트 파일과 hosting 설정을 임시 폴더에 복사해 배포함
+- [x] **Hosting 배포 경로 고치기:** `firebase.json`의 `public: ../policy-site/public`을 Firebase CLI가 "outside of project directory"로 거부해 사이트를 `firebase/policy-site/`로 옮김 (2026-11-10)
 - [ ] **카카오 키 해시 교체:** 운영용 네이티브 앱 키(`jpark.bro.days`)에 출시용 키 · Play 앱 서명 키의 키 해시를 등록. 지금은 개발 PC의 디버그 키 해시만 등록되어 있음
 - [ ] **Firebase 지문 추가:** 운영 앱(`jpark.bro.days`)에 출시용 키 · Play 앱 서명 키의 SHA-1 · SHA-256 등록 (구글 로그인 · App Check)
 - [ ] **dev · prod Firebase 분리 재검토:** 지금은 한 프로젝트(`days-61328`)를 dev · prod가 함께 씀. 운영 데이터가 생기기 전에 나눌지 결정

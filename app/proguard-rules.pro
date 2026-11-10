@@ -31,6 +31,19 @@
 # 오픈소스 라이선스(OSS Licenses) 화면 관련 클래스 유지
 -keep class com.google.android.gms.oss.licenses.** { *; }
 
+# 카카오 SDK: R8 full mode(AGP 8+) 권장 규칙 (카카오 개발자 문서 "ProGuard 규칙")
+# 응답 모델은 Gson으로 역직렬화하고, API 인터페이스는 Retrofit이 리플렉션으로 읽는다
+-keep class com.kakao.sdk.**.model.* { <fields>; }
+-keep class * extends com.google.gson.TypeAdapter
+-keep interface com.kakao.sdk.**.*Api
+
+# 카카오 SDK가 쓰는 Retrofit 2.9.0에는 R8 full mode 규칙이 없다 (2.10+에 포함)
+# 없으면 Call<T>의 제네릭 시그니처가 지워져 앱 시작 시
+# "Call return type must be parameterized as Call<Foo>"로 크래시한다
+-keep,allowobfuscation,allowshrinking interface retrofit2.Call
+-keep,allowobfuscation,allowshrinking class retrofit2.Response
+-keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
+
 # 로그에서 클래스 이름과 메서드가 난독화되지 않도록 유지
 -keepattributes SourceFile, LineNumberTable
 

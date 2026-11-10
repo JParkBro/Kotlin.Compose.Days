@@ -9,8 +9,9 @@
 | `firestore.rules` | 보안 규칙 |
 | `storage.rules` | Storage 보안 규칙 (사진) |
 | `firestore.indexes.json` | 복합 인덱스 |
-| `firebase.json` | 에뮬레이터 설정, Hosting(`../policy-site/public`, `cleanUrls`) |
+| `firebase.json` | 에뮬레이터 설정, Hosting(`policy-site/public`, `cleanUrls`) |
 | `tests/rules.test.js` · `tests/storage.test.js` | 보안 규칙 테스트 (vitest + `@firebase/rules-unit-testing`, 파일은 차례로 실행) |
+| `policy-site/public/` | 정책 문서 사이트 (Hosting). 배포: `npx firebase deploy --only hosting --project days-61328` |
 | `functions/` | Cloud Functions (규칙 · 명령은 `functions/CLAUDE.md`) |
 | `package.json` · `.npmrc` | 테스트 도구 (버전 고정). `.npmrc`의 `legacy-peer-deps`는 npm 10 설치 오류 회피용 |
 

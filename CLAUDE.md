@@ -9,7 +9,7 @@
 | 루트 (`app/`, `core/`, `feature/`, `widget/`, `build-logic/`) | Android 앱 (Kotlin, Compose, 멀티 모듈) | 이 파일의 "Android 앱" 섹션 |
 | `firebase/` | Firestore · Storage 보안 규칙 · 인덱스 · 에뮬레이터 설정 | `firebase/CLAUDE.md` |
 | `firebase/functions/` | Cloud Functions for Firebase (TypeScript): 카카오 토큰 발급, 결제 자동 해제. Firebase CLI가 프로젝트 폴더 밖 소스를 배포하지 못해 `firebase/` 안에 둔다 | `firebase/functions/CLAUDE.md` |
-| `policy-site/` | Firebase Hosting(`public/`): 개인정보 처리방침 · 이용약관 · app-ads.txt. 배포 설정은 `firebase/firebase.json` | `docs/days/infra-and-billing-protection.md` 2-4 |
+| `firebase/policy-site/` | Firebase Hosting(`public/`): 개인정보 처리방침 · 이용약관 · app-ads.txt. 배포 설정은 `firebase/firebase.json`. Functions와 같은 이유로 `firebase/` 안에 둔다 | `docs/days/infra-and-billing-protection.md` 2-4 |
 | `e2e/` | Maestro 흐름 | – |
 | `docs/common/` | 범용 규칙 (아키텍처, 컨벤션, 테스트, Git) | – |
 | `docs/days/` | 이 프로젝트의 기획 · 데이터 · 인프라 결정 | – |

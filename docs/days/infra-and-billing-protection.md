@@ -211,7 +211,9 @@ Cloud Billing 예산 (월 1달러 = 결제 계정 통화 기준 1,000원, 알림
 - [ ] Storage 기본 버킷을 `us-central1`로 만들기(2026-11 결정, 무료 사용량), 공개 URL · 공개 읽기 없음 확인, `storage.rules` 배포
 - [ ] Remote Config 차단 스위치 4종 등록 및 앱 동작 확인
 - [ ] Firebase(Google) 계정 2단계 인증 설정
-- [ ] `policy-site/` 초안의 `.todo`(운영자 이름 · 문의 이메일 · 해제된 커플 공유 데이터 삭제 시점 · 사진 버킷 리전) 채우기 → `deploy --only hosting` → Play 개인정보 처리방침 URL(`/privacy`) · 개발자 웹사이트(`https://days-61328.web.app`, app-ads.txt) 등록
+- [x] `policy-site/` 초안의 `.todo`(운영자 이름 · 문의 이메일 · 해제된 커플 공유 데이터 삭제 시점 · 사진 버킷 리전) 채우기 → Hosting 배포 (2026-11-10). 해제 후 30일이 지난 공유 데이터는 자동 삭제 없이 요청 시 삭제로 적음
+- [ ] Play 서비스 약관 URL(`/terms`) · 개인정보 처리방침 URL(`/privacy`) · 개발자 웹사이트(`https://days-61328.web.app`, app-ads.txt) 등록
+- [ ] **Hosting 배포 경로 고치기:** `firebase.json`의 `public: ../policy-site/public`을 Firebase CLI가 "outside of project directory"로 거부함. 2026-11-10 배포는 사이트 파일과 hosting 설정을 임시 폴더에 복사해 배포함
 - [ ] **카카오 키 해시 교체:** 운영용 네이티브 앱 키(`jpark.bro.days`)에 출시용 키 · Play 앱 서명 키의 키 해시를 등록. 지금은 개발 PC의 디버그 키 해시만 등록되어 있음
 - [ ] **Firebase 지문 추가:** 운영 앱(`jpark.bro.days`)에 출시용 키 · Play 앱 서명 키의 SHA-1 · SHA-256 등록 (구글 로그인 · App Check)
 - [ ] **dev · prod Firebase 분리 재검토:** 지금은 한 프로젝트(`days-61328`)를 dev · prod가 함께 씀. 운영 데이터가 생기기 전에 나눌지 결정

@@ -81,8 +81,8 @@ internal class DefaultOnboardingRepository(
 
     companion object {
         /** 정책 문서(policy-site, 9단계)의 시행일. 문서를 바꾸면 함께 올린다 */
-        const val TERMS_VERSION = "2026-11-05"
-        const val PRIVACY_VERSION = "2026-11-05"
+        const val TERMS_VERSION = "2026-11-12"
+        const val PRIVACY_VERSION = "2026-11-12"
         private const val REMOTE_TIMEOUT_MILLIS = 10_000L
     }
 }

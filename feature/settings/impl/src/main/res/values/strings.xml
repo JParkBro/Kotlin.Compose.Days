@@ -99,9 +99,9 @@
     <string name="settings_account_provider_google">Google</string>
     <string name="settings_account_provider_kakao">카카오</string>
     <string name="settings_account_logout">로그아웃</string>
-    <string name="settings_account_logout_desc">로그아웃하면 이 기기에 저장한 디데이 · 일정이 모두 지워져요. 우리 둘이 항목은 다시 로그인하면 받아 와요.</string>
+    <string name="settings_account_logout_desc">로그아웃하면 이 기기에 저장한 디데이 · 일정이 모두 지워져요. 우리 둘이 항목은 다시 로그인하면 받아 와요. 먼저 백업 · 복원에서 백업해 두세요.</string>
     <string name="settings_account_logout_confirm_title">로그아웃할까요?</string>
-    <string name="settings_account_logout_confirm_message">이 기기에 저장한 디데이 · 일정(나만 보기 포함), 대표 고정, 알림 설정, 알림 목록이 모두 지워지고 되돌릴 수 없어요. 우리 둘이 항목은 다시 로그인하면 받아 와요.</string>
+    <string name="settings_account_logout_confirm_message">이 기기에 저장한 디데이 · 일정(나만 보기 포함), 대표 고정, 알림 설정, 알림 목록이 모두 지워지고 되돌릴 수 없어요. 우리 둘이 항목은 다시 로그인하면 받아 와요.\n\n먼저 설정 → 백업 · 복원에서 백업해 두세요.</string>
     <string name="settings_account_logout_failed">로그아웃하지 못했어요. 잠시 후 다시 시도해 주세요.</string>
     <string name="settings_account_withdraw">회원 탈퇴</string>
     <string name="settings_withdraw_title">회원 탈퇴</string>

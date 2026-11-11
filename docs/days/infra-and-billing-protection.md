@@ -167,6 +167,8 @@ Cloud Billing 예산 (월 1달러 = 결제 계정 통화 기준 1,000원, 알림
 ### 4-3. Firebase 콘솔 설정
 
 - **App Check:** 두 앱(`jpark.bro.days`, `jpark.bro.days.dev`)을 Play Integrity로 등록. dev는 디버그 제공자 + 디버그 토큰. 동작 확인 후 Firestore · Storage · Functions에 **강제(enforce)**.
+  - Google Cloud 프로젝트에서 **Play Integrity API(`playintegrity.googleapis.com`)를 사용 설정**해야 합니다. 꺼져 있으면 prod 앱의 토큰 교환이 400으로 실패하고, 함수가 `app: INVALID`로 거부해 카카오 로그인이 안 됩니다 (2026-11 확인). Play 앱 서명 키의 SHA-256도 등록합니다 (업로드 키와 다름).
+  - 앱은 **로그인 전 상태로 시작할 때 토큰을 미리 받습니다** (`FirebaseSetup`). 처음 받을 때 약 2초가 걸려, 버튼을 누른 뒤 받으면 카카오 · 구글 로그인이 그만큼 늦어지기 때문입니다. 받은 토큰은 SDK가 저장해 만료(기본 1시간) 전까지 다시 쓰므로, 늘어나는 요청은 로그인 전 앱 실행당 최대 한 번입니다. App Check는 무료이고 Play Integrity는 하루 10,000회까지 무료라, 최악의 경우에도 한도에서 막힐 뿐 요금은 생기지 않습니다.
 - **보안 규칙:** Firestore(`firebase/firestore.rules`) · Storage(`firebase/storage.rules`)는 에뮬레이터 테스트를 통과한 것만 배포. 쿼리 개수 제한(`request.query.limit <= 50`).
 - **Identity Platform으로 업그레이드하지 않기:** 기본 Authentication으로 충분하며, 업그레이드하면 MAU 과금이 생깁니다 (`firebase-cost-strategy.md`).
 - **dev · prod가 한 프로젝트(`days-61328`)를 함께 씀:** 개발 중 버그가 운영 사용량 · 요금으로 이어지므로, 디버그 빌드는 가능한 한 **에뮬레이터**에 연결합니다 (5장 6번).

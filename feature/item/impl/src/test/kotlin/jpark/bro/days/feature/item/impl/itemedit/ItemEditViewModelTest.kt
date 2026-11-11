@@ -402,6 +402,7 @@ class ItemEditViewModelTest {
     @Test
     fun `커버 사진을 고르면 보여주고 저장하면 배경 사진 id가 들어감`() =
         runTest {
+            connect()
             val viewModel = viewModel()
             viewModel.onAction(ItemEditAction.PhotoPicked("content://photo/1"))
             assertEquals(images.files.value["image-1"], viewModel.state.value.backgroundFile)
@@ -416,8 +417,14 @@ class ItemEditViewModelTest {
     @Test
     fun `커버 사진을 바꿔 저장하면 이전 사진을 버리고 취소하면 새 사진만 버림`() =
         runTest {
+            connect()
             images.add("old")
-            val withPhoto = quitSmoking.content.copy(backgroundImageId = "old")
+            val withPhoto =
+                quitSmoking.content.copy(
+                    visibility = Visibility.SHARED,
+                    coupleId = "couple-1",
+                    backgroundImageId = "old",
+                )
             val id = repository.saveItem(id = null, content = withPhoto).getOrThrow().id
 
             val cancelled = viewModel(itemId = id)
@@ -467,6 +474,7 @@ class ItemEditViewModelTest {
     @Test
     fun `사진을 읽지 못하면 알림`() =
         runTest {
+            connect()
             val viewModel = viewModel()
             images.failNextImport = true
 
@@ -522,17 +530,37 @@ class ItemEditViewModelTest {
         }
 
     @Test
-    fun `나만 보기 항목은 사진 한도를 묻지 않고 사진 선택기를 엶`() =
+    fun `솔로 · 나만 보기 디데이는 사진 칸이 없고 사진 선택기를 열지 않음`() =
         runTest {
+            val solo = viewModel()
+            assertFalse(solo.state.value.canAddPhoto)
+
             connect()
             quotas.quota = fullQuota
             val viewModel = viewModel()
+            assertTrue(viewModel.state.value.canAddPhoto)
             viewModel.onAction(ItemEditAction.VisibilitySelected(Visibility.PRIVATE))
+            assertFalse(viewModel.state.value.canAddPhoto)
             viewModel.event.test {
                 viewModel.onAction(ItemEditAction.PhotoClicked)
-                assertEquals(ItemEditEvent.OpenPhotoPicker, awaitItem())
+                expectNoEvents()
             }
             assertNull(viewModel.state.value.imageLimit)
+        }
+
+    @Test
+    fun `사진을 고른 뒤 나만 보기로 바꿔 저장하면 사진 없이 저장하고 고른 사진은 버림`() =
+        runTest {
+            connect()
+            val viewModel = viewModel()
+            viewModel.onAction(ItemEditAction.PhotoPicked("content://photo/1"))
+            viewModel.onAction(ItemEditAction.VisibilitySelected(Visibility.PRIVATE))
+            viewModel.onAction(ItemEditAction.TitleChanged("토익 시험"))
+            viewModel.onAction(ItemEditAction.SaveClicked)
+
+            val saved = repository.observeItems().first().first { it.content.title == "토익 시험" }
+            assertNull(saved.content.backgroundImageId)
+            assertEquals(listOf("image-1"), images.discarded)
         }
 
     @Test

@@ -59,7 +59,7 @@ internal class ItemEditViewModel(
             .launchIn(viewModelScope)
         // 커버 사진이 커플 저장소에 올라가는 경우(우리 둘이 디데이)에만 남은 한도를 읽는다 (바뀔 때마다 서버 읽기 1번)
         state
-            .map { it.type == ItemType.DDAY && it.coupleId != null && it.visibility == Visibility.SHARED }
+            .map { it.canAddPhoto }
             .distinctUntilChanged()
             .mapLatest { uploads -> if (uploads) imageQuotaRepository.uploadQuota().getOrNull()?.remaining else null }
             .onEach { remaining -> setState { copy(photoQuotaRemaining = remaining) } }
@@ -143,16 +143,12 @@ internal class ItemEditViewModel(
     }
 
     /**
-     * 커버 사진은 커플 공유 항목일 때만 커플 저장소에 올라간다. 그때 한도를 다 썼으면 고르기 전에 보상형 광고를 권한다.
-     * 나만 보기 항목은 서버로 보내지 않으니 묻지 않는다
+     * 커버 사진은 우리 둘이 항목만 (product-spec 4-5) 고르고 커플 저장소에 올라간다.
+     * 커플 한도를 다 썼으면 고르기 전에 보상형 광고를 권한다
      */
     private fun openPhotoPicker() {
         val state = currentState
-        if (state.isPhotoWorking) return
-        if (state.coupleId == null || state.visibility != Visibility.SHARED) {
-            sendEvent(ItemEditEvent.OpenPhotoPicker)
-            return
-        }
+        if (state.isPhotoWorking || !state.canAddPhoto) return
         setState { copy(isPhotoWorking = true) }
         viewModelScope.launch {
             val exhausted = imageQuotaRepository.exhaustedQuotaOrNull()
@@ -210,9 +206,12 @@ internal class ItemEditViewModel(
         if (!state.canSave) return
         setState { copy(isSaving = true) }
         viewModelScope.launch {
+            // 사진을 고른 뒤 나만 보기로 바꿨으면 사진을 빼고 저장한다 (사진은 우리 둘이 항목만)
+            if (!state.canAddPhoto) photo.remove()
+            val content = state.copy(backgroundImageId = photo.current).toContent(original?.content)
             val saved =
                 itemRepository
-                    .saveItem(id = state.itemId, content = state.toContent(original?.content))
+                    .saveItem(id = state.itemId, content = content)
                     .getOrElse { return@launch saveFailed() }
             val reminders = state.reminderOffsets.map { ItemReminder(it, ItemReminder.DefaultTime) }
             itemRepository.setReminders(saved.id, reminders).getOrElse { return@launch saveFailed() }

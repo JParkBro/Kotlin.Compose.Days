@@ -189,7 +189,7 @@ private fun ItemEditForm(
             onColorSelect = { onAction(ItemEditAction.ColorSelected(it)) },
         )
     }
-    if (isDday) {
+    if (state.canAddPhoto) {
         EditSection(title = stringResource(R.string.item_edit_photo)) {
             CoverPhotoPicker(
                 file = state.backgroundFile,

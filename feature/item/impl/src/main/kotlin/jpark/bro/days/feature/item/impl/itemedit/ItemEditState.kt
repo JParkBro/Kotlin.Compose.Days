@@ -74,6 +74,9 @@ internal data class ItemEditState(
 ) {
     val showVisibility: Boolean get() = coupleId != null
 
+    /** 커버 사진은 우리 둘이 디데이만 넣는다. 나만 보기 · 솔로 · 일정은 사진 칸이 없다 (product-spec 4-5) */
+    val canAddPhoto: Boolean get() = type == ItemType.DDAY && coupleId != null && visibility == Visibility.SHARED
+
     val isNew: Boolean get() = itemId == null
 
     /** 제목 필수, 디데이는 기준일 필수 (product-spec 2-1) */

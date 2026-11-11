@@ -151,5 +151,38 @@ describe('Storage 사진', () => {
   test('커플 밖 경로는 모두 거부된다', async () => {
     await seedCouple({ count: 1 });
     await assertFails(put(A, `users/${A}/profile.webp`));
+    await assertFails(put(A, `backups/${A}/other.json`, KB, 'application/json'));
+  });
+});
+
+describe('Storage 백업', () => {
+  const backup = (uid) => `backups/${uid}/latest.json`;
+  const putJson = (uid, path, size = KB) => put(uid, path, size, 'application/json');
+
+  test('본인은 JSON 2MB 이하를 올리고 읽고 지울 수 있다', async () => {
+    await assertSucceeds(putJson(A, backup(A)));
+    await assertSucceeds(getBytes(ref(storage(A), backup(A))));
+    await assertSucceeds(deleteObject(ref(storage(A), backup(A))));
+  });
+
+  test('2MB 초과 · JSON이 아닌 형식은 거부된다', async () => {
+    await assertFails(putJson(A, backup(A), 2 * 1024 * KB + 1));
+    await assertFails(put(A, backup(A), KB, 'image/webp'));
+  });
+
+  test('10분 안에 다시 덮어쓸 수 없다', async () => {
+    await assertSucceeds(putJson(A, backup(A)));
+    await assertFails(putJson(A, backup(A)));
+  });
+
+  test('다른 사용자 · 비로그인 사용자는 읽기 · 쓰기 · 삭제가 거부된다', async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await uploadBytes(ref(ctx.storage(), backup(A)), webp(KB), { contentType: 'application/json' });
+    });
+    await assertFails(getBytes(ref(storage(B), backup(A))));
+    await assertFails(putJson(B, backup(A)));
+    await assertFails(deleteObject(ref(storage(B), backup(A))));
+    await assertFails(getBytes(ref(storage(null), backup(A))));
+    await assertFails(putJson(null, backup(A)));
   });
 });

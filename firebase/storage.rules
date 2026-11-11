@@ -28,5 +28,26 @@ service firebase.storage {
       allow update: if false;
       allow delete: if isMember();
     }
+
+    // 백업 (product-spec 6장, infra-and-billing-protection.md 2-6): 본인만, 파일 하나를 덮어쓴다.
+    // Firestore를 읽지 않는다. 최악의 경우 사용자 1명이 10분에 1번 2MB (지웠다 다시 만들면 그 사이 간격은 없다)
+    match /backups/{userId}/latest.json {
+      function isOwner() {
+        return request.auth != null && request.auth.uid == userId;
+      }
+      function isValidBackup() {
+        return request.resource.contentType == 'application/json'
+          && request.resource.size <= 2 * 1024 * 1024;
+      }
+
+      allow read: if isOwner();
+      // 파일을 다시 올리는 것(덮어쓰기)도 create로 검사된다. 이미 있으면 마지막으로 올린 뒤 10분이 지나야 한다
+      allow create: if isOwner() && isValidBackup()
+        && (resource == null || request.time > resource.updated + duration.value(10, 'm'));
+      // 메타데이터만 바꾸는 것은 쓰지 않는다
+      allow update: if false;
+      // 탈퇴할 때 지운다
+      allow delete: if isOwner();
+    }
   }
 }

@@ -26,9 +26,12 @@ import jpark.bro.days.core.ui.MviViewModel
 import jpark.bro.days.feature.item.api.ItemEditKey
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.time.Clock
@@ -53,6 +56,13 @@ internal class ItemEditViewModel(
         photoId
             .flatMapLatest(imageRepository::observeImageFileOrNull)
             .onEach { file -> setState { copy(backgroundFile = file) } }
+            .launchIn(viewModelScope)
+        // 커버 사진이 커플 저장소에 올라가는 경우(우리 둘이 디데이)에만 남은 한도를 읽는다 (바뀔 때마다 서버 읽기 1번)
+        state
+            .map { it.type == ItemType.DDAY && it.coupleId != null && it.visibility == Visibility.SHARED }
+            .distinctUntilChanged()
+            .mapLatest { uploads -> if (uploads) imageQuotaRepository.uploadQuota().getOrNull()?.remaining else null }
+            .onEach { remaining -> setState { copy(photoQuotaRemaining = remaining) } }
             .launchIn(viewModelScope)
         viewModelScope.launch {
             // 연결된 커플은 화면을 여는 시점 기준. 편집 중에 해제되면 공유 저장이 실패하고 안내한다
@@ -114,7 +124,13 @@ internal class ItemEditViewModel(
                 }
                 viewModelScope.launch {
                     val rewarded = imageQuotaRepository.awaitRewardedQuota(quota)
-                    setState { copy(isRewardWorking = false, imageLimit = null) }
+                    setState {
+                        copy(
+                            isRewardWorking = false,
+                            imageLimit = null,
+                            photoQuotaRemaining = rewarded.getOrNull()?.remaining ?: photoQuotaRemaining,
+                        )
+                    }
                     sendEvent(if (rewarded.isSuccess) ItemEditEvent.OpenPhotoPicker else ItemEditEvent.RewardPending)
                 }
             }

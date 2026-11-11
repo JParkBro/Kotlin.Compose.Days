@@ -33,17 +33,29 @@ import jpark.bro.days.feature.item.impl.R
 import java.io.File
 import jpark.bro.days.core.designsystem.R as DesignR
 
-/** 디데이 커버 사진 1장 (product-spec 4-5, 시안 item-edit-dday). 없으면 "사진 추가" 칸 */
+/**
+ * 디데이 커버 사진 1장 (product-spec 4-5, 시안 item-edit-dday). 없으면 "사진 추가" 칸.
+ * [remainingQuota]가 있으면(우리 둘이 항목) 커플이 더 올릴 수 있는 사진 수를 위에 보여준다
+ */
 @Composable
 internal fun CoverPhotoPicker(
     file: File?,
     hasPhoto: Boolean,
     isWorking: Boolean,
+    remainingQuota: Int?,
     onPick: () -> Unit,
     onRemove: () -> Unit,
 ) {
     val colors = AppThemeTokens.colors
     Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.sm)) {
+        if (remainingQuota != null) {
+            Text(
+                text = stringResource(R.string.item_edit_photo_remaining, remainingQuota),
+                style = AppThemeTokens.typography.labelMd,
+                color = colors.textSecondary,
+                modifier = Modifier.testTag("item_edit_photo_remaining"),
+            )
+        }
         Box(
             modifier =
                 Modifier
@@ -103,6 +115,23 @@ private val PhotoHeight = 140.dp
 @Composable
 private fun CoverPhotoPickerPreview() {
     DaysPreviewSurface {
-        CoverPhotoPicker(file = null, hasPhoto = false, isWorking = false, onPick = {}, onRemove = {})
+        Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.lg)) {
+            CoverPhotoPicker(
+                file = null,
+                hasPhoto = false,
+                isWorking = false,
+                remainingQuota = null,
+                onPick = {},
+                onRemove = {},
+            )
+            CoverPhotoPicker(
+                file = null,
+                hasPhoto = false,
+                isWorking = false,
+                remainingQuota = 12,
+                onPick = {},
+                onRemove = {},
+            )
+        }
     }
 }

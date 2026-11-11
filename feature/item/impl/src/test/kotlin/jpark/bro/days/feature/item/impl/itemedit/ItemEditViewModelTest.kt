@@ -480,6 +480,48 @@ class ItemEditViewModelTest {
     private val fullQuota = ImageUploadQuota("user-me", "couple-1", used = 30, bonus = 0)
 
     @Test
+    fun `우리 둘이 디데이는 남은 사진 수를 보여주고 나만 보기로 바꾸면 숨김`() =
+        runTest {
+            connect()
+            quotas.quota = ImageUploadQuota("user-me", "couple-1", used = 18, bonus = 0)
+            val viewModel = viewModel()
+            assertEquals(12, viewModel.state.value.photoQuotaRemaining)
+
+            viewModel.onAction(ItemEditAction.VisibilitySelected(Visibility.PRIVATE))
+            assertNull(viewModel.state.value.photoQuotaRemaining)
+        }
+
+    @Test
+    fun `솔로 · 일정 · 한도 읽기 실패면 남은 사진 수를 보여주지 않음`() =
+        runTest {
+            quotas.quota = ImageUploadQuota("user-me", "couple-1", used = 18, bonus = 0)
+            assertNull(viewModel().state.value.photoQuotaRemaining)
+
+            connect()
+            assertNull(viewModel(type = ItemType.PLAN).state.value.photoQuotaRemaining)
+
+            quotas.failQuota = true
+            assertNull(viewModel().state.value.photoQuotaRemaining)
+        }
+
+    @Test
+    fun `광고 보상을 받으면 남은 사진 수가 늘어남`() =
+        runTest {
+            connect()
+            quotas.quota = fullQuota
+            val viewModel = viewModel()
+            assertEquals(0, viewModel.state.value.photoQuotaRemaining)
+            viewModel.event.test {
+                viewModel.onAction(ItemEditAction.PhotoClicked)
+                viewModel.onAction(ItemEditAction.WatchAdClicked)
+                awaitItem()
+                viewModel.onAction(ItemEditAction.RewardedAdFinished(RewardedAdResult.Earned))
+                awaitItem()
+            }
+            assertEquals(1, viewModel.state.value.photoQuotaRemaining)
+        }
+
+    @Test
     fun `나만 보기 항목은 사진 한도를 묻지 않고 사진 선택기를 엶`() =
         runTest {
             connect()

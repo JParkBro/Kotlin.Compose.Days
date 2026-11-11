@@ -195,6 +195,7 @@ private fun ItemEditForm(
                 file = state.backgroundFile,
                 hasPhoto = state.backgroundImageId != null,
                 isWorking = state.isPhotoWorking,
+                remainingQuota = state.photoQuotaRemaining,
                 onPick = { onAction(ItemEditAction.PhotoClicked) },
                 onRemove = { onAction(ItemEditAction.PhotoRemoved) },
             )

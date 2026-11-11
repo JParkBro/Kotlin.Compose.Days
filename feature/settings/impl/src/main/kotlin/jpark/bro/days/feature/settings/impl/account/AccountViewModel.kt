@@ -19,16 +19,18 @@ internal class AccountViewModel(
 
     override fun onAction(action: AccountAction) {
         when (action) {
-            AccountAction.LogoutClicked -> logout()
+            AccountAction.LogoutClicked -> setState { copy(isLogoutConfirmVisible = true) }
+            AccountAction.LogoutConfirmed -> logout()
+            AccountAction.LogoutDismissed -> setState { copy(isLogoutConfirmVisible = false) }
             AccountAction.WithdrawClicked -> sendEvent(AccountEvent.OpenWithdraw)
             AccountAction.BackClicked -> sendEvent(AccountEvent.NavigateBack)
         }
     }
 
-    /** 기기 데이터는 지우지 않는다. 다른 계정으로 로그인하면 그 계정 항목만 보인다 (product-spec 6장) */
+    /** 이 기기의 이 계정 데이터도 지운다 (product-spec 6장). 확인 창에서 먼저 알린다 */
     private fun logout() {
         if (currentState.isSigningOut) return
-        setState { copy(isSigningOut = true) }
+        setState { copy(isSigningOut = true, isLogoutConfirmVisible = false) }
         viewModelScope.launch {
             authRepository
                 .signOut()

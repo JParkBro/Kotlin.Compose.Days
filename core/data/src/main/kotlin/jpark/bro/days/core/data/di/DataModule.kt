@@ -11,6 +11,7 @@ import jpark.bro.days.core.data.auth.CredentialManagerGoogleSignIn
 import jpark.bro.days.core.data.auth.GoogleSignInClient
 import jpark.bro.days.core.data.auth.KakaoSdkSignIn
 import jpark.bro.days.core.data.auth.KakaoSignInClient
+import jpark.bro.days.core.data.auth.ProviderSessions
 import jpark.bro.days.core.data.couple.CoupleTransitions
 import jpark.bro.days.core.data.image.ImageStore
 import jpark.bro.days.core.data.repository.AccountRepository
@@ -55,6 +56,7 @@ val dataModule =
         singleOf(::AccountAuth)
         singleOf(::AccountServerData)
         singleOf(::AccountLocalData)
+        singleOf(::ProviderSessions)
         singleOf(::DefaultAccountRepository) bind AccountRepository::class
         single<GoogleSignInClient> {
             CredentialManagerGoogleSignIn(

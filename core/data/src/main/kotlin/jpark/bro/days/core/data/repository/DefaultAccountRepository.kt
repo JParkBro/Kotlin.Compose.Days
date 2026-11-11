@@ -4,6 +4,7 @@ import jpark.bro.days.core.common.suspendRunCatching
 import jpark.bro.days.core.data.account.AccountAuth
 import jpark.bro.days.core.data.account.AccountLocalData
 import jpark.bro.days.core.data.account.AccountServerData
+import jpark.bro.days.core.data.auth.ProviderSessions
 import jpark.bro.days.core.data.session.UserSession
 import jpark.bro.days.core.model.Reauthentication
 import kotlinx.coroutines.flow.first
@@ -14,6 +15,7 @@ internal class DefaultAccountRepository(
     private val coupleRepository: CoupleRepository,
     private val serverData: AccountServerData,
     private val localData: AccountLocalData,
+    private val providerSessions: ProviderSessions,
 ) : AccountRepository {
     override suspend fun withdraw(reauthentication: Reauthentication): Result<Unit> =
         suspendRunCatching {
@@ -28,6 +30,6 @@ internal class DefaultAccountRepository(
             serverData.delete(me)
             accountAuth.deleteAccount()
             localData.delete(me)
-            accountAuth.unlinkKakao()
+            providerSessions.clear(unlinkKakao = true)
         }
 }

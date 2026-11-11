@@ -76,8 +76,6 @@ internal fun WithdrawRoot(
             }
 
             WithdrawEvent.Withdrawn -> {
-                // 다음 로그인에서 구글 계정을 다시 고르게 한다 (카카오 연결은 탈퇴에서 끊었다)
-                googleSignIn.clearCredentialState(context)
                 onSessionEnded()
             }
 

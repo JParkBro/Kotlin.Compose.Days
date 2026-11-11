@@ -68,9 +68,14 @@ internal data class ItemEditState(
     val imageLimit: ImageUploadQuota? = null,
     /** 광고를 보는 중이거나 보상 반영을 기다리는 중 */
     val isRewardWorking: Boolean = false,
+    /** 커플이 더 올릴 수 있는 사진 수. 우리 둘이 디데이일 때만 사진 칸 위에 보인다 (null이면 숨김 · 읽지 못함) */
+    val photoQuotaRemaining: Int? = null,
     val dialog: ItemEditDialog? = null,
 ) {
     val showVisibility: Boolean get() = coupleId != null
+
+    /** 커버 사진은 우리 둘이 디데이만 넣는다. 나만 보기 · 솔로 · 일정은 사진 칸이 없다 (product-spec 4-5) */
+    val canAddPhoto: Boolean get() = type == ItemType.DDAY && coupleId != null && visibility == Visibility.SHARED
 
     val isNew: Boolean get() = itemId == null
 

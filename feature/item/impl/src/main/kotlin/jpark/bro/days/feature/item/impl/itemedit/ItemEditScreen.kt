@@ -189,12 +189,13 @@ private fun ItemEditForm(
             onColorSelect = { onAction(ItemEditAction.ColorSelected(it)) },
         )
     }
-    if (isDday) {
+    if (state.canAddPhoto) {
         EditSection(title = stringResource(R.string.item_edit_photo)) {
             CoverPhotoPicker(
                 file = state.backgroundFile,
                 hasPhoto = state.backgroundImageId != null,
                 isWorking = state.isPhotoWorking,
+                remainingQuota = state.photoQuotaRemaining,
                 onPick = { onAction(ItemEditAction.PhotoClicked) },
                 onRemove = { onAction(ItemEditAction.PhotoRemoved) },
             )

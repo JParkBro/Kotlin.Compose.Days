@@ -66,6 +66,7 @@
 
     <string name="item_edit_photo">커버 사진 (선택)</string>
     <string name="item_edit_photo_add">사진 추가</string>
+    <string name="item_edit_photo_remaining">남은 무료 사진 %1$d장</string>
     <string name="item_edit_photo_change">사진 변경</string>
     <string name="item_edit_photo_remove">사진 삭제</string>
     <string name="item_edit_photo_description">커버 사진</string>

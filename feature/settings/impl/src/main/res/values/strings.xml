@@ -71,6 +71,28 @@
     <string name="settings_widget_add_failed">이 홈 화면 앱은 바로 추가를 지원하지 않아요. 홈 화면을 길게 눌러 추가해 주세요.</string>
 
     <!-- 계정 관리 (product-spec 6장) -->
+    <string name="settings_main_backup">백업 · 복원</string>
+    <string name="settings_main_backup_desc">로그아웃 전에 백업해 두세요</string>
+    <string name="settings_backup_title">백업 · 복원</string>
+    <string name="settings_backup_back">뒤로</string>
+    <string name="settings_backup_desc">나만 보기 디데이 · 일정과 대표 고정 · 알림 설정을 서버에 백업해 두면, 로그아웃하거나 기기를 바꿔도 같은 계정으로 복원할 수 있어요. 우리 둘이 항목은 자동으로 저장되니 백업하지 않아도 돼요.</string>
+    <string name="settings_backup_notice_photos">사진은 백업하지 않아요. 백업은 10분에 한 번 할 수 있고, 새로 백업하면 이전 백업을 덮어써요.</string>
+    <string name="settings_backup_last">마지막 백업: %1$s %2$s</string>
+    <string name="settings_backup_last_none">아직 백업하지 않았어요</string>
+    <string name="settings_backup_last_loading">백업 기록을 확인하는 중…</string>
+    <string name="settings_backup_button">광고 보고 백업하기</string>
+    <string name="settings_backup_working">백업하는 중…</string>
+    <string name="settings_backup_ad_notice">광고를 끝까지 보면 백업해요. 광고를 불러오지 못하면 광고 없이 백업해요.</string>
+    <string name="settings_backup_done">백업했어요.</string>
+    <string name="settings_backup_too_soon">방금 백업했어요. 10분 뒤에 다시 백업할 수 있어요.</string>
+    <string name="settings_backup_failed">백업하지 못했어요. 인터넷 연결을 확인하고 다시 시도해 주세요.</string>
+    <string name="settings_backup_restore_button">복원하기</string>
+    <string name="settings_backup_restore_working">복원하는 중…</string>
+    <string name="settings_backup_restore_confirm_title">백업으로 복원할까요?</string>
+    <string name="settings_backup_restore_confirm_message">지금 이 기기의 나만 보기 디데이 · 일정과 대표 고정 · 알림 설정이 백업 내용으로 바뀌어요. 백업 뒤에 만든 나만 보기 항목은 사라져요.</string>
+    <string name="settings_backup_restored">나만 보기 항목 %1$d개를 복원했어요.</string>
+    <string name="settings_backup_none">아직 백업한 내용이 없어요.</string>
+    <string name="settings_backup_restore_failed">복원하지 못했어요. 인터넷 연결을 확인하고 다시 시도해 주세요.</string>
     <string name="settings_account_title">계정 관리</string>
     <string name="settings_account_back">뒤로</string>
     <string name="settings_account_login_method">로그인 수단</string>
@@ -84,7 +106,7 @@
     <string name="settings_withdraw_back">뒤로</string>
     <string name="settings_withdraw_headline">탈퇴하면 이렇게 돼요</string>
     <string name="settings_withdraw_notice_account">프로필, 약관 동의 기록, 로그인 계정이 삭제돼요.</string>
-    <string name="settings_withdraw_notice_device">이 기기에 저장한 내 디데이 · 일정(나만 보기 포함)과 알림 목록이 삭제되고 복구할 수 없어요.</string>
+    <string name="settings_withdraw_notice_device">이 기기에 저장한 내 디데이 · 일정(나만 보기 포함)과 알림 목록이 삭제되고 복구할 수 없어요. 서버의 백업도 함께 삭제돼요.</string>
     <string name="settings_withdraw_partner_fallback">상대</string>
     <string name="settings_withdraw_notice_couple">%1$s 님과 연결이 해제돼요. 함께 쓰던 항목은 %1$s 님에게 사본으로 남아요.</string>
     <string name="settings_withdraw_notice_photos">내가 올린 사진은 삭제돼요. 상대가 아직 받지 않은 사진은 사본에서 보이지 않아요.</string>

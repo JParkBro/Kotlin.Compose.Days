@@ -18,6 +18,9 @@ internal enum class SettingsDestination {
 
     /** 개발자 응원하기 */
     SUPPORT_DEVELOPER,
+
+    /** 백업 · 복원 */
+    BACKUP,
     ACCOUNT,
 }
 

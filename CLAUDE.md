@@ -35,14 +35,14 @@
 
 - **Firebase는 Blaze(종량제) + 과금 방어.** 서버는 Firebase 한 곳(Auth · Firestore · Functions · Storage · Hosting)이고 Cloudflare는 쓰지 않는다. 넘으면 바로 과금되므로 예산 알림 + 결제 자동 해제 함수(`stopBilling`)를 유지하고, 사용량을 늘리는 변경(리스너 · 쓰기 · 함수 호출 · 업로드)은 이유와 최악의 경우를 설명한다. Identity Platform으로 업그레이드하지 않는다.
 - **Room이 원본.** 화면은 Room만 구독한다. Firestore는 `visibility = SHARED` 항목과 커플 정보만 오간다.
-- **"나만 보기"(PRIVATE) 데이터는 서버로 보내지 않는다.**
+- **"나만 보기"(PRIVATE) 데이터는 서버로 보내지 않는다.** 예외는 사용자가 설정 → 백업 · 복원에서 직접 한 백업 파일 하나(`backups/{uid}/latest.json`, 사진 제외)뿐이다 (2026-11 결정).
 - **이미지는 Cloud Storage + Storage 보안 규칙으로만 접근한다.** 공개 URL · 공개 읽기 · 장기 다운로드 토큰 공유를 만들지 않는다. 크기 · 형식 · 개수 한도는 규칙(서버)에서 막는다.
 - **함수는 App Check 강제 + `maxInstances` 제한.** (AdMob이 부르는 `admobReward`만 App Check 대신 AdMob 서명 확인) 서비스 계정 비공개 키 파일을 만들거나 저장하지 않는다 (함수 실행 서비스 계정 권한으로 처리).
 - **ID는 클라이언트 생성 UUID 문자열**, 날짜는 `yyyy-MM-dd`(LocalDate), 시각은 epoch millis. 자동 증가 ID 금지.
 - **자동 기념일(100일 단위 · 주년 · 생일)은 저장하지 않고 계산한다.** 숨긴 것만 저장.
 - **대표 고정 · 알림 설정은 사용자별 데이터**(`user_item_pref`, `item_reminder`)이며 공유하지 않는다.
 - **색은 테마 토큰으로만.** `Color(0xFF…)` 하드코딩 금지.
-- 문서의 "범위 밖" 기능(커플 다이어리, 사진 아카이브, 오늘의 문구, 백업 메뉴)을 임의로 추가하지 않는다.
+- 문서의 "범위 밖" 기능(커플 다이어리, 사진 아카이브, 오늘의 문구)을 임의로 추가하지 않는다.
 
 ## 작업 방식
 

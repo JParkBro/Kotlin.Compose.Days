@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -26,13 +27,26 @@ class AccountViewModelTest {
     }
 
     @Test
-    fun `로그아웃하면 세션을 끝냄`() =
+    fun `로그아웃을 누르면 데이터 삭제 확인 창을 띄우고 취소하면 닫음`() {
+        viewModel.onAction(AccountAction.LogoutClicked)
+        assertTrue(viewModel.state.value.isLogoutConfirmVisible)
+        assertEquals(user, authRepository.currentUser())
+
+        viewModel.onAction(AccountAction.LogoutDismissed)
+        assertFalse(viewModel.state.value.isLogoutConfirmVisible)
+        assertEquals(user, authRepository.currentUser())
+    }
+
+    @Test
+    fun `확인 창에서 로그아웃하면 세션을 끝냄`() =
         runTest {
             viewModel.event.test {
                 viewModel.onAction(AccountAction.LogoutClicked)
+                viewModel.onAction(AccountAction.LogoutConfirmed)
                 assertEquals(AccountEvent.LoggedOut, awaitItem())
             }
             assertNull(authRepository.currentUser())
+            assertFalse(viewModel.state.value.isLogoutConfirmVisible)
         }
 
     @Test
@@ -41,7 +55,7 @@ class AccountViewModelTest {
             authRepository.failNext = true
 
             viewModel.event.test {
-                viewModel.onAction(AccountAction.LogoutClicked)
+                viewModel.onAction(AccountAction.LogoutConfirmed)
                 assertEquals(AccountEvent.LogoutFailed, awaitItem())
             }
             assertFalse(viewModel.state.value.isSigningOut)

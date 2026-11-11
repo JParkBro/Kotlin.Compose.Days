@@ -7,20 +7,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
-import jpark.bro.days.core.data.auth.GoogleSignInClient
-import jpark.bro.days.core.data.auth.KakaoSignInClient
 import jpark.bro.days.core.designsystem.AppSpacing
 import jpark.bro.days.core.designsystem.AppTheme
 import jpark.bro.days.core.designsystem.AppThemeTokens
@@ -38,7 +37,6 @@ import jpark.bro.days.core.model.AuthUser
 import jpark.bro.days.core.ui.ObserveEvents
 import jpark.bro.days.feature.settings.impl.R
 import jpark.bro.days.feature.settings.impl.WithdrawKey
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import jpark.bro.days.core.designsystem.R as DesignR
 
@@ -48,20 +46,14 @@ internal fun AccountRoot(
     onSessionEnded: () -> Unit,
     onBack: () -> Unit,
     viewModel: AccountViewModel = koinViewModel(),
-    googleSignIn: GoogleSignInClient = koinInject(),
-    kakaoSignIn: KakaoSignInClient = koinInject(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val context = LocalContext.current
     val toastHostState = remember { SnackbarHostState() }
     val logoutFailed = stringResource(R.string.settings_account_logout_failed)
 
     ObserveEvents(viewModel.event) { event ->
         when (event) {
             AccountEvent.LoggedOut -> {
-                // 다음 로그인에서 구글 계정을 다시 고르게 하고, 카카오 쪽 토큰도 끊는다
-                googleSignIn.clearCredentialState(context)
-                kakaoSignIn.logout()
                 onSessionEnded()
             }
 
@@ -145,6 +137,31 @@ private fun AccountScreen(
             )
         }
     }
+    if (state.isLogoutConfirmVisible) {
+        LogoutConfirmDialog(
+            onConfirm = { onAction(AccountAction.LogoutConfirmed) },
+            onDismiss = { onAction(AccountAction.LogoutDismissed) },
+        )
+    }
+}
+
+@Composable
+private fun LogoutConfirmDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = AppThemeTokens.colors.surfaceRaised,
+        title = { Text(stringResource(R.string.settings_account_logout_confirm_title)) },
+        text = { Text(stringResource(R.string.settings_account_logout_confirm_message)) },
+        confirmButton = {
+            TextButton(onClick = onConfirm, modifier = Modifier.testTag("account_logout_confirm")) {
+                Text(stringResource(R.string.settings_account_logout), color = AppThemeTokens.colors.danger)
+            }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(DesignR.string.common_cancel)) } },
+    )
 }
 
 private val AuthProvider.label: Int
@@ -160,6 +177,21 @@ private fun AccountScreenPreview() {
     AppTheme {
         AccountScreen(
             state = AccountState(user = AuthUser("google-1", AuthProvider.GOOGLE, email = "hyunwoo@example.com")),
+            onAction = {},
+        )
+    }
+}
+
+@ScreenPreviews
+@Composable
+private fun AccountScreenLogoutConfirmPreview() {
+    AppTheme {
+        AccountScreen(
+            state =
+                AccountState(
+                    user = AuthUser("kakao:1", AuthProvider.KAKAO),
+                    isLogoutConfirmVisible = true,
+                ),
             onAction = {},
         )
     }

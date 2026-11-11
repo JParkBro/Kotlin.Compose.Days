@@ -43,8 +43,6 @@ internal class AccountAuth(
 
     suspend fun deleteAccount() = authDataSource.deleteCurrentUser()
 
-    suspend fun unlinkKakao() = kakaoSignIn.unlink()
-
     private companion object {
         const val KAKAO_UID_PREFIX = "kakao:"
     }

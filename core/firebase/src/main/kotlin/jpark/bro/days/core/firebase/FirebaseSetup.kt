@@ -46,5 +46,18 @@ object FirebaseSetup {
             Firebase.functions(FUNCTIONS_REGION).useEmulator(emulatorHost, FUNCTIONS_EMULATOR_PORT)
             Firebase.storage.useEmulator(emulatorHost, STORAGE_EMULATOR_PORT)
         }
+        prefetchAppCheckTokenBeforeSignIn()
+    }
+
+    /**
+     * 로그인 전이면 App Check 토큰을 미리 받아 둔다. 처음 받을 때 Play Integrity + 교환으로 약 2초가 걸려
+     * 로그인 버튼을 누른 뒤 받으면 카카오 · 구글 로그인이 그만큼 늦어진다 (소개 · 약관 화면을 보는 동안 받는다).
+     * 받은 토큰은 SDK가 저장해 만료 전까지 다시 쓰므로 추가 요청은 앱 실행당 최대 한 번이다.
+     * 실패해도 무시한다: 로그인할 때 SDK가 다시 받는다.
+     * 에뮬레이터 연결 뒤에 부른다 (useEmulator는 Auth를 쓰기 전에 설정해야 한다).
+     */
+    private fun prefetchAppCheckTokenBeforeSignIn() {
+        if (Firebase.auth.currentUser != null) return
+        Firebase.appCheck.getAppCheckToken(false)
     }
 }

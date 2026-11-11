@@ -18,11 +18,13 @@ import jpark.bro.days.core.data.repository.AccountRepository
 import jpark.bro.days.core.data.repository.ActivityRepository
 import jpark.bro.days.core.data.repository.AnniversaryRepository
 import jpark.bro.days.core.data.repository.AuthRepository
+import jpark.bro.days.core.data.repository.BackupRepository
 import jpark.bro.days.core.data.repository.CoupleRepository
 import jpark.bro.days.core.data.repository.DefaultAccountRepository
 import jpark.bro.days.core.data.repository.DefaultActivityRepository
 import jpark.bro.days.core.data.repository.DefaultAnniversaryRepository
 import jpark.bro.days.core.data.repository.DefaultAuthRepository
+import jpark.bro.days.core.data.repository.DefaultBackupRepository
 import jpark.bro.days.core.data.repository.DefaultCoupleRepository
 import jpark.bro.days.core.data.repository.DefaultImageQuotaRepository
 import jpark.bro.days.core.data.repository.DefaultImageRepository
@@ -58,6 +60,7 @@ val dataModule =
         singleOf(::AccountLocalData)
         singleOf(::ProviderSessions)
         singleOf(::DefaultAccountRepository) bind AccountRepository::class
+        singleOf(::DefaultBackupRepository) bind BackupRepository::class
         single<GoogleSignInClient> {
             CredentialManagerGoogleSignIn(
                 webClientId = androidContext().defaultWebClientId(),

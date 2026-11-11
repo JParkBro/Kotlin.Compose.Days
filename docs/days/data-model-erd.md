@@ -162,7 +162,7 @@ erDiagram
 | USER | 내 프로필 + 상대 프로필 캐시 | `users/{uid}` | `users` |
 | COUPLE + MEMBER | 계정별 내 커플 (`members` 2명을 `member1_user_id` 발급자 · `member2_user_id` 입력자 컬럼으로) | `couples/{coupleId}` (`members` 배열로 합침) | `couples` + `couple_members` |
 | PAIR_CODE | ✗ | `pairCodes/{code}` | `pair_codes` |
-| ITEM (나만 보기) | ✓ | ✗ (백업 기능 추가 시 `users/{uid}/items`) | `items` |
+| ITEM (나만 보기) | ✓ | ✗ (사용자가 백업하면 Storage `backups/{uid}/latest.json`에 JSON으로, product-spec 6장) | `items` |
 | ITEM (우리 둘이) | ✓ | `couples/{coupleId}/items/{itemId}` | `items` |
 | USER_ITEM_PREF, ITEM_REMINDER | ✓ (내 것만) | ✗ | 기기 간 동기화가 필요해지면 추가 |
 | IMAGE | 로컬 경로 + 업로드 상태 | 사진 id만 항목 · 프로필 문서에 (`backgroundImageId` · `profileImageId`), 파일은 Cloud Storage | `images` + 오브젝트 스토리지 (S3 호환으로 옮김) |

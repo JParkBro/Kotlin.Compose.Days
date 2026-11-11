@@ -58,6 +58,7 @@ import jpark.bro.days.feature.couple.api.PairingKey
 import jpark.bro.days.feature.settings.api.NotificationSettingsKey
 import jpark.bro.days.feature.settings.api.ProfileEditKey
 import jpark.bro.days.feature.settings.impl.AccountKey
+import jpark.bro.days.feature.settings.impl.BackupKey
 import jpark.bro.days.feature.settings.impl.MoreAppsKey
 import jpark.bro.days.feature.settings.impl.PolicyListKey
 import jpark.bro.days.feature.settings.impl.R
@@ -95,6 +96,7 @@ internal fun SettingsRoot(
                         SettingsDestination.POLICY -> PolicyListKey
                         SettingsDestination.MORE_APPS -> MoreAppsKey
                         SettingsDestination.SUPPORT_DEVELOPER -> SupportDeveloperKey
+                        SettingsDestination.BACKUP -> BackupKey
                         SettingsDestination.ACCOUNT -> AccountKey
                     },
                 )

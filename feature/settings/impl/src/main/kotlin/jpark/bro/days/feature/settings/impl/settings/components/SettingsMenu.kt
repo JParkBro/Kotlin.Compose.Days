@@ -151,6 +151,13 @@ internal fun SettingsMenu(
 
     DaysSection(title = stringResource(R.string.settings_main_section_account)) {
         SettingsMenuRow(
+            icon = DesignR.drawable.ic_history,
+            title = stringResource(R.string.settings_main_backup),
+            subtitle = stringResource(R.string.settings_main_backup_desc),
+            onClick = { onAction(SettingsAction.MenuClicked(SettingsDestination.BACKUP)) },
+        )
+        DaysDivider(inset = AppSpacing.marginMobile)
+        SettingsMenuRow(
             icon = DesignR.drawable.ic_manage_accounts,
             title = stringResource(R.string.settings_main_account),
             subtitle = state.accountEmail,

@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.days.android.library)
     alias(libs.plugins.days.koin)
+    // 백업 파일(JSON)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -14,6 +16,7 @@ dependencies {
     implementation(projects.core.datastore)
     implementation(projects.core.network)
     implementation(projects.core.firebase)
+    implementation(libs.kotlinx.serialization.json)
     // 구글 로그인 (Credential Manager)
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)

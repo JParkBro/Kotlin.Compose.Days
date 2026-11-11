@@ -10,6 +10,10 @@ internal data object WidgetSettingsKey : NavKey
 @Serializable
 internal data object AccountKey : NavKey
 
+/** 백업 · 복원 */
+@Serializable
+internal data object BackupKey : NavKey
+
 @Serializable
 internal data object WithdrawKey : NavKey
 

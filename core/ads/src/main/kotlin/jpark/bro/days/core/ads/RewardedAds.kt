@@ -51,19 +51,25 @@ class RewardedAds(
     private val appContext = context.applicationContext
     private var initialized = false
 
+    /**
+     * [request]가 null이면 서버 측 확인 값을 넣지 않는다 (백업처럼 앱에서만 보상하는 광고).
+     * 같은 광고 단위라 AdMob 콜백은 오지만 `admobReward`가 값이 없어 무시한다 (함수 호출 1번)
+     */
     suspend fun show(
         activity: Activity,
-        request: RewardedAdRequest,
+        request: RewardedAdRequest?,
     ): RewardedAdResult {
         val ad = if (gatherConsent(activity)) load() else null
         if (ad == null) return RewardedAdResult.Failed
-        ad.setServerSideVerificationOptions(
-            ServerSideVerificationOptions
-                .Builder()
-                .setUserId(request.userId)
-                .setCustomData(request.customData)
-                .build(),
-        )
+        if (request != null) {
+            ad.setServerSideVerificationOptions(
+                ServerSideVerificationOptions
+                    .Builder()
+                    .setUserId(request.userId)
+                    .setCustomData(request.customData)
+                    .build(),
+            )
+        }
         return present(activity, ad)
     }
 

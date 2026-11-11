@@ -7,6 +7,7 @@ import jpark.bro.days.core.database.dao.CoupleDao
 import jpark.bro.days.core.database.dao.ImageDao
 import jpark.bro.days.core.database.dao.ImageSyncDao
 import jpark.bro.days.core.datastore.SettingsDataStore
+import jpark.bro.days.core.firebase.sync.BackupRemoteDataSource
 import jpark.bro.days.core.firebase.sync.CoupleRemoteDataSource
 import jpark.bro.days.core.firebase.sync.ImageRemoteDataSource
 import jpark.bro.days.core.firebase.sync.ProfileRemoteDataSource
@@ -18,8 +19,9 @@ internal class AccountServerData(
     private val imageRemote: ImageRemoteDataSource,
     private val coupleRemote: CoupleRemoteDataSource,
     private val profileRemote: ProfileRemoteDataSource,
+    private val backupRemote: BackupRemoteDataSource,
 ) {
-    /** 내가 올린 사진 파일 · 발급한 커플 코드 · `users/{uid}`. 이미 없는 것은 성공으로 본다 */
+    /** 내가 올린 사진 파일 · 발급한 커플 코드 · 백업 파일 · `users/{uid}`. 이미 없는 것은 성공으로 본다 */
     suspend fun delete(userId: String) {
         imageSyncDao.getUploadedImages(userId).forEach { image ->
             val coupleId = image.remoteCoupleId ?: return@forEach
@@ -29,6 +31,7 @@ internal class AccountServerData(
             // 만료됐거나 이미 지운 코드여도 탈퇴는 계속한다
             suspendRunCatching { coupleRemote.deletePairCode(issued.code) }
         }
+        backupRemote.delete(userId)
         profileRemote.deleteProfile(userId)
     }
 }

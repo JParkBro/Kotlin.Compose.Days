@@ -7,6 +7,7 @@ import jpark.bro.days.core.data.session.UserSession
 import jpark.bro.days.core.database.dao.ImageDao
 import jpark.bro.days.core.database.entity.ImageEntity
 import jpark.bro.days.core.firebase.sync.ImageRemoteDataSource
+import jpark.bro.days.core.model.ImageCrop
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -30,12 +31,15 @@ internal class DefaultImageRepository(
     /** 이번 실행에서 받지 못한 사진. 같은 사진을 계속 다시 요청하지 않게 다음 실행까지 기다린다 */
     private val failedDownloads = mutableSetOf<String>()
 
-    override suspend fun importImage(uri: String): Result<String> =
+    override suspend fun importImage(
+        uri: String,
+        crop: ImageCrop?,
+    ): Result<String> =
         suspendRunCatching {
             val me = userSession.currentUserId()
             val id = idGenerator.newId()
             val path = store.relativePath(id)
-            val stored = store.save(uri, path)
+            val stored = store.save(uri, path, crop)
             imageDao.upsertImage(
                 ImageEntity(
                     id = id,

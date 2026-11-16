@@ -47,6 +47,7 @@ import jpark.bro.days.core.model.UserProfile
 import jpark.bro.days.core.ui.DaysDatePickerDialog
 import jpark.bro.days.core.ui.ImageLimitSheet
 import jpark.bro.days.core.ui.ObserveEvents
+import jpark.bro.days.core.ui.PhotoCropDialog
 import jpark.bro.days.core.ui.ProfileAvatar
 import jpark.bro.days.core.ui.rememberPhotoPicker
 import jpark.bro.days.core.ui.toDisplayText
@@ -179,6 +180,13 @@ private fun ProfileEditScreen(
             maxDate = state.today,
             onConfirm = { onAction(ProfileEditAction.BirthDateSelected(it)) },
             onDismiss = { onAction(ProfileEditAction.BirthDateDismissed) },
+        )
+    }
+    state.cropUri?.let { uri ->
+        PhotoCropDialog(
+            uri = uri,
+            onConfirm = { onAction(ProfileEditAction.PhotoCropped(it)) },
+            onDismiss = { onAction(ProfileEditAction.PhotoCropDismissed) },
         )
     }
     state.imageLimit?.let { quota ->

@@ -3,6 +3,7 @@ package jpark.bro.days.feature.settings.impl.profileedit
 import app.cash.turbine.test
 import jpark.bro.days.core.ads.RewardedAdRequest
 import jpark.bro.days.core.ads.RewardedAdResult
+import jpark.bro.days.core.model.ImageCrop
 import jpark.bro.days.core.model.ImageUploadQuota
 import jpark.bro.days.core.model.UserProfile
 import jpark.bro.days.core.testing.FakeImageQuotaRepository
@@ -30,6 +31,7 @@ class ProfileEditViewModelTest {
     private val saved = UserProfile("user-me", "현우", LocalDate.of(1998, 4, 12))
     private val repository = FakeProfileRepository(me = saved)
     private val images = FakeImageRepository()
+    private val crop = ImageCrop(left = 0.25f, top = 0f, width = 0.5f, height = 1f)
     private val quotas = FakeImageQuotaRepository()
     private val viewModel by lazy { ProfileEditViewModel(repository, images, quotas, clock) }
 
@@ -109,9 +111,37 @@ class ProfileEditViewModelTest {
         }
 
     @Test
+    fun `사진을 고르면 자르기 화면이 열리고 확인하면 고른 영역만 가져옴`() =
+        runTest {
+            viewModel.onAction(ProfileEditAction.PhotoPicked("content://photo/1"))
+            assertEquals("content://photo/1", viewModel.state.value.cropUri)
+            assertNull(viewModel.state.value.photoId)
+
+            viewModel.onAction(ProfileEditAction.PhotoCropped(crop))
+
+            assertNull(viewModel.state.value.cropUri)
+            assertEquals("image-1", viewModel.state.value.photoId)
+            assertEquals(listOf("content://photo/1"), images.imported)
+            assertEquals(listOf<ImageCrop?>(crop), images.importedCrops)
+        }
+
+    @Test
+    fun `자르기 화면을 닫으면 사진을 가져오지 않고 그대로`() =
+        runTest {
+            viewModel.onAction(ProfileEditAction.PhotoPicked("content://photo/1"))
+            viewModel.onAction(ProfileEditAction.PhotoCropDismissed)
+
+            assertNull(viewModel.state.value.cropUri)
+            assertNull(viewModel.state.value.photoId)
+            assertEquals(emptyList<String>(), images.imported)
+            assertFalse(viewModel.state.value.canSave)
+        }
+
+    @Test
     fun `사진을 고르면 보여주고 저장하면 프로필에 사진 id가 들어감`() =
         runTest {
             viewModel.onAction(ProfileEditAction.PhotoPicked("content://photo/1"))
+            viewModel.onAction(ProfileEditAction.PhotoCropped(crop))
 
             val state = viewModel.state.value
             assertEquals("image-1", state.photoId)
@@ -129,6 +159,7 @@ class ProfileEditViewModelTest {
             repository.myProfile.value = saved.copy(profileImageId = "old")
 
             viewModel.onAction(ProfileEditAction.PhotoPicked("content://photo/1"))
+            viewModel.onAction(ProfileEditAction.PhotoCropped(crop))
             assertEquals(emptyList<String>(), images.discarded)
             viewModel.onAction(ProfileEditAction.SaveClicked)
 
@@ -139,6 +170,7 @@ class ProfileEditViewModelTest {
     fun `저장하지 않고 뒤로 가면 새로 고른 사진을 버리고 프로필은 그대로`() =
         runTest {
             viewModel.onAction(ProfileEditAction.PhotoPicked("content://photo/1"))
+            viewModel.onAction(ProfileEditAction.PhotoCropped(crop))
 
             viewModel.event.test {
                 viewModel.onAction(ProfileEditAction.BackClicked)
@@ -155,6 +187,7 @@ class ProfileEditViewModelTest {
 
             viewModel.event.test {
                 viewModel.onAction(ProfileEditAction.PhotoPicked("content://broken"))
+                viewModel.onAction(ProfileEditAction.PhotoCropped(crop))
                 assertEquals(ProfileEditEvent.PhotoFailed, awaitItem())
             }
             assertNull(viewModel.state.value.photoId)

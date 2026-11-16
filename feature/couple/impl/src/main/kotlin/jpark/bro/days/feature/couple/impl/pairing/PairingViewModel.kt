@@ -3,15 +3,19 @@ package jpark.bro.days.feature.couple.impl.pairing
 import androidx.lifecycle.viewModelScope
 import jpark.bro.days.core.data.couple.ProfileRequiredException
 import jpark.bro.days.core.data.repository.CoupleRepository
+import jpark.bro.days.core.data.repository.ProfileRepository
 import jpark.bro.days.core.model.PairCodeCheck
 import jpark.bro.days.core.ui.MviViewModel
 import jpark.bro.days.feature.couple.impl.messageRes
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 internal class PairingViewModel(
     private val coupleRepository: CoupleRepository,
+    profileRepository: ProfileRepository,
 ) : MviViewModel<PairingState, PairingAction, PairingEvent>(PairingState()) {
     init {
         issue()
@@ -20,6 +24,12 @@ internal class PairingViewModel(
             coupleRepository.observeCouple().filterNotNull().first()
             sendEvent(PairingEvent.Connected)
         }
+        // 프로필 수정에서 이름을 정하고 돌아오면 이 화면(ViewModel)은 그대로라 코드를 다시 발급한다
+        profileRepository
+            .observeMyProfile()
+            .filterNotNull()
+            .onEach { if (currentState.issueError == IssueError.PROFILE_REQUIRED) issue() }
+            .launchIn(viewModelScope)
     }
 
     override fun onAction(action: PairingAction) {

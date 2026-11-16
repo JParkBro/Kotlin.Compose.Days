@@ -101,7 +101,17 @@ internal class ProfileEditViewModel(
             }
 
             is ProfileEditAction.PhotoPicked -> {
-                editPhoto { replace(action.uri).onFailure { sendEvent(ProfileEditEvent.PhotoFailed) } }
+                setState { copy(cropUri = action.uri) }
+            }
+
+            is ProfileEditAction.PhotoCropped -> {
+                val uri = currentState.cropUri ?: return
+                setState { copy(cropUri = null) }
+                editPhoto { replace(uri, action.crop).onFailure { sendEvent(ProfileEditEvent.PhotoFailed) } }
+            }
+
+            ProfileEditAction.PhotoCropDismissed -> {
+                setState { copy(cropUri = null) }
             }
 
             ProfileEditAction.PhotoRemoved -> {

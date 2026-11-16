@@ -340,7 +340,11 @@ private fun ItemEditState.reduce(action: ItemEditAction.PlanInput): ItemEditStat
         }
     }
 
-/** 새 항목 기본값: 디데이는 기준일이 필수라 오늘(또는 캘린더에서 고른 날)로 채운다. 빠른 시작이면 카테고리 · 제목도 */
+/**
+ * 새 항목 기본값: 날짜는 오늘(또는 캘린더에서 고른 날). 디데이는 기준일이 필수이고,
+ * 일정은 날짜가 없으면 홈 · 캘린더 어디에도 보이지 않아(product-spec 4-1 · 4-3) 오늘로 채우고 지울 수 있게 둔다.
+ * 빠른 시작이면 카테고리 · 제목도
+ */
 private fun initialState(
     key: ItemEditKey,
     today: LocalDate,
@@ -355,7 +359,7 @@ private fun initialState(
         title = key.presetTitle.orEmpty(),
         category = category,
         icon = category.defaultIcon,
-        date = presetDate ?: today.takeIf { key.type == ItemType.DDAY },
+        date = presetDate ?: today,
     )
 }
 

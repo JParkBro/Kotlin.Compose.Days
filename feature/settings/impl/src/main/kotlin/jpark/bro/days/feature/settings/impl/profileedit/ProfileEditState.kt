@@ -12,6 +12,8 @@ internal data class ProfileEditState(
     /** 저장할 프로필 사진 id와 그 파일 (없으면 이름 첫 글자) */
     val photoId: String? = null,
     val photoFile: File? = null,
+    /** 고른 사진에서 쓸 부분을 정하는 중인 사진의 content Uri (null이면 자르기 화면 닫힘) */
+    val cropUri: String? = null,
     /** 사진 한도를 확인하거나 고른 사진을 줄이는 중 */
     val isPhotoWorking: Boolean = false,
     /** 커플 사진 한도를 다 써서 보여주는 시트 (null이면 닫힘) */

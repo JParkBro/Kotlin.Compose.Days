@@ -1,6 +1,7 @@
 package jpark.bro.days.core.data.image
 
 import jpark.bro.days.core.data.repository.ImageRepository
+import jpark.bro.days.core.model.ImageCrop
 
 /**
  * 수정 화면에서 고르는 중인 사진 하나 (배경 · 프로필). 저장 전에는 원래 사진을 지우지 않고,
@@ -23,8 +24,12 @@ class ImageDraft(
         current = saved
     }
 
-    suspend fun replace(uri: String): Result<String> =
-        images.importImage(uri).onSuccess { id ->
+    /** [crop]이 있으면 그 영역만 가져온다 (프로필 사진) */
+    suspend fun replace(
+        uri: String,
+        crop: ImageCrop? = null,
+    ): Result<String> =
+        images.importImage(uri, crop).onSuccess { id ->
             discardIfUnsaved(current)
             imported += id
             current = id

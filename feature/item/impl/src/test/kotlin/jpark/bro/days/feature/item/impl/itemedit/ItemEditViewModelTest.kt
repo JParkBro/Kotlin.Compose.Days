@@ -116,10 +116,12 @@ class ItemEditViewModelTest {
     }
 
     @Test
-    fun `새 일정은 날짜 없이 시작하고 제목만 있으면 저장 가능`() {
+    fun `새 일정은 오늘 날짜로 시작하고 날짜를 지워도 제목만 있으면 저장 가능`() {
         val viewModel = viewModel(type = ItemType.PLAN)
+        assertEquals(today, viewModel.state.value.date)
 
         viewModel.onAction(ItemEditAction.TitleChanged("하고 싶은 것"))
+        viewModel.onAction(ItemEditAction.DateCleared)
 
         assertNull(viewModel.state.value.date)
         assertTrue(viewModel.state.value.canSave)

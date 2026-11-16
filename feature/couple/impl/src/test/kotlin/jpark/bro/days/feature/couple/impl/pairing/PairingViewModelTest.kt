@@ -5,6 +5,7 @@ import jpark.bro.days.core.data.couple.ProfileRequiredException
 import jpark.bro.days.core.model.Couple
 import jpark.bro.days.core.model.PairCodeCheck
 import jpark.bro.days.core.testing.FakeCoupleRepository
+import jpark.bro.days.core.testing.FakeProfileRepository
 import jpark.bro.days.core.testing.MainDispatcherRule
 import jpark.bro.days.feature.couple.impl.R
 import kotlinx.coroutines.test.runTest
@@ -21,7 +22,8 @@ class PairingViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val repository = FakeCoupleRepository()
-    private val viewModel by lazy { PairingViewModel(repository) }
+    private val profileRepository = FakeProfileRepository()
+    private val viewModel by lazy { PairingViewModel(repository, profileRepository) }
 
     @Test
     fun `열면 내 코드를 발급해 보여줌`() {
@@ -43,6 +45,24 @@ class PairingViewModelTest {
                 viewModel.onAction(PairingAction.SetProfileClicked)
                 assertEquals(PairingEvent.OpenProfileEdit, awaitItem())
             }
+        }
+
+    @Test
+    fun `프로필 수정에서 이름을 저장하면 나갔다 오지 않아도 코드를 발급함`() =
+        runTest {
+            val issued = repository.issueResult
+            repository.issueResult = Result.failure(ProfileRequiredException())
+            assertEquals(IssueError.PROFILE_REQUIRED, viewModel.state.value.issueError)
+
+            repository.issueResult = issued
+            profileRepository.saveMyProfile("지민", birthDate = null, profileImageId = null)
+
+            assertNull(viewModel.state.value.issueError)
+            assertEquals(
+                "K7Q2MX",
+                viewModel.state.value.myCode
+                    ?.code,
+            )
         }
 
     @Test

@@ -46,4 +46,9 @@
     <string name="common_image_limit_close">닫기</string>
     <string name="common_image_limit_ad_failed">광고를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.</string>
     <string name="common_image_limit_reward_pending">보상을 아직 확인하지 못했어요. 잠시 후 다시 시도해 주세요.</string>
+
+    <!-- 프로필 사진 자르기 (product-spec 6장 프로필 수정) -->
+    <string name="common_photo_crop_title">사진 위치 정하기</string>
+    <string name="common_photo_crop_hint">사진을 끌어서 옮기고, 두 손가락으로 확대할 수 있어요.</string>
+    <string name="common_photo_crop_photo">자를 사진</string>
 </resources>

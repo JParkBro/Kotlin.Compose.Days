@@ -1,6 +1,7 @@
 package jpark.bro.days.core.testing
 
 import jpark.bro.days.core.data.repository.ImageRepository
+import jpark.bro.days.core.model.ImageCrop
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -10,6 +11,9 @@ import java.io.File
 class FakeImageRepository : ImageRepository {
     val files = MutableStateFlow<Map<String, File>>(emptyMap())
     val imported = mutableListOf<String>()
+
+    /** [imported]와 같은 순서. 자르지 않았으면 null */
+    val importedCrops = mutableListOf<ImageCrop?>()
     val discarded = mutableListOf<String>()
 
     /** true면 다음 가져오기가 실패한다 */
@@ -18,13 +22,17 @@ class FakeImageRepository : ImageRepository {
 
     fun add(imageId: String): File = File("/fake/$imageId.webp").also { files.value += imageId to it }
 
-    override suspend fun importImage(uri: String): Result<String> {
+    override suspend fun importImage(
+        uri: String,
+        crop: ImageCrop?,
+    ): Result<String> {
         if (failNextImport) {
             failNextImport = false
             return Result.failure(IllegalStateException("가져오기 실패 (테스트)"))
         }
         val id = "image-${nextId++}"
         imported += uri
+        importedCrops += crop
         add(id)
         return Result.success(id)
     }

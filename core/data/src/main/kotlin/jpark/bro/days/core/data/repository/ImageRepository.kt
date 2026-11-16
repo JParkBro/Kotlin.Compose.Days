@@ -1,5 +1,6 @@
 package jpark.bro.days.core.data.repository
 
+import jpark.bro.days.core.model.ImageCrop
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import java.io.File
@@ -9,8 +10,11 @@ import java.io.File
  * 나만 보기 항목 · 솔로 프로필 사진은 서버에 올리지 않는다.
  */
 interface ImageRepository {
-    /** 사진 선택기가 준 content Uri를 줄여 기기에 저장하고 사진 id를 돌려준다 */
-    suspend fun importImage(uri: String): Result<String>
+    /** 사진 선택기가 준 content Uri를 줄여 기기에 저장하고 사진 id를 돌려준다. [crop]이 있으면 그 영역만 저장한다 */
+    suspend fun importImage(
+        uri: String,
+        crop: ImageCrop? = null,
+    ): Result<String>
 
     /** 기기 파일. 상대가 올린 사진이면 처음 한 번 받아 저장한다. 없거나 받지 못하면 null */
     fun observeImageFile(imageId: String): Flow<File?>

@@ -8,6 +8,7 @@
 | [CODING_CONVENTIONS.md](CODING_CONVENTIONS.md) | 코드를 **어떻게** 쓰나 (이름, MVI, Compose, 코루틴, Git) | 보통 |
 | [TESTING.md](TESTING.md) | 무엇을 **어떻게 검증**하나 (테스트 종류, 템플릿, CI) | 보통 |
 | [GIT_CONVENTIONS.md](GIT_CONVENTIONS.md) | 변경을 **어떻게 합치고 출시**하나 (브랜치, 커밋 · PR, 리뷰, 릴리스) | 낮음 |
+| [STORE_ASSETS.md](STORE_ASSETS.md) | 스토어 **출시 그래픽**을 어떻게 만드나 (아이콘, 대표 그래픽, 실제 화면 캡처 · 합성, 규격 검증) | 낮음 |
 
 ## 기술 스택 요약
 

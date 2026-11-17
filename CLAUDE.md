@@ -11,6 +11,8 @@
 | `firebase/functions/` | Cloud Functions for Firebase (TypeScript): 카카오 토큰 발급, 결제 자동 해제. Firebase CLI가 프로젝트 폴더 밖 소스를 배포하지 못해 `firebase/` 안에 둔다 | `firebase/functions/CLAUDE.md` |
 | `firebase/policy-site/` | Firebase Hosting(`public/`): 개인정보 처리방침 · 이용약관 · app-ads.txt. 배포 설정은 `firebase/firebase.json`. Functions와 같은 이유로 `firebase/` 안에 둔다 | `docs/days/infra-and-billing-protection.md` 2-4 |
 | `e2e/` | Maestro 흐름 | – |
+| `store-assets/` | Play 스토어 그래픽 (아이콘 · 대표 그래픽 · 스크린샷 · 원본 캡처) | `store-assets/README.md` |
+| `tools/store-assets/` | 스토어 그래픽을 다시 만드는 스크립트 (`run_all.sh`) | `store-assets/README.md` |
 | `docs/common/` | 범용 규칙 (아키텍처, 컨벤션, 테스트, Git) | – |
 | `docs/days/` | 이 프로젝트의 기획 · 데이터 · 인프라 결정 | – |
 
@@ -30,6 +32,7 @@
 | Firebase · Functions · 과금 | `docs/days/infra-and-billing-protection.md`, `docs/days/firebase-cost-strategy.md` |
 | 광고 · 후원 | `docs/days/ads-strategy.md` |
 | 브랜치 · 커밋 · PR | `docs/common/GIT_CONVENTIONS.md` |
+| 앱 출시 에셋 (스토어 아이콘 · 대표 그래픽 · 스크린샷) | `docs/common/STORE_ASSETS.md` (절차), `store-assets/README.md` (이 앱의 화면 · 문구 · 다시 만드는 명령) |
 
 ## 절대 어기면 안 되는 결정
 

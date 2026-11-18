@@ -3,6 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- MainActivity의 세로 고정이 이 기능을 필수로 만든다. 세로를 보고하지 않는 기기(일부 태블릿 · Desktop · XR)도 설치되게 선택으로 둔다 -->
+    <uses-feature
+        android:name="android.hardware.screen.portrait"
+        android:required="false" />
 
     <application
         android:name=".DaysApplication"

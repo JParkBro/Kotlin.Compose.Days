@@ -1,8 +1,8 @@
 [versions]
 # project
 projectApplicationId = "jpark.bro.days"
-projectVersionCode = "18"
-projectVersionName = "2.0.3"
+projectVersionCode = "19"
+projectVersionName = "2.0.4"
 projectCompileSdkVersion = "37"
 projectMinSdkVersion = "30"
 projectTargetSdkVersion = "37"

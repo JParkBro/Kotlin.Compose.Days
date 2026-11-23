@@ -1,7 +1,7 @@
 [versions]
 # project
 projectApplicationId = "jpark.bro.days"
-projectVersionCode = "19"
+projectVersionCode = "20"
 projectVersionName = "2.0.4"
 projectCompileSdkVersion = "37"
 projectMinSdkVersion = "30"
@@ -33,6 +33,7 @@ kakaoSdk = "2.26.0"
 glance = "1.2.0"
 coil = "3.6.3"
 playServicesAds = "25.5.0"
+appUpdate = "2.1.0"
 ump = "4.0.0"
 billing = "9.1.0"
 workRuntime = "2.12.0"
@@ -47,6 +48,9 @@ ktlint = "1.8.0"
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
+# 인앱 업데이트 (docs/days/in-app-update.md)
+app-update = { module = "com.google.android.play:app-update", version.ref = "appUpdate" }
+app-update-ktx = { module = "com.google.android.play:app-update-ktx", version.ref = "appUpdate" }
 play-services-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "playServicesAds" }
 ump = { module = "com.google.android.ump:user-messaging-platform", version.ref = "ump" }
 billing-ktx = { module = "com.android.billingclient:billing-ktx", version.ref = "billing" }

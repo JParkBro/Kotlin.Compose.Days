@@ -1,5 +1,7 @@
 package jpark.bro.days.di
 
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import jpark.bro.days.BuildConfig
 import jpark.bro.days.MainViewModel
 import jpark.bro.days.core.ads.AdsConfig
@@ -27,8 +29,10 @@ import jpark.bro.days.navigation.AppOnboardingResultHandler
 import jpark.bro.days.navigation.AppSessionEndedHandler
 import jpark.bro.days.navigation.TopLevelDestination
 import jpark.bro.days.navigation.startKeyFor
+import jpark.bro.days.update.UpdateViewModel
 import jpark.bro.days.widget.di.widgetModule
 import kotlinx.coroutines.runBlocking
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
@@ -47,6 +51,9 @@ val appModule =
         singleOf(::AppOnboardingResultHandler) bind OnboardingResultHandler::class
         singleOf(::AppSessionEndedHandler) bind SessionEndedHandler::class
         viewModelOf(::MainViewModel)
+        // UpdateViewModel(리스너)과 MainActivity(Play 호출)가 같은 인스턴스를 써야 한다
+        single<AppUpdateManager> { AppUpdateManagerFactory.create(androidContext()) }
+        viewModelOf(::UpdateViewModel)
         single { AdsConfig(rewardedAdUnitId = BuildConfig.ADMOB_REWARDED_AD_UNIT_ID) }
 
         includes(

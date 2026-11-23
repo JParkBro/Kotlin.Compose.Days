@@ -5,6 +5,9 @@
     <string name="common_confirm">확인</string>
     <string name="common_delete">삭제</string>
 
+    <!-- 마스코트 로딩 (DaysMascotLoading) -->
+    <string name="common_loading">불러오는 중</string>
+
     <!-- 디데이 숫자 (DdayText) -->
     <string name="common_dday_remaining">D-%1$d</string>
     <string name="common_dday_today">D-Day</string>

@@ -40,9 +40,11 @@ import jpark.bro.days.core.designsystem.component.DaysButtonSize
 import jpark.bro.days.core.designsystem.component.DaysIconBadge
 import jpark.bro.days.core.designsystem.component.DaysIconBadgeTone
 import jpark.bro.days.core.designsystem.component.DaysIconButton
+import jpark.bro.days.core.designsystem.component.DaysMascot
 import jpark.bro.days.core.designsystem.component.DaysSoftButton
 import jpark.bro.days.core.designsystem.component.DaysToastHost
 import jpark.bro.days.core.designsystem.component.DaysTopBar
+import jpark.bro.days.core.designsystem.component.Mascot
 import jpark.bro.days.core.designsystem.preview.ScreenPreviews
 import jpark.bro.days.core.model.ActivityType
 import jpark.bro.days.core.model.ItemType
@@ -252,7 +254,7 @@ private fun EmptyNotifications() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
     ) {
-        DaysIconBadge(icon = DesignR.drawable.ic_notifications, tone = DaysIconBadgeTone.SHARED)
+        DaysMascot(mascot = Mascot.FACE_CONTENT, size = 96.dp, contentDescription = null)
         Text(
             text = stringResource(R.string.notifications_list_empty_title),
             style = AppThemeTokens.typography.headlineSm,

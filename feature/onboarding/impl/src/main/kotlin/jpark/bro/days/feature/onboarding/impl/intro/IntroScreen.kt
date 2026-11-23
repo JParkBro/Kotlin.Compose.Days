@@ -42,7 +42,9 @@ import jpark.bro.days.core.designsystem.AppShapes
 import jpark.bro.days.core.designsystem.AppSpacing
 import jpark.bro.days.core.designsystem.AppTheme
 import jpark.bro.days.core.designsystem.AppThemeTokens
+import jpark.bro.days.core.designsystem.component.DaysMascot
 import jpark.bro.days.core.designsystem.component.DaysPrimaryButton
+import jpark.bro.days.core.designsystem.component.Mascot
 import jpark.bro.days.core.designsystem.preview.ScreenPreviews
 import jpark.bro.days.core.ui.ObserveEvents
 import jpark.bro.days.feature.onboarding.impl.R
@@ -68,17 +70,17 @@ internal fun IntroRoot(
 }
 
 private enum class IntroPage(
-    @param:DrawableRes val icon: Int,
+    val mascot: Mascot,
     @param:StringRes val title: Int,
     @param:StringRes val body: Int,
 ) {
-    COUNT(DesignR.drawable.ic_calendar, R.string.onboarding_intro_title_count, R.string.onboarding_intro_body_count),
+    COUNT(Mascot.WAVE, R.string.onboarding_intro_title_count, R.string.onboarding_intro_body_count),
     ANNIVERSARY(
-        DesignR.drawable.ic_cake,
+        Mascot.JUMP,
         R.string.onboarding_intro_title_anniversary,
         R.string.onboarding_intro_body_anniversary,
     ),
-    COUPLE(DesignR.drawable.ic_favorite, R.string.onboarding_intro_title_couple, R.string.onboarding_intro_body_couple),
+    COUPLE(Mascot.FACE_SHY, R.string.onboarding_intro_title_couple, R.string.onboarding_intro_body_couple),
 }
 
 @Composable
@@ -165,21 +167,7 @@ private fun IntroPageContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Box(
-            modifier =
-                Modifier
-                    .size(180.dp)
-                    .clip(AppShapes.xl)
-                    .background(colors.primarySoft),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                painter = painterResource(page.icon),
-                contentDescription = null,
-                tint = colors.primary,
-                modifier = Modifier.size(80.dp),
-            )
-        }
+        DaysMascot(mascot = page.mascot, size = 180.dp, contentDescription = null)
         Spacer(modifier = Modifier.height(AppSpacing.xxl))
         Text(
             text = stringResource(page.title),

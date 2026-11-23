@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import jpark.bro.days.core.designsystem.AppSpacing
 import jpark.bro.days.core.designsystem.AppThemeTokens
 import jpark.bro.days.core.designsystem.component.DaysBadge
@@ -19,7 +20,9 @@ import jpark.bro.days.core.designsystem.component.DaysButtonSize
 import jpark.bro.days.core.designsystem.component.DaysCard
 import jpark.bro.days.core.designsystem.component.DaysCheckbox
 import jpark.bro.days.core.designsystem.component.DaysListItem
+import jpark.bro.days.core.designsystem.component.DaysMascot
 import jpark.bro.days.core.designsystem.component.DaysSoftButton
+import jpark.bro.days.core.designsystem.component.Mascot
 import jpark.bro.days.core.ui.scheduleText
 import jpark.bro.days.core.ui.toMonthDayText
 import jpark.bro.days.feature.calendar.impl.CalendarEntry
@@ -142,10 +145,17 @@ internal fun EmptyListText(
     text: String,
     modifier: Modifier = Modifier,
 ) {
-    Text(
-        text = text,
-        style = AppThemeTokens.typography.bodyMd,
-        color = AppThemeTokens.colors.textSecondary,
+    Row(
         modifier = modifier.fillMaxWidth().padding(vertical = AppSpacing.xl, horizontal = AppSpacing.xs),
-    )
+        horizontalArrangement = Arrangement.spacedBy(AppSpacing.md),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        DaysMascot(mascot = Mascot.FACE_NEUTRAL, size = 64.dp, contentDescription = null)
+        Text(
+            text = text,
+            style = AppThemeTokens.typography.bodyMd,
+            color = AppThemeTokens.colors.textSecondary,
+            modifier = Modifier.weight(1f),
+        )
+    }
 }

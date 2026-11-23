@@ -24,8 +24,10 @@ import jpark.bro.days.core.designsystem.AppShapes
 import jpark.bro.days.core.designsystem.AppSpacing
 import jpark.bro.days.core.designsystem.AppThemeTokens
 import jpark.bro.days.core.designsystem.component.DaysButtonSize
+import jpark.bro.days.core.designsystem.component.DaysMascot
 import jpark.bro.days.core.designsystem.component.DaysPrimaryButton
 import jpark.bro.days.core.designsystem.component.DaysSecondaryButton
+import jpark.bro.days.core.designsystem.component.Mascot
 import jpark.bro.days.feature.home.impl.QuickStart
 import jpark.bro.days.feature.home.impl.R
 import jpark.bro.days.core.designsystem.R as DesignR
@@ -98,24 +100,10 @@ internal fun HomeEmptyContent(
     }
 }
 
-/** 일러스트: primary-soft 원 안의 달력 아이콘 */
+/** 일러스트: primary-soft 원 안에서 손 흔드는 마스코트 */
 @Composable
 private fun EmptyIllustration() {
-    Box(
-        modifier =
-            Modifier
-                .size(160.dp)
-                .clip(AppShapes.full)
-                .background(AppThemeTokens.colors.primarySoft),
-        contentAlignment = Alignment.Center,
-    ) {
-        Icon(
-            painter = painterResource(DesignR.drawable.ic_calendar),
-            contentDescription = null,
-            tint = AppThemeTokens.colors.primary,
-            modifier = Modifier.size(72.dp),
-        )
-    }
+    DaysMascot(mascot = Mascot.WAVE, size = 160.dp, contentDescription = null)
 }
 
 @get:StringRes

@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import jpark.bro.days.core.billing.SupportOffer
 import jpark.bro.days.core.billing.SupportProduct
@@ -31,10 +32,13 @@ import jpark.bro.days.core.designsystem.component.DaysDivider
 import jpark.bro.days.core.designsystem.component.DaysIconBadge
 import jpark.bro.days.core.designsystem.component.DaysIconButton
 import jpark.bro.days.core.designsystem.component.DaysListItem
+import jpark.bro.days.core.designsystem.component.DaysMascot
 import jpark.bro.days.core.designsystem.component.DaysSecondaryButton
 import jpark.bro.days.core.designsystem.component.DaysSoftButton
 import jpark.bro.days.core.designsystem.component.DaysToastHost
+import jpark.bro.days.core.designsystem.component.DaysToastVisuals
 import jpark.bro.days.core.designsystem.component.DaysTopBar
+import jpark.bro.days.core.designsystem.component.Mascot
 import jpark.bro.days.core.designsystem.preview.ScreenPreviews
 import jpark.bro.days.core.ui.ObserveEvents
 import jpark.bro.days.feature.settings.impl.R
@@ -57,7 +61,7 @@ internal fun SupportDeveloperRoot(
     ObserveEvents(viewModel.event) { event ->
         when (event) {
             is SupportDeveloperEvent.LaunchPurchase -> launchPurchase(event.product)
-            SupportDeveloperEvent.Thanks -> toastHostState.showSnackbar(thanks)
+            SupportDeveloperEvent.Thanks -> toastHostState.showSnackbar(DaysToastVisuals(thanks, Mascot.JUMP))
             SupportDeveloperEvent.PurchasePending -> toastHostState.showSnackbar(pending)
             SupportDeveloperEvent.PurchaseFailed -> toastHostState.showSnackbar(failed)
             SupportDeveloperEvent.NavigateBack -> onBack()
@@ -174,6 +178,7 @@ private fun UnavailableCard(
             modifier = Modifier.fillMaxWidth().padding(AppSpacing.lg),
             verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
         ) {
+            DaysMascot(mascot = Mascot.FACE_WORRIED, size = 64.dp, contentDescription = null)
             Text(
                 text = stringResource(message),
                 style = AppThemeTokens.typography.bodyMd,

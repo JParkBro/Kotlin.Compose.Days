@@ -13,15 +13,20 @@ import app.cash.turbine.test
 import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.appupdate.testing.FakeAppUpdateManager
 import com.google.android.play.core.install.model.AppUpdateType
+import jpark.bro.days.core.testing.FakeSettingsRepository
 import jpark.bro.days.core.testing.MainDispatcherRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
+import java.time.Clock
+import java.time.LocalDate
+import java.time.ZoneId
 
 // DaysApplication(Firebase 초기화)을 띄우지 않는다
 @RunWith(AndroidJUnit4::class)
@@ -31,7 +36,12 @@ class UpdateViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val appUpdateManager = FakeAppUpdateManager(ApplicationProvider.getApplicationContext())
-    private val viewModel by lazy { UpdateViewModel(appUpdateManager) }
+    private val settingsRepository = FakeSettingsRepository()
+    private val viewModel by lazy { viewModelOn(TODAY) }
+
+    /** 앱을 새로 연 것처럼 [date]에 ViewModel을 만든다 */
+    private fun viewModelOn(date: LocalDate) =
+        UpdateViewModel(appUpdateManager, settingsRepository, Clock.fixed(date.atStartOfDay(SEOUL).toInstant(), SEOUL))
 
     @Test
     fun `새 버전이 없으면 아무것도 묻지 않음`() {
@@ -61,6 +71,33 @@ class UpdateViewModelTest {
         idle()
 
         assertEquals(UpdatePrompt.None, viewModel.state.value.prompt)
+    }
+
+    @Test
+    fun `업데이트 안내를 미루면 그날 다시 열어도 묻지 않음`() {
+        appUpdateManager.setUpdateAvailable(NEW_VERSION_CODE)
+        viewModel.onAction(UpdateAction.AppStarted)
+        idle()
+        viewModel.onAction(UpdateAction.UpdateDismissed)
+        assertEquals(TODAY, settingsRepository.updatePromptDismissedDate)
+
+        val reopened = viewModelOn(TODAY)
+        reopened.onAction(UpdateAction.AppStarted)
+        idle()
+
+        assertEquals(UpdatePrompt.None, reopened.state.value.prompt)
+    }
+
+    @Test
+    fun `업데이트 안내를 미룬 다음 날 열면 다시 물음`() {
+        settingsRepository.updatePromptDismissedDate = TODAY
+        appUpdateManager.setUpdateAvailable(NEW_VERSION_CODE)
+
+        val nextDay = viewModelOn(TODAY.plusDays(1))
+        nextDay.onAction(UpdateAction.AppStarted)
+        idle()
+
+        assertTrue(nextDay.state.value.prompt is UpdatePrompt.UpdateAvailable)
     }
 
     @Test
@@ -121,6 +158,7 @@ class UpdateViewModelTest {
 
         viewModel.onAction(UpdateAction.InstallDismissed)
         assertEquals(UpdatePrompt.None, viewModel.state.value.prompt)
+        assertNull(settingsRepository.updatePromptDismissedDate)
 
         viewModel.onAction(UpdateAction.AppResumed)
         idle()
@@ -171,5 +209,7 @@ class UpdateViewModelTest {
 
     private companion object {
         const val NEW_VERSION_CODE = 100
+        val TODAY: LocalDate = LocalDate.of(2026, 11, 5)
+        val SEOUL: ZoneId = ZoneId.of("Asia/Seoul")
     }
 }

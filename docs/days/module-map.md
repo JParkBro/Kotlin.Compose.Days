@@ -39,7 +39,7 @@ days/
 │  ├─ designsystem/   AppColors(27 토큰) · 8 팔레트, 공통 컴포넌트
 │  ├─ ui/             MviViewModel, ObserveEvents, DdayRow · 뱃지 등 공유 UI
 │  ├─ database/       Room (user, item, couple, user_item_pref, item_reminder, image, anniversary_hide, activity_log, widget_config, sync_cursor)
-│  ├─ datastore/      테마 · 모드, 온보딩 완료 여부
+│  ├─ datastore/      테마 · 모드, 온보딩 완료 여부, 인앱 업데이트 안내 미룬 날
 │  ├─ firebase/       Auth, Firestore 원격 데이터 소스, Remote Config, App Check
 │  ├─ network/        Ktor: 외부 HTTP가 필요할 때 (카카오 토큰 발급은 Functions callable이라 core:firebase)
 │  ├─ data/           Repository: Item, Couple, User, Image, Settings

@@ -3,6 +3,7 @@ package jpark.bro.days.core.data.repository
 import jpark.bro.days.core.model.NotificationSettings
 import jpark.bro.days.core.model.ThemeSetting
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
 
 interface SettingsRepository {
     /** 저장된 테마 */
@@ -26,4 +27,9 @@ interface SettingsRepository {
     fun observeCoupleBannerDismissed(): Flow<Boolean>
 
     suspend fun dismissCoupleBanner(): Result<Unit>
+
+    /** 인앱 업데이트 안내에서 마지막으로 "나중에"를 누른 날 (기기에만 저장). 그날은 다시 묻지 않는다 */
+    suspend fun updatePromptDismissedDate(): Result<LocalDate?>
+
+    suspend fun setUpdatePromptDismissedDate(date: LocalDate): Result<Unit>
 }

@@ -266,6 +266,8 @@ CSS 변수 이름은 `--color-{토큰}` 형식입니다.
 
 Apple·Google 로그인 버튼은 각 사의 가이드라인 색을 따릅니다.
 
+마스코트(`DaysMascot`)는 고정 색(보라) 픽셀아트 비트맵이라 테마 토큰 대상이 아닙니다. 다크 모드에서도 외곽선(`#150F33`)이 보이도록 항상 `primary-soft` 원 위에 그립니다 (11장).
+
 ## 5. 사용 규칙
 
 ### 5.1 primary는 화면당 한두 곳만
@@ -435,9 +437,16 @@ WCAG 기준: 일반 텍스트 4.5:1 이상, 큰 텍스트(24px 이상 또는 18.
 | `DaysBars.kt` | `DaysTopBar(isScrolled)` · `DaysBottomBar` | 상단 헤더 · 하단 탭바 |
 | `DaysBottomSheet.kt` | `DaysBottomSheet` · `DaysSheetHandle` | 바텀시트 · 드래그 핸들 |
 | `DaysItemIcon.kt` | `DaysItemIcon(icon, color)` · `itemColor(color)` · `ItemIcon.iconRes` | 항목 아이콘 · 색 (product-spec 4-5). 항목 색 테마의 primary-soft 배경 + primary 아이콘 |
-| `DaysFeedback.kt` · `DaysInfoBoxTone.kt` | `DaysInfoBox(TIP · WARNING)` · `DaysToast` · `DaysToastHost` | 안내 박스 · 토스트 |
+| `DaysFeedback.kt` · `DaysInfoBoxTone.kt` | `DaysInfoBox(TIP · WARNING)` · `DaysToast(mascot)` · `DaysToastHost` · `DaysToastVisuals` | 안내 박스 · 토스트 (마스코트를 같이 띄우려면 `showSnackbar(DaysToastVisuals(message, mascot))`) |
+| `DaysMascot.kt` | `DaysMascot(mascot, size)` · `DaysMascotLoading` · `Mascot` | 마스코트 (아래) |
 
 화면 전용 모양(히어로 카드, 캘린더 날짜 셀)은 각 feature에 둡니다.
+
+**마스코트** (`DaysMascot.kt`, 이미지 `core/designsystem/src/main/res/drawable-nodpi/mascot_*.png`)
+- 80×80px 픽셀아트. `primary-soft` 원(`size`) 안에 원의 80% 안에 들어가는 가장 큰 **정수 배율**로, 보간 없이(`FilterQuality.None`) 그립니다. 표정(`FACE_*`)은 아래가 잘린 상반신이라 원을 꽉 채워 원 아래에 붙입니다(잘린 부분이 원 테두리에 가려짐). 기기 밀도에 맞춰 늘리면 픽셀이 들쭉날쭉해져서 `drawable-nodpi`에 둡니다.
+- 원본 · 정리 규칙은 저장소 밖 `Mascot/` 폴더(README)에 있습니다. 쓰는 그림만 리소스로 넣습니다.
+- 쓰는 곳: 로딩(`DaysMascotLoading`, 기본 120dp, 통통 튀기 2프레임 300ms · 시스템 애니메이션을 끄면 멈춤 · 접근성 "불러오는 중") — 정책 문서 · 다른 앱 둘러보기 · 커플 코드 발급. 빈 상태 — 홈(`WAVE`) · 알림(`FACE_CONTENT`) · 캘린더 목록(`FACE_NEUTRAL`) · 위젯 설정(`FACE_SMILE`). 실패 — 정책 문서 · 다른 앱 둘러보기 · 후원 상품 없음(`FACE_WORRIED`). 온보딩 소개(`WAVE` · `JUMP` · `FACE_SHY`). 후원 감사 토스트(`JUMP`).
+- 옆 글자가 상황을 설명하면 `contentDescription = null`.
 
 외부 웹 페이지는 `core:ui`의 `DaysWebView`(배경 `bg`, https 한 사이트만 · Play 스토어 링크는 스토어로 · 그 밖은 막음, 파일 접근 · JS 인터페이스 없음)로 엽니다 (다른 앱 둘러보기, 이후 정책 문서).
 

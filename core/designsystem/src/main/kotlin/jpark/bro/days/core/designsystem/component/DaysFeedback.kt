@@ -8,8 +8,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarVisuals
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -60,11 +62,12 @@ fun DaysInfoBox(
     }
 }
 
-/** 토스트: text-primary 배경 + bg 글자 + shadow */
+/** 토스트: text-primary 배경 + bg 글자 + shadow. [mascot]이 있으면 앞에 작게 보여준다 (후원 감사 등) */
 @Composable
 fun DaysToast(
     message: String,
     modifier: Modifier = Modifier,
+    mascot: Mascot? = null,
 ) {
     val colors = AppThemeTokens.colors
     Box(
@@ -77,8 +80,24 @@ fun DaysToast(
                 .padding(horizontal = AppSpacing.lg, vertical = AppSpacing.md),
         contentAlignment = Alignment.Center,
     ) {
-        Text(text = message, style = AppThemeTokens.typography.bodyMd, color = colors.bg)
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(AppSpacing.md),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (mascot != null) DaysMascot(mascot = mascot, size = 40.dp, contentDescription = null)
+            Text(text = message, style = AppThemeTokens.typography.bodyMd, color = colors.bg)
+        }
     }
+}
+
+/** 마스코트가 함께 뜨는 토스트. `hostState.showSnackbar(DaysToastVisuals(message, Mascot.JUMP))` */
+data class DaysToastVisuals(
+    override val message: String,
+    val mascot: Mascot,
+) : SnackbarVisuals {
+    override val actionLabel: String? get() = null
+    override val withDismissAction: Boolean get() = false
+    override val duration: SnackbarDuration get() = SnackbarDuration.Short
 }
 
 /** 스낵바 자리에 [DaysToast]를 띄운다. 화면 Root에서 SnackbarHost 대신 쓴다 */
@@ -87,7 +106,9 @@ fun DaysToastHost(
     hostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
-    SnackbarHost(hostState = hostState, modifier = modifier) { data -> DaysToast(message = data.visuals.message) }
+    SnackbarHost(hostState = hostState, modifier = modifier) { data ->
+        DaysToast(message = data.visuals.message, mascot = (data.visuals as? DaysToastVisuals)?.mascot)
+    }
 }
 
 @ComponentPreviews
@@ -100,5 +121,6 @@ private fun DaysFeedbackPreview() {
             tone = DaysInfoBoxTone.WARNING,
         )
         DaysToast(message = "저장했어요")
+        DaysToast(message = "후원해 주셔서 고마워요", mascot = Mascot.JUMP)
     }
 }

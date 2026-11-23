@@ -25,6 +25,7 @@ import jpark.bro.days.core.designsystem.AppThemeTokens
 import jpark.bro.days.core.designsystem.component.DaysCard
 import jpark.bro.days.core.designsystem.component.DaysInfoBox
 import jpark.bro.days.core.designsystem.component.DaysInfoBoxTone
+import jpark.bro.days.core.designsystem.component.DaysMascotLoading
 import jpark.bro.days.core.designsystem.component.DaysPrimaryButton
 import jpark.bro.days.core.designsystem.component.DaysSoftButton
 import jpark.bro.days.core.model.PairCode
@@ -87,7 +88,7 @@ internal fun MyCodeTab(
     when {
         state.isIssuing -> {
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = AppThemeTokens.colors.primary)
+                DaysMascotLoading()
             }
         }
 

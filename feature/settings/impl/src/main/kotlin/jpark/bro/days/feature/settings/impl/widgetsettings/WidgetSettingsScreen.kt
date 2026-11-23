@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import jpark.bro.days.core.designsystem.AppSpacing
 import jpark.bro.days.core.designsystem.AppTheme
@@ -28,10 +29,12 @@ import jpark.bro.days.core.designsystem.component.DaysIconBadgeTone
 import jpark.bro.days.core.designsystem.component.DaysIconButton
 import jpark.bro.days.core.designsystem.component.DaysInfoBox
 import jpark.bro.days.core.designsystem.component.DaysListItem
+import jpark.bro.days.core.designsystem.component.DaysMascot
 import jpark.bro.days.core.designsystem.component.DaysPrimaryButton
 import jpark.bro.days.core.designsystem.component.DaysSection
 import jpark.bro.days.core.designsystem.component.DaysToastHost
 import jpark.bro.days.core.designsystem.component.DaysTopBar
+import jpark.bro.days.core.designsystem.component.Mascot
 import jpark.bro.days.core.designsystem.preview.ScreenPreviews
 import jpark.bro.days.core.model.WidgetBackground
 import jpark.bro.days.core.model.WidgetConfig
@@ -101,6 +104,7 @@ private fun WidgetSettingsScreen(
                 verticalArrangement = Arrangement.spacedBy(AppSpacing.lg),
             ) {
                 if (state.widgets.isEmpty()) {
+                    DaysMascot(mascot = Mascot.FACE_SMILE, size = 96.dp, contentDescription = null)
                     Text(
                         text = stringResource(R.string.settings_widget_empty),
                         style = AppThemeTokens.typography.headlineSm,

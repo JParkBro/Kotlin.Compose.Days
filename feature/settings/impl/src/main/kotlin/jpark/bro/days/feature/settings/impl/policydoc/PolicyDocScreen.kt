@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import jpark.bro.days.core.designsystem.AppSpacing
 import jpark.bro.days.core.designsystem.AppTheme
@@ -25,8 +26,11 @@ import jpark.bro.days.core.designsystem.AppThemeTokens
 import jpark.bro.days.core.designsystem.LocalIsDarkTheme
 import jpark.bro.days.core.designsystem.component.DaysButtonSize
 import jpark.bro.days.core.designsystem.component.DaysIconButton
+import jpark.bro.days.core.designsystem.component.DaysMascot
+import jpark.bro.days.core.designsystem.component.DaysMascotLoading
 import jpark.bro.days.core.designsystem.component.DaysSoftButton
 import jpark.bro.days.core.designsystem.component.DaysTopBar
+import jpark.bro.days.core.designsystem.component.Mascot
 import jpark.bro.days.core.designsystem.preview.ScreenPreviews
 import jpark.bro.days.core.ui.DaysWebView
 import jpark.bro.days.core.ui.ObserveEvents
@@ -117,7 +121,7 @@ private fun PolicyDocScreen(
             )
             when {
                 state.isFailed -> FailedMessage(onRetry = { onAction(PolicyDocAction.RetryClicked) })
-                state.isLoading -> CircularProgressIndicator(color = colors.primary)
+                state.isLoading -> DaysMascotLoading()
                 else -> Unit
             }
         }
@@ -131,6 +135,7 @@ private fun FailedMessage(onRetry: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(AppSpacing.md),
     ) {
+        DaysMascot(mascot = Mascot.FACE_WORRIED, size = 96.dp, contentDescription = null)
         Text(
             text = stringResource(R.string.settings_policy_doc_failed),
             style = AppThemeTokens.typography.bodyMd,

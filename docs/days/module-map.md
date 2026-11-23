@@ -136,7 +136,7 @@ days/
 
 | 모듈 | 정의 위치 |
 |---|---|
-| `appModule` | app — Navigator, 결과 핸들러, 전체 `includes` |
+| `appModule` | app — Navigator, 결과 핸들러, 인앱 업데이트(`AppUpdateManager` · `UpdateViewModel`, `in-app-update.md`), 전체 `includes` |
 | `databaseModule`, `datastoreModule` | core |
 | `firebaseModule` | core:firebase — FirebaseAuth, Firestore, RemoteConfig, 원격 데이터 소스 |
 | `networkModule` | core:network — HttpClient (외부 HTTP가 생기면) |

@@ -31,6 +31,7 @@
 | 동기화 · 커플 연결 | `docs/days/sync-and-pairing.md` |
 | Firebase · Functions · 과금 | `docs/days/infra-and-billing-protection.md`, `docs/days/firebase-cost-strategy.md` |
 | 광고 · 후원 | `docs/days/ads-strategy.md` |
+| 인앱 업데이트 (Play In-App Updates) 수정 | `docs/days/in-app-update.md` |
 | 브랜치 · 커밋 · PR | `docs/common/GIT_CONVENTIONS.md` |
 | 앱 출시 에셋 (스토어 아이콘 · 대표 그래픽 · 스크린샷) | `docs/common/STORE_ASSETS.md` (절차), `store-assets/README.md` (이 앱의 화면 · 문구 · 다시 만드는 명령) |
 
@@ -143,6 +144,11 @@ di/{Feature}Module.kt  viewModelOf + navigation<{Feature}Key>
 - `@KoinExperimentalAPI` 사용 시 `@OptIn`은 모듈 정의 파일에만.
 - Koin 모듈을 추가 · 수정하면 `KoinModulesTest`(`verify()`)가 통과해야 한다.
 - 온보딩 완료 · 로그아웃 후 목적지는 impl이 아니라 app의 결과 핸들러가 결정한다.
+
+### 인앱 업데이트
+
+- Play In-App Updates(FLEXIBLE만, `appUpdate = "2.1.0"`). 앱 시작 시 컨펌 다이얼로그 → 수락하면 백그라운드 다운로드 → 끝나면 재시작 컨펌 후 설치. **컨펌 없이 업데이트 · 재시작하지 않는다.**
+- app 모듈(`app/.../update/`)에만 둔다. 판단은 `UpdateViewModel`, Play 호출(`startUpdateFlowForResult` · `completeUpdate`)은 MainActivity가 `UpdateEvent`로 받아서 한다. 수정 전에 `docs/days/in-app-update.md`를 본다.
 
 ### 데이터
 

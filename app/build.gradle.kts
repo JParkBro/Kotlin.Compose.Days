@@ -70,8 +70,13 @@ dependencies {
     implementation(libs.bundles.navigation3)
     implementation(libs.bundles.koin.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
+    // 인앱 업데이트 (docs/days/in-app-update.md)
+    implementation(libs.app.update)
+    implementation(libs.app.update.ktx)
 
     // core
+    implementation(projects.core.common)
+    implementation(projects.core.ui)
     implementation(projects.core.navigation)
     implementation(projects.core.designsystem)
     implementation(projects.core.model)
@@ -101,4 +106,7 @@ dependencies {
     implementation(projects.feature.notifications.impl)
     implementation(projects.feature.settings.api)
     implementation(projects.feature.settings.impl)
+
+    testImplementation(libs.bundles.robolectric)
+    testImplementation(projects.core.testing)
 }

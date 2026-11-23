@@ -147,7 +147,7 @@ di/{Feature}Module.kt  viewModelOf + navigation<{Feature}Key>
 
 ### 인앱 업데이트
 
-- Play In-App Updates(FLEXIBLE만, `appUpdate = "2.1.0"`). 앱 시작 시 컨펌 다이얼로그 → 수락하면 백그라운드 다운로드 → 끝나면 재시작 컨펌 후 설치. **컨펌 없이 업데이트 · 재시작하지 않는다.**
+- Play In-App Updates(FLEXIBLE만, `appUpdate = "2.1.0"`). 앱 시작 시 컨펌 다이얼로그 → 수락하면 백그라운드 다운로드 → 끝나면 재시작 컨펌 후 설치. **컨펌 없이 업데이트 · 재시작하지 않는다.** "업데이트 안내"를 미루면 그날은 다시 묻지 않고(`AppUpdateDataStore` 날짜), "설치 준비 완료"는 미뤄도 앱으로 돌아올 때마다 다시 묻는다.
 - app 모듈(`app/.../update/`)에만 둔다. 판단은 `UpdateViewModel`, Play 호출(`startUpdateFlowForResult` · `completeUpdate`)은 MainActivity가 `UpdateEvent`로 받아서 한다. 수정 전에 `docs/days/in-app-update.md`를 본다.
 
 ### 데이터

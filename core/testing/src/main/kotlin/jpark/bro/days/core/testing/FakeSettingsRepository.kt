@@ -6,6 +6,7 @@ import jpark.bro.days.core.model.ThemeSetting
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import java.time.LocalDate
 
 class FakeSettingsRepository(
     initial: ThemeSetting = ThemeSetting(),
@@ -17,6 +18,9 @@ class FakeSettingsRepository(
 
     /** 현재 미리보기 값 (null이면 미리보기 아님) */
     val themePreview: ThemeSetting? get() = preview.value
+
+    /** 인앱 업데이트 안내에서 "나중에"를 누른 날 */
+    var updatePromptDismissedDate: LocalDate? = null
 
     /** true면 다음 저장이 실패한다 */
     var failNextSave: Boolean = false
@@ -54,6 +58,13 @@ class FakeSettingsRepository(
 
     override suspend fun dismissCoupleBanner(): Result<Unit> {
         coupleBannerDismissed.value = true
+        return Result.success(Unit)
+    }
+
+    override suspend fun updatePromptDismissedDate(): Result<LocalDate?> = Result.success(updatePromptDismissedDate)
+
+    override suspend fun setUpdatePromptDismissedDate(date: LocalDate): Result<Unit> {
+        updatePromptDismissedDate = date
         return Result.success(Unit)
     }
 }
